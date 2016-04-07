@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group
+        android:id="@+id/nav_tabs_group"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_steps_list"
+            android:icon="@drawable/ic_numbered_list"
+            android:title="@string/nav_drawer_step_list"/>
+        <item
+            android:id="@+id/nav_news_list"
+            android:icon="@drawable/ic_newspaper"
+            android:title="@string/nav_drawer_news_list"/>
+        <item
+            android:id="@+id/nav_credits"
+            android:icon="@drawable/ic_emoticon_tongue"
+            android:title="@string/nav_drawer_credits"/>
+
+    </group>
+
+
+    <group
+        android:id="@+id/nav_settings_group"
+        android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_send_feedback"
+            android:icon="@drawable/ic_feedback"
+            android:title="@string/nav_drawer_feedback"/>
+        <item
+            android:id="@+id/nav_opensource_link"
+            android:icon="@drawable/ic_github"
+            android:title="@string/nav_drawer_opensource"/>
+    </group>
+
+    <item android:title="@string/nav_drawer_sync_title">
+        <menu>
+            <item
+                android:id="@+id/nav_last_update"
+                android:icon="@drawable/ic_sync"
+                android:title="@string/sync_never_updated"
+                />
+        </menu>
+    </item>
+
+</menu>

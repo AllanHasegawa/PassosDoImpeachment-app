@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                 xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                 xmlns:tools="http://schemas.android.com/tools"
+                                                 android:layout_width="match_parent"
+                                                 android:layout_height="match_parent"
+                                                 android:fitsSystemWindows="true"
+                                                 tools:context=".activities.StepDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:id="@+id/detail_toolbar_fl"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:layout_margin="0dp"
+                android:background="@color/colorPrimary"
+                android:padding="0dp">
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="32dp"
+                    android:padding="0dp">
+
+                    <FrameLayout
+                        android:id="@+id/detail_pos_number_fl"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginTop="16dp">
+                        <!-- Can't "find" views when <include> has id -->
+                        <include
+                            layout="@layout/view_position_number"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"/>
+                    </FrameLayout>
+
+
+                    <TextView
+                        android:id="@+id/detail_toolbar_expanded_date_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/detail_pos_number_fl"
+                        android:layout_marginLeft="8dp"
+                        android:layout_toRightOf="@id/detail_pos_number_fl"
+                        android:text="4 de abril de 2016"
+                        android:textColor="@color/colorAccent"
+                        android:textSize="14sp"/>
+
+                    <TextView
+                        android:id="@+id/detail_toolbar_expanded_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/detail_pos_number_fl"
+                        android:layout_marginTop="8dp"
+                        android:text="23 de 43"
+                        android:textSize="18sp"/>
+
+                    <ProgressBar
+                        android:id="@+id/detail_toolbar_expanded_pb"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="170dp"
+                        android:layout_height="18dp"
+                        android:layout_below="@+id/detail_toolbar_expanded_tv"
+                        android:indeterminate="false"
+                        android:max="43"
+                        android:progress="23"/>
+
+                    <ImageView
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="32dp"
+                        app:srcCompat="@drawable/app_icon_plain"/>
+
+                </RelativeLayout>
+            </FrameLayout>
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/detail_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="@android:color/transparent"
+                android:theme="@style/AppTheme"
+                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        </FrameLayout>
+
+        <FrameLayout
+            android:id="@+id/fragmentContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </LinearLayout>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/detail_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:srcCompat="@drawable/ic_share"
+        app:layout_anchor="@id/detail_toolbar_fl"
+        app:layout_anchorGravity="bottom|end"/>
+
+</android.support.design.widget.CoordinatorLayout>
