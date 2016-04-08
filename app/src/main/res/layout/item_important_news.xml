@@ -28,8 +28,7 @@
                 style="@style/DetailLinkTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#AFFF"
-                android:text="AShudAIUhdaljd lakjd lakjsd aojidaisjd"
+                android:textColor="#DFFF"
                 />
 
             <TextView
@@ -37,8 +36,7 @@
                 style="@style/DetailLinkUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#9FFF"
-                android:text="oiasdjfo asd jfoasidf asdoifj sadfij"
+                android:textColor="#CFFF"
                 />
         </LinearLayout>
 
