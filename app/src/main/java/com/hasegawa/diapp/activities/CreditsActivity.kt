@@ -29,6 +29,7 @@ import android.view.MenuItem
 import android.view.View
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.string
+import timber.log.Timber
 
 class CreditsActivity : BaseNavDrawerActivity() {
 
@@ -60,6 +61,10 @@ class CreditsActivity : BaseNavDrawerActivity() {
                 this, drawer, toolbar, string.nav_drawer_open, string.nav_drawer_close)
         drawer.setDrawerListener(toggle)
         toggle.syncState()
+
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
 
         navView.setNavigationItemSelectedListener(this)
         navView.setCheckedItem(R.id.nav_credits)

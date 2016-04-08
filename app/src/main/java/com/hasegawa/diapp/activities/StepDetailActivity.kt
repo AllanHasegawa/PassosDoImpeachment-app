@@ -81,6 +81,8 @@ class StepDetailActivity : BaseNavDrawerActivity() {
         toolbarExpandedPb = findViewById(R.id.detail_toolbar_expanded_pb) as ProgressBar
         navView = findViewById(R.id.detail_nav_view) as NavigationView
 
+        setSupportActionBar(toolbar)
+
         val toggle = ActionBarDrawerToggle(
                 this, drawer, toolbar,
                 R.string.nav_drawer_open, R.string.nav_drawer_close)
@@ -89,9 +91,10 @@ class StepDetailActivity : BaseNavDrawerActivity() {
 
         navView.setNavigationItemSelectedListener(this)
 
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayShowHomeEnabled(true)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
 
         fab.setOnClickListener({ launchShareIntent() })
 
@@ -112,6 +115,14 @@ class StepDetailActivity : BaseNavDrawerActivity() {
         stepSubscription?.unsubscribeIfSubscribed()
         numberOfStepsSubscription?.unsubscribeIfSubscribed()
         stepDetailFragment = null
+    }
+
+    override fun onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
+        }
     }
 
     override fun getNavigationView(): NavigationView {

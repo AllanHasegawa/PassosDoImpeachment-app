@@ -17,7 +17,6 @@ package com.hasegawa.diapp.activities
 
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
@@ -33,7 +32,6 @@ import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
-import android.util.DisplayMetrics
 import android.view.MenuItem
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
@@ -105,6 +103,9 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         toolbarExpandedTv = findViewById(R.id.main_toolbar_expanded_tv) as TextView
         toolbarProgressBar = findViewById(R.id.main_toolbar_expanded_pb) as ProgressBar
 
+        setSupportActionBar(toolbar)
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
+
         if (findViewById(R.id.main_fragment_container) != null) {
             Timber.d("Tablet mode on!")
             isTablet = true
@@ -120,10 +121,10 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                     R.string.nav_drawer_open, R.string.nav_drawer_close)
             drawer?.setDrawerListener(toggle)
             toggle.syncState()
+
+            toolbar.setNavigationOnClickListener { drawer?.openDrawer(GravityCompat.START) }
         }
 
-        setSupportActionBar(toolbar)
-        supportActionBar!!.setDisplayShowTitleEnabled(false)
         navView.setNavigationItemSelectedListener(this)
 
         fab.setOnClickListener({ launchShareIntent() })

@@ -15,12 +15,16 @@
  ******************************************************************************/
 package com.hasegawa.diapp
 
+import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
+import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withClassName
+import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withParent
 import android.support.test.espresso.matcher.ViewMatchers.withText
@@ -28,11 +32,11 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.adapters.StepsRvAdapter
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.containsString
 import org.junit.Assume
-import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -149,5 +153,81 @@ class MainActivityTest {
         onView(allOf(withId(R.id.view_position_tv),
                 withParent(withParent(withId(R.id.detail_pos_number_fl)))))
                 .check(matches(withText("2")))
+    }
+
+    @Test
+    fun checkHamburgerIconIsShowing() {
+        phoneMode()
+        onView(withContentDescription(R.string.nav_drawer_open)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun checkHamburgerIconOpensNavDrawer() {
+        phoneMode()
+        onView(withContentDescription(R.string.nav_drawer_open)).perform(ViewActions.click())
+        onView(withText(R.string.nav_drawer_news_list)).check(matches(isDisplayed()))
+    }
+
+
+    @Test
+    fun goToCreditsAndComeBackWithUpButton() {
+        phoneMode()
+        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
+
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(
+                ViewActions.click())
+
+        onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToCreditsAndComeBackWithBackButton() {
+        phoneMode()
+        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
+
+        pressBack()
+
+        onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToDetailAndComeBackWithUpButton() {
+        phoneMode()
+        onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
+        Thread.sleep(300) // add animation time
+        onView(withId(R.id.main_steps_rv)).perform(
+                RecyclerViewActions.scrollToPosition<StepsRvAdapter.StepViewHolder>(2))
+        onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
+                .perform(ViewActions.click())
+
+        onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(
+                ViewActions.click())
+
+        onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToDetailAndComeBackWithBackButton() {
+        phoneMode()
+        onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
+        Thread.sleep(300) // add animation time
+        onView(withId(R.id.main_steps_rv)).perform(
+                RecyclerViewActions.scrollToPosition<StepsRvAdapter.StepViewHolder>(2))
+        onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
+                .perform(ViewActions.click())
+
+        pressBack()
+
+        onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun openDrawerAndPressBackButtonToCloseIt() {
+        phoneMode()
+        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        Espresso.pressBack()
+        onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
     }
 }
