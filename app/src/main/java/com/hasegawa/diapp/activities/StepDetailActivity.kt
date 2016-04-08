@@ -98,11 +98,14 @@ class StepDetailActivity : BaseNavDrawerActivity() {
 
         fab.setOnClickListener({ launchShareIntent() })
 
-        if (stepDetailFragment == null) {
+        if (savedInstanceState == null) {
             stepDetailFragment = StepDetailFragment.newInstance(false)
             supportFragmentManager.beginTransaction()
-                    .add(R.id.fragmentContainer, stepDetailFragment)
+                    .add(R.id.detail_fragment_container, stepDetailFragment)
                     .commit()
+        } else {
+            stepDetailFragment = supportFragmentManager.findFragmentById(
+                    R.id.detail_fragment_container) as StepDetailFragment
         }
 
         loadStep()
@@ -208,14 +211,14 @@ class StepDetailActivity : BaseNavDrawerActivity() {
     }
 
     private fun loadStep() {
-        val stepId = intent.getStringExtra(INTENT_STEP_ID_KEY)
+        val stepPosition = intent.getIntExtra(INTENT_STEP_POSITION_KEY, 1)
         stepSubscription =
                 DiApp.diProvider.get()
                         .`object`(Step::class.java)
                         .withQuery(Query.builder()
                                 .uri(StepsContract.URI)
-                                .where("${StepsContract.COL_ID}=?")
-                                .whereArgs(stepId).build())
+                                .where("${StepsContract.COL_POSITION}=?")
+                                .whereArgs(stepPosition).build())
                         .prepare()
                         .asRxObservable()
                         .observeOn(AndroidSchedulers.mainThread())
@@ -241,7 +244,7 @@ class StepDetailActivity : BaseNavDrawerActivity() {
                             }
 
                             override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error loading step with id $stepId")
+                                Timber.d(e, "Error loading step with id $stepPosition")
                             }
 
                             override fun onCompleted() {
@@ -250,15 +253,15 @@ class StepDetailActivity : BaseNavDrawerActivity() {
     }
 
     companion object {
-        private val INTENT_STEP_ID_KEY = "stepId"
+        private val INTENT_STEP_POSITION_KEY = "step_position"
 
         fun launch(activity: Activity, step: Step) {
             val intent = Intent(activity, StepDetailActivity::class.java)
             if (activity is MainActivity) {
-                intent.putExtra(INTENT_STEP_ID_KEY, step.id)
+                intent.putExtra(INTENT_STEP_POSITION_KEY, step.position)
                 activity.startActivityForResult(intent, 0x42)
             } else {
-                activity.startActivity(intent)
+                throw RuntimeException("Only MainActivity should call this function.")
             }
         }
     }
