@@ -17,6 +17,7 @@ package com.hasegawa.diapp.views
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
+import android.support.v7.widget.CardView
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
@@ -27,11 +28,14 @@ import com.hasegawa.diapp.R
 import com.hasegawa.diapp.models.Step
 
 class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, attrs) {
-    lateinit var positionTv: TextView
-    lateinit var positionFl: FrameLayout
-    lateinit var possibleDateTv: TextView
-    lateinit var titleTv: TextView
-    lateinit var timeCompletedTv: TextView
+    private lateinit var positionTv: TextView
+    private lateinit var positionFl: FrameLayout
+    private lateinit var possibleDateTv: TextView
+    private lateinit var titleTv: TextView
+    private lateinit var timeCompletedTv: TextView
+
+    private var colorSelected: Int = 0
+    private var colorUnselected: Int = 0
 
     init {
         inflate(ctx, R.layout.item_step, this)
@@ -48,6 +52,11 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
         possibleDateTv = this.findViewById(R.id.step_possible_date_tv) as TextView
         titleTv = this.findViewById(R.id.step_title_tv) as TextView
         timeCompletedTv = this.findViewById(R.id.step_completed_tv) as TextView
+
+        val colorStateList =
+                ContextCompat.getColorStateList(context, R.color.selector_step_selection_color)
+        colorSelected = colorStateList.getColorForState(View.SELECTED_STATE_SET, 0)
+        colorUnselected = colorStateList.defaultColor
     }
 
     var step: Step? = null
@@ -78,6 +87,8 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
 
     override fun setSelected(selected: Boolean) {
         super.setSelected(selected)
+        (getChildAt(0) as CardView).setCardBackgroundColor(
+                if (selected) colorSelected else colorUnselected)
         if (selected) {
             shakeShake()
         }
