@@ -183,8 +183,8 @@ class MainActivityIntentsTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeLeft())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(3))
-        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(3,
+                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(2))
+        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(2,
                 R.id.important_news_share_bt)).perform(ViewActions.click())
 
         Intents.intended(allOf(
@@ -217,13 +217,13 @@ class MainActivityIntentsTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeLeft())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(3))
+                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(2))
         var url: String = ""
-        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(3,
+        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(2,
                 R.id.important_news_url_tv)).perform(TestUtils.customAction {
             url = (it!! as TextView).text.toString()
         })
-        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(3,
+        onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(2,
                 R.id.important_news_open_bt)).perform(ViewActions.click())
 
         Intents.intended(

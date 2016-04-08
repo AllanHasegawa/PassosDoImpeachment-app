@@ -92,7 +92,7 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                             val arr = ArrayList<Item>(it.size + 2)
                             if (!isTablet) {
                                 arr.add(Item(TYPE_SPACE, null))
-                                arr.add(Item(TYPE_BEGINNING, null))
+//                                arr.add(Item(TYPE_BEGINNING, null))
                             }
                             arr.addAll(it.map { Item(TYPE_STEP, it) })
 

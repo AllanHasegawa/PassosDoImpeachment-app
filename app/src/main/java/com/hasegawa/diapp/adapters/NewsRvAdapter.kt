@@ -78,7 +78,7 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
                             val arr = ArrayList<Item>(it.size + 2)
                             if (!isTablet) {
                                 arr.add(Item(TYPE_SPACE, null, null))
-                                arr.add(Item(TYPE_BEGINNING, null, null))
+//                                arr.add(Item(TYPE_BEGINNING, null, null))
                             }
                             for (date in it.keys) {
                                 arr.add(Item(TYPE_DATE, null, date))
