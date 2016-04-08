@@ -3,7 +3,10 @@
     <color name="colorPrimary">#FFC107</color>
     <color name="colorPrimaryDark">#FFA000</color>
     <color name="colorPrimaryLight">#FFECB3</color>
-    <color name="colorAccent">#795548</color>
+    <color name="colorSecondaryDark">#5D4037</color>
+    <color name="colorSecondary">#795548</color>
+    <color name="colorSecondaryLight">#D7CCC8</color>
+    <color name="colorAccent">#5C6BC0</color>
     <color name="colorPrimaryText">#A000</color>
     <color name="colorSecondaryText">#77000000</color>
     <color name="colorDivider">#B6B6B6</color>

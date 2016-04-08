@@ -51,7 +51,7 @@
                         android:layout_marginLeft="8dp"
                         android:layout_toRightOf="@id/detail_pos_number_fl"
                         android:text="4 de abril de 2016"
-                        android:textColor="@color/colorAccent"
+                        android:textColor="@color/colorSecondary"
                         android:textSize="14sp"/>
 
                     <TextView

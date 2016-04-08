@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@color/colorPrimary"
+            android:background="@color/colorSecondary"
             android:orientation="vertical">
 
             <TextView
@@ -28,6 +28,8 @@
                 style="@style/DetailLinkTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#AFFF"
+                android:text="AShudAIUhdaljd lakjd lakjsd aojidaisjd"
                 />
 
             <TextView
@@ -35,6 +37,8 @@
                 style="@style/DetailLinkUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="#9FFF"
+                android:text="oiasdjfo asd jfoasidf asdoifj sadfij"
                 />
         </LinearLayout>
 
