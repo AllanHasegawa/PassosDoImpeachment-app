@@ -75,22 +75,10 @@
             </FrameLayout>
 
             <TextView
-                style="@style/DetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/step_detail_title"/>
-
-            <TextView
                 android:id="@+id/detail_title_tv"
-                style="@style/DetailText"
+                style="@style/DetailTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-
-            <TextView
-                style="@style/DetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/step_detail_description"/>
 
             <TextView
                 android:id="@+id/detail_description_tv"
