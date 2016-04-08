@@ -26,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.R.layout
 import timber.log.Timber
 
 class CreditsFragment : Fragment() {
@@ -40,7 +39,7 @@ class CreditsFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val root = inflater!!.inflate(layout.fragment_credits, container, false)
+        val root = inflater!!.inflate(R.layout.fragment_credits, container, false)
 
         root.findViewById(R.id.credits_hase_email_bt).setOnClickListener({ sendHaseEmail() })
         root.findViewById(R.id.credits_hase_github_bt).setOnClickListener({ openHaseGithub() })
