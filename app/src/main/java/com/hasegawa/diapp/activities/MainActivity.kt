@@ -142,7 +142,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
             setupViewPager()
         } else {
             tmSetupMainFragment(savedInstanceState)
-            setupFirstStepSubscription()
+            tmSetupFirstStepSubscription()
         }
     }
 
@@ -174,7 +174,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         if (savedInstanceState == null) {
             navView.setCheckedItem(R.id.nav_steps_list)
             val mainFragment = MainFragment.newInstance(isTablet)
-            detailFragment = StepDetailFragment.newInstance(isTablet)
+            detailFragment = StepDetailFragment.newInstance(isTablet, 1)
             supportFragmentManager.beginTransaction()
                     .add(R.id.main_fragment_container, mainFragment, TM_MAIN_FRAG_TAG)
                     .add(R.id.detail_fragment_container, detailFragment, TM_DETAIL_FRAG_TAG)
@@ -186,7 +186,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     }
 
 
-    private fun setupFirstStepSubscription() {
+    private fun tmSetupFirstStepSubscription() {
         firstStepSubscription?.unsubscribeIfSubscribed()
         firstStepSubscription =
                 DiApp.diProvider.get()
@@ -206,8 +206,8 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                                 Timber.d(e, "Error loading first step.")
                             }
 
-                            override fun onNext(t: Step?) {
-                                detailFragment?.step = t
+                            override fun onNext(t: Step) {
+                                detailFragment?.stepPosition = t.position
                             }
                         })
     }
@@ -377,7 +377,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                     expandToolbar()
                 } else {
                     val mainFragment = MainFragment.newInstance(true)
-                    detailFragment = StepDetailFragment.newInstance(true)
+                    detailFragment = StepDetailFragment.newInstance(true, 1)
                     supportFragmentManager.beginTransaction()
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                             .replace(R.id.main_fragment_container, mainFragment)
@@ -385,7 +385,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                             .replace(R.id.detail_fragment_container, detailFragment)
                             .commit()
                     tmAdjustPanes(true)
-                    setupFirstStepSubscription()
+                    tmSetupFirstStepSubscription()
                 }
             }
             R.id.nav_news_list -> {
@@ -451,7 +451,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         if (!isTablet) {
             StepDetailActivity.launch(this, step)
         } else {
-            detailFragment?.step = step
+            detailFragment?.stepPosition = step.position
         }
     }
 

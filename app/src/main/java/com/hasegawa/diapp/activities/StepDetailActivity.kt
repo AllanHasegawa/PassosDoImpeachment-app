@@ -17,11 +17,13 @@ package com.hasegawa.diapp.activities
 
 import android.app.Activity
 import android.content.Intent
+import android.database.DataSetObserver
 import android.os.Bundle
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
@@ -32,7 +34,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.fragments.StepDetailFragment
+import com.hasegawa.diapp.adapters.StepDetailFragmentAdapter
 import com.hasegawa.diapp.models.DiContract.StepsContract
 import com.hasegawa.diapp.models.Step
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
@@ -42,7 +44,7 @@ import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 
-class StepDetailActivity : BaseNavDrawerActivity() {
+class StepDetailActivity : BaseNavDrawerActivity(), ViewPager.OnPageChangeListener {
     lateinit var drawer: DrawerLayout
 
     lateinit var positionFl: FrameLayout
@@ -52,20 +54,19 @@ class StepDetailActivity : BaseNavDrawerActivity() {
     lateinit var toolbarExpandedTv: TextView
     lateinit var toolbarExpandedPb: ProgressBar
     lateinit var toolbar: Toolbar
+    lateinit var viewPager: ViewPager
 
     lateinit var fab: FloatingActionButton
 
     lateinit var navView: NavigationView
 
-    private var stepDetailFragment: StepDetailFragment? = null
-
     private var numberOfSteps = 0
     private var thisStepNumber = 0
     private var numberOfStepsSubscription: Subscription? = null
-
-    private var stepSubscription: Subscription? = null
+    private lateinit var fragmentAdapter: StepDetailFragmentAdapter
 
     private var step: Step? = null
+    private var stepPosition: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +81,7 @@ class StepDetailActivity : BaseNavDrawerActivity() {
         toolbarExpandedTv = findViewById(R.id.detail_toolbar_expanded_tv) as TextView
         toolbarExpandedPb = findViewById(R.id.detail_toolbar_expanded_pb) as ProgressBar
         navView = findViewById(R.id.detail_nav_view) as NavigationView
+        viewPager = findViewById(R.id.detail_view_pager) as ViewPager
 
         setSupportActionBar(toolbar)
 
@@ -98,26 +100,37 @@ class StepDetailActivity : BaseNavDrawerActivity() {
 
         fab.setOnClickListener({ launchShareIntent() })
 
-        if (savedInstanceState == null) {
-            stepDetailFragment = StepDetailFragment.newInstance(false)
-            supportFragmentManager.beginTransaction()
-                    .add(R.id.detail_fragment_container, stepDetailFragment)
-                    .commit()
+        if (savedInstanceState != null) {
+            stepPosition = savedInstanceState.getInt(INTENT_STEP_POSITION_KEY, 1)
         } else {
-            stepDetailFragment = supportFragmentManager.findFragmentById(
-                    R.id.detail_fragment_container) as StepDetailFragment
+            stepPosition = intent.getIntExtra(INTENT_STEP_POSITION_KEY, 1)
         }
 
-        loadStep()
+        fragmentAdapter = StepDetailFragmentAdapter(supportFragmentManager)
+        fragmentAdapter.registerDataSetObserver(object : DataSetObserver() {
+            override fun onChanged() {
+                fragmentAdapter.stepsCache.forEachIndexed {
+                    i, step ->
+                    if (step.position == stepPosition) {
+                        viewPager.currentItem = i
+                    }
+                }
+            }
+        })
+        fragmentAdapter.notifyDataSetChanged()
+
+        viewPager.adapter = fragmentAdapter
+        viewPager.addOnPageChangeListener(this)
+
+
         loadNumberOfSteps()
         updateNavLastUpdateTitle()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stepSubscription?.unsubscribeIfSubscribed()
         numberOfStepsSubscription?.unsubscribeIfSubscribed()
-        stepDetailFragment = null
+        fragmentAdapter.close()
     }
 
     override fun onBackPressed() {
@@ -126,6 +139,10 @@ class StepDetailActivity : BaseNavDrawerActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putInt(INTENT_STEP_POSITION_KEY, stepPosition)
     }
 
     override fun getNavigationView(): NavigationView {
@@ -190,17 +207,17 @@ class StepDetailActivity : BaseNavDrawerActivity() {
     private fun loadNumberOfSteps() {
         numberOfStepsSubscription =
                 DiApp.diProvider.get()
-                        .listOfObjects(Step::class.java)
+                        .numberOfResults()
                         .withQuery(Query.builder().uri(StepsContract.URI).build())
                         .prepare()
                         .asRxObservable()
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<List<Step>> {
+                        .subscribe(object : Observer<Int> {
                             override fun onCompleted() {
                             }
 
-                            override fun onNext(t: List<Step>) {
-                                numberOfSteps = t.size
+                            override fun onNext(t: Int) {
+                                numberOfSteps = t
                                 updateProgressDisplay()
                             }
 
@@ -210,46 +227,37 @@ class StepDetailActivity : BaseNavDrawerActivity() {
                         })
     }
 
-    private fun loadStep() {
-        val stepPosition = intent.getIntExtra(INTENT_STEP_POSITION_KEY, 1)
-        stepSubscription =
-                DiApp.diProvider.get()
-                        .`object`(Step::class.java)
-                        .withQuery(Query.builder()
-                                .uri(StepsContract.URI)
-                                .where("${StepsContract.COL_POSITION}=?")
-                                .whereArgs(stepPosition).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Step> {
-                            override fun onNext(t: Step) {
-                                stepDetailFragment?.step = t
-                                step = t
-                                thisStepNumber = step?.position!!
-                                toolbarExpandedDateTv.text = step?.possibleDate
-                                val borderId = when (step!!.completed) {
-                                    true -> R.drawable.border_item_step_number_completed
-                                    false -> R.drawable.border_item_step_number_incomplete
-                                }
-                                if (android.os.Build.VERSION.SDK_INT >= 16) {
-                                    positionFl.background = ContextCompat.getDrawable(
-                                            this@StepDetailActivity, borderId)
-                                } else {
-                                    positionFl.setBackgroundDrawable(ContextCompat.getDrawable(
-                                            this@StepDetailActivity, borderId))
-                                }
-                                positionTv.text = step!!.position.toString()
-                                updateProgressDisplay()
-                            }
+    private fun loadStep(t: Step?) {
+        step = t
+        if (t != null) {
+            thisStepNumber = t.position
+            toolbarExpandedDateTv.text = t.possibleDate
+            val borderId = when (t.completed) {
+                true -> R.drawable.border_item_step_number_completed
+                false -> R.drawable.border_item_step_number_incomplete
+            }
+            if (android.os.Build.VERSION.SDK_INT >= 16) {
+                positionFl.background = ContextCompat.getDrawable(
+                        this@StepDetailActivity, borderId)
+            } else {
+                positionFl.setBackgroundDrawable(ContextCompat.getDrawable(
+                        this@StepDetailActivity, borderId))
+            }
+            positionTv.text = t.position.toString()
+        }
+        updateProgressDisplay()
+    }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error loading step with id $stepPosition")
-                            }
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+    }
 
-                            override fun onCompleted() {
-                            }
-                        })
+    override fun onPageScrollStateChanged(state: Int) {
+    }
+
+    override fun onPageSelected(position: Int) {
+        val step = fragmentAdapter.stepFromCache(position)
+        loadStep(step)
+        stepPosition = step?.position ?: 1
     }
 
     companion object {

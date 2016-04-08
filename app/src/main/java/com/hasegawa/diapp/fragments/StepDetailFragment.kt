@@ -15,6 +15,7 @@
  ******************************************************************************/
 package com.hasegawa.diapp.fragments
 
+import android.os.Build.VERSION
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
@@ -27,7 +28,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.models.DiContract
+import com.hasegawa.diapp.R.drawable
+import com.hasegawa.diapp.R.layout
+import com.hasegawa.diapp.R.string
 import com.hasegawa.diapp.models.DiContract.LinksContract
 import com.hasegawa.diapp.models.DiContract.StepsContract
 import com.hasegawa.diapp.models.Step
@@ -42,95 +45,36 @@ import timber.log.Timber
 
 class StepDetailFragment : Fragment() {
 
-    lateinit var titleTv: TextView
-    lateinit var descriptionTv: TextView
-    lateinit var linksLl: LinearLayout
+    private lateinit var titleTv: TextView
+    private lateinit var descriptionTv: TextView
+    private lateinit var linksLl: LinearLayout
 
-    var positionFl: FrameLayout? = null
-    var positionTv: TextView? = null
-    var dateTv: TextView? = null
-    var stepPb: ProgressBar? = null
-    var stepNumberTv: TextView? = null
+    private var positionFl: FrameLayout? = null
+    private var positionTv: TextView? = null
+    private var dateTv: TextView? = null
+    private var stepPb: ProgressBar? = null
+    private var stepNumberTv: TextView? = null
 
     private var totalSteps = 0
     private var totalStepsSubscription: Subscription? = null
-
-    private var stepLinkSubscription: Subscription? = null
-    var step: Step? = null
+    var stepPosition: Int = -1
         set(value) {
             field = value
-            if (step != null) {
-
-                if (isTablet) {
-                    val positionDrawable = when (step!!.completed) {
-                        true -> R.drawable.border_item_step_number_completed
-                        false -> R.drawable.border_item_step_number_incomplete
-                    }
-                    if (android.os.Build.VERSION.SDK_INT >= 16) {
-                        positionFl?.background = ContextCompat.getDrawable(
-                                context, positionDrawable)
-                    } else {
-                        positionFl?.setBackgroundDrawable(ContextCompat.getDrawable(
-                                context, positionDrawable))
-                    }
-                    positionTv?.text = step!!.position.toString()
-
-                    dateTv?.text = step!!.possibleDate
-                    updateProgressBar()
-                }
-
-                titleTv.text = step!!.title
-                if (step!!.description.length == 0) {
-                    descriptionTv.text = getString(R.string.step_detail_description_empty)
-                } else {
-                    descriptionTv.text = step!!.description
-                }
-
-                stepLinkSubscription?.unsubscribeIfSubscribed()
-                stepLinkSubscription = DiApp.diProvider.get()
-                        .listOfObjects(StepLink::class.java)
-                        .withQuery(Query.builder().uri(DiContract.LinksContract.URI)
-                                .where("${LinksContract.COL_STEPS_ID}=?")
-                                .whereArgs(step!!.id)
-                                .build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                object : Observer<List<StepLink>> {
-                                    override fun onCompleted() {
-                                    }
-
-                                    override fun onError(e: Throwable?) {
-                                        Timber.d(e, "Error getting the step links")
-                                    }
-
-                                    override fun onNext(t: List<StepLink>) {
-                                        linksLl.removeAllViews()
-                                        t.map {
-                                            val view = ItemDetailLinkView(context, null)
-                                            view.stepLink = it
-                                            linksLl.addView(view)
-                                        }
-                                        if (t.size == 0) {
-                                            val emptyView =
-                                                    LayoutInflater.from(context)
-                                                            .inflate(R.layout.item_details_link_empty,
-                                                                    linksLl, false)
-                                            linksLl.addView(emptyView)
-                                        }
-                                    }
-                                }
-                        )
-            }
+            loadStep()
         }
 
+    private var stepSubscription: Subscription? = null
+    private var stepLinkSubscription: Subscription? = null
+
     private var isTablet = false
+
+    private var step: Step? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (arguments != null) {
             isTablet = arguments.getBoolean(ARG_IS_TABLET, false)
+            stepPosition = arguments.getInt(ARG_STEP_POSITION, 1)
         }
     }
 
@@ -140,7 +84,6 @@ class StepDetailFragment : Fragment() {
         titleTv = root.findViewById(R.id.detail_title_tv) as TextView
         descriptionTv = root.findViewById(R.id.detail_description_tv) as TextView
         linksLl = root.findViewById(R.id.detail_links_ll) as LinearLayout
-
 
         if (isTablet) {
             positionFl = root.findViewById(R.id.view_position_fl) as FrameLayout
@@ -172,6 +115,7 @@ class StepDetailFragment : Fragment() {
                             })
         }
 
+        loadStep()
         return root
     }
 
@@ -181,17 +125,113 @@ class StepDetailFragment : Fragment() {
         totalStepsSubscription?.unsubscribeIfSubscribed()
     }
 
+    override fun onSaveInstanceState(outState: Bundle?) {
+        outState?.putInt(ARG_STEP_POSITION, stepPosition)
+    }
+
     private fun updateProgressBar() {
         stepPb?.max = totalSteps
         stepPb?.progress = step?.position ?: 0
         stepNumberTv?.text = "${step?.position ?: 0} de $totalSteps"
     }
 
+    private fun loadStep() {
+        stepSubscription?.unsubscribeIfSubscribed()
+        stepSubscription =
+                DiApp.diProvider.get().`object`(Step::class.java)
+                        .withQuery(Query.builder().uri(StepsContract.URI)
+                                .where("${StepsContract.COL_POSITION}=?")
+                                .whereArgs(stepPosition).build())
+                        .prepare()
+                        .asRxObservable()
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(object : Observer<Step> {
+                            override fun onCompleted() {
+                            }
+
+                            override fun onError(e: Throwable?) {
+                                Timber.d(e, "Error loading step")
+                            }
+
+                            override fun onNext(t: Step) {
+                                step = t
+                                loadStepIntoViews()
+                            }
+                        })
+    }
+
+    private fun loadStepIntoViews() {
+        if (isTablet) {
+            val positionDrawable = when (step!!.completed) {
+                true -> drawable.border_item_step_number_completed
+                false -> drawable.border_item_step_number_incomplete
+            }
+            if (VERSION.SDK_INT >= 16) {
+                positionFl?.background = ContextCompat.getDrawable(
+                        context, positionDrawable)
+            } else {
+                positionFl?.setBackgroundDrawable(ContextCompat.getDrawable(
+                        context, positionDrawable))
+            }
+            positionTv?.text = step!!.position.toString()
+
+            dateTv?.text = step!!.possibleDate
+            updateProgressBar()
+        }
+
+        titleTv.text = step!!.title
+        if (step!!.description.length == 0) {
+            descriptionTv.text = getString(string.step_detail_description_empty)
+        } else {
+            descriptionTv.text = step!!.description
+        }
+
+        stepLinkSubscription?.unsubscribeIfSubscribed()
+        stepLinkSubscription = DiApp.diProvider.get()
+                .listOfObjects(StepLink::class.java)
+                .withQuery(Query.builder().uri(LinksContract.URI)
+                        .where("${LinksContract.COL_STEPS_ID}=?")
+                        .whereArgs(step!!.id)
+                        .build())
+                .prepare()
+                .asRxObservable()
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        object : Observer<List<StepLink>> {
+                            override fun onCompleted() {
+                            }
+
+                            override fun onError(e: Throwable?) {
+                                Timber.d(e, "Error getting the step links")
+                            }
+
+                            override fun onNext(t: List<StepLink>) {
+                                linksLl.removeAllViews()
+                                t.map {
+                                    val view = ItemDetailLinkView(context, null)
+                                    view.stepLink = it
+                                    linksLl.addView(view)
+                                }
+                                if (t.size == 0) {
+                                    val emptyView =
+                                            LayoutInflater.from(context)
+                                                    .inflate(layout.item_details_link_empty,
+                                                            linksLl, false)
+                                    linksLl.addView(emptyView)
+                                }
+                            }
+                        }
+                )
+    }
+
+
     companion object {
         const val ARG_IS_TABLET = "is_tablet"
-        fun newInstance(isTablet: Boolean): StepDetailFragment {
+        const val ARG_STEP_POSITION = "step_position"
+        fun newInstance(isTablet: Boolean, stepPosition: Int): StepDetailFragment {
             val args = Bundle()
             args.putBoolean(ARG_IS_TABLET, isTablet)
+            args.putInt(ARG_STEP_POSITION, stepPosition)
             val fragment = StepDetailFragment()
             fragment.arguments = args
             return fragment
