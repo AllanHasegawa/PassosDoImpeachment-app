@@ -153,7 +153,7 @@ class StepDetailFragment : Fragment() {
                                 Timber.d(e, "Error loading step")
                             }
 
-                            override fun onNext(t: Step) {
+                            override fun onNext(t: Step?) {
                                 step = t
                                 loadStepIntoViews()
                             }
@@ -161,6 +161,7 @@ class StepDetailFragment : Fragment() {
     }
 
     private fun loadStepIntoViews() {
+        if (step == null) return
         if (isTablet) {
             val positionDrawable = when (step!!.completed) {
                 true -> drawable.border_item_step_number_completed
