@@ -20,7 +20,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#465c96"
+            android:background="@color/colorPrimary"
             android:orientation="vertical">
 
             <TextView
@@ -28,14 +28,14 @@
                 style="@style/DetailLinkTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#afffffff"/>
+                />
 
             <TextView
                 android:id="@+id/important_news_url_tv"
                 style="@style/DetailLinkUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#a0fffefe"/>
+                />
         </LinearLayout>
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"/>
 
         <LinearLayout
-            android:layout_width="200dp"
+            android:layout_width="240dp"
             android:layout_height="match_parent"
             android:layout_gravity="right"
             android:layout_marginBottom="8dp"
@@ -59,9 +59,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="36dp"
                 android:layout_weight="0.5"
-                android:background="@color/colorPrimaryLight"
                 android:text="@string/news_item_share_button"
-                android:textColor="@color/colorLink"
+                android:textColor="@color/colorAccent"
                 android:textSize="12sp"/>
 
             <Button
@@ -71,7 +70,7 @@
                 android:layout_height="36dp"
                 android:layout_weight="0.5"
                 android:text="@string/news_item_access_button"
-                android:textColor="@color/colorLink"
+                android:textColor="@color/colorAccent"
                 android:textSize="12sp"/>
 
         </LinearLayout>
