@@ -30,9 +30,6 @@ import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.util.ArrayList
 
-/**
- * Created by hasegawa on 4/8/2016.
- */
 class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
         FragmentStatePagerAdapter(fragmentManager) {
     val stepsCache = ArrayList<Step>()
