@@ -53,7 +53,7 @@ kapt {
 
 buildscript {
     ext.kotlin_version = '1.0.1'
-    ext.support_lib_version = '23.2.1'
+    ext.support_lib_version = '23.3.0'
     ext.espresso_version = '2.2.2'
     repositories {
         jcenter()
@@ -67,7 +67,7 @@ buildscript {
 
 configurations.all {
     resolutionStrategy {
-        force 'com.android.support:recyclerview-v7:23.2.1', 'com.android.support:design:23.2.1'
+        force 'com.android.support:recyclerview-v7:23.3.0', 'com.android.support:design:23.3.0'
     }
 }
 
