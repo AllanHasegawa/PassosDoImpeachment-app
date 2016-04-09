@@ -29,7 +29,6 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.drawable
-import com.hasegawa.diapp.R.layout
 import com.hasegawa.diapp.R.string
 import com.hasegawa.diapp.models.DiContract.LinksContract
 import com.hasegawa.diapp.models.DiContract.StepsContract
@@ -212,13 +211,6 @@ class StepDetailFragment : Fragment() {
                                     val view = ItemDetailLinkView(context, null)
                                     view.stepLink = it
                                     linksLl.addView(view)
-                                }
-                                if (t.size == 0) {
-                                    val emptyView =
-                                            LayoutInflater.from(context)
-                                                    .inflate(layout.item_details_link_empty,
-                                                            linksLl, false)
-                                    linksLl.addView(emptyView)
                                 }
                             }
                         }

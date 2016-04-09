@@ -29,12 +29,6 @@
                 android:layout_height="wrap_content"
                 />
 
-            <TextView
-                style="@style/DetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/step_detail_links"/>
-
             <LinearLayout
                 android:id="@+id/detail_links_ll"
                 android:layout_width="match_parent"

@@ -6,8 +6,6 @@
     <string name="title_activity_step_detail" translatable="false">StepDetailActivity</string>
     <string name="title_activity_credits">Créditos</string>
 
-    <string name="app_opensource_soon">Link para o projeto opensource deste app será disponibilizado em breve!!!</string>
-
     <string name="nav_drawer_open">Abrir a tela de navegação</string>
     <string name="nav_drawer_close">Fechar a tela de navegação</string>
 
@@ -43,11 +41,7 @@
     <string name="news_item_access_button">Abrir</string>
 
 
-    <string name="step_detail_title">Título</string>
-    <string name="step_detail_description">Descrição</string>
     <string name="step_detail_description_empty">Sem descrição.</string>
-    <string name="step_detail_links">Links</string>
-    <string name="step_detail_links_empty">Sem links.</string>
     <string name="step_detail_step_from_to">%1$d de %2$d</string>
 
 

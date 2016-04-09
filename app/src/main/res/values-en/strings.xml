@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="action_settings">Settings</string>
-    <string name="app_opensource_soon"></string>
     <string name="credits_email_chooser_header">Send e-mail…</string>
     <string name="credits_hase_position">Developer</string>
     <string name="error_invalid_link">Invalid link.</string>
@@ -32,12 +31,8 @@
     <string name="share_step_detail_state_completed">completed in</string>
     <string name="share_step_detail_state_incomplete">on going until</string>
     <string name="share_step_detail_text">Step %1$d of %2$d %3$s %4$s. %5$s Follow with: %6$s</string>
-    <string name="step_detail_description">Description</string>
     <string name="step_detail_description_empty">No description.</string>
-    <string name="step_detail_links">Links</string>
     <string name="step_detail_step_from_to">%1$d of %2$d</string>
-    <string name="step_detail_links_empty">No links.</string>
-    <string name="step_detail_title">Title</string>
     <string name="step_item_completed_in">Completed in %1$s</string>
     <string name="sync_done">Update completed successfully.</string>
     <string name="sync_first">Downloading content...</string>
