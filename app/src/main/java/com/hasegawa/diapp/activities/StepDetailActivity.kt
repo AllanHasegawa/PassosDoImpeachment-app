@@ -112,7 +112,11 @@ class StepDetailActivity : BaseNavDrawerActivity(), ViewPager.OnPageChangeListen
                 fragmentAdapter.stepsCache.forEachIndexed {
                     i, step ->
                     if (step.position == stepPosition) {
-                        viewPager.currentItem = i
+                        if (viewPager.currentItem == i) {
+                            onPageSelected(i)
+                        } else {
+                            viewPager.currentItem = i
+                        }
                     }
                 }
             }
