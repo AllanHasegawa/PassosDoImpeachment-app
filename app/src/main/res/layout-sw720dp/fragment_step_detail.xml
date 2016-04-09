@@ -49,7 +49,6 @@
                         android:layout_alignBottom="@id/detail_pos_number_fl"
                         android:layout_marginLeft="8dp"
                         android:layout_toRightOf="@id/detail_pos_number_fl"
-                        android:textColor="@color/colorSecondary"
                         android:textSize="14sp"/>
 
                     <TextView

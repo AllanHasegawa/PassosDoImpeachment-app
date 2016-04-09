@@ -42,16 +42,20 @@
                 android:id="@+id/step_possible_date_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text=""
-                android:textColor="@color/colorSecondary"
-                android:textStyle="bold"/>
+                android:layout_marginBottom="2dp"
+                android:text="Lorem ipsum dolor sit amet"
+                android:textColor="@color/colorPrimaryText"
+                android:textSize="16sp"
+                />
 
             <TextView
                 android:id="@+id/step_title_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text=""/>
+                android:text="Maecenas vel est volutpat, semper lectus sed, sagittis elit. Nunc mollis nisi sit amet ornare laoreet. Nam sollicitudin arcu non elit ultricies placerat. Morbi volutpat feugiat placerat."
+                android:textColor="@color/colorSecondaryText"
+                android:textSize="14sp"
+                />
 
             <TextView
                 android:id="@+id/step_completed_tv"
