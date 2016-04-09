@@ -19,6 +19,7 @@ import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
@@ -64,19 +65,19 @@ import java.util.ArrayList
 class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
     // Common to tablet and phones. Must have.
-    lateinit var toolbar: Toolbar
-    lateinit var fab: FloatingActionButton
-    lateinit var navView: NavigationView
-    lateinit var toolbarFl: FrameLayout
-    lateinit var toolbarExpandedTv: TextView
-    lateinit var toolbarProgressBar: ProgressBar
+    private lateinit var toolbar: Toolbar
+    private lateinit var fab: FloatingActionButton
+    private lateinit var navView: NavigationView
+    private lateinit var toolbarFl: FrameLayout
+    private lateinit var toolbarExpandedTv: TextView
+    private lateinit var toolbarProgressBar: ProgressBar
 
 
     // Only used in phones
-    var drawer: DrawerLayout? = null
-    var mainViewPager: ViewPager? = null
-    var mainTabLayout: TabLayout? = null
-    var toolbarShrunkTv: TextView? = null
+    private var drawer: DrawerLayout? = null
+    private var mainViewPager: ViewPager? = null
+    private var mainTabLayout: TabLayout? = null
+    private var toolbarShrunkTv: TextView? = null
 
     // Only used in tablets
     private var detailFl: FrameLayout? = null
@@ -91,6 +92,9 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
     private var isTablet = false
     private var detailFragment: StepDetailFragment? = null
+    private var mainFragment: MainFragment? = null
+
+    private var selectedStepPosition: Int = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -142,7 +146,6 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
             setupViewPager()
         } else {
             tmSetupMainFragment(savedInstanceState)
-            tmSetupFirstStepSubscription()
         }
     }
 
@@ -162,6 +165,129 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         }
     }
 
+    override fun onBackPressed() {
+        if (!isTablet) {
+            if (drawer!!.isDrawerOpen(GravityCompat.START)) {
+                drawer!!.closeDrawer(GravityCompat.START)
+            } else {
+                super.onBackPressed()
+            }
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putInt(SAVED_STATE_SELECTED_STEP_POSITION, selectedStepPosition)
+    }
+
+
+    override fun onItemStepClicked(step: Step) {
+        if (!isTablet) {
+            StepDetailActivity.launch(this, step)
+        } else {
+            detailFragment?.stepPosition = step.position
+            selectedStepPosition = step.position
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (data != null) {
+            mainViewPager?.currentItem = data.getIntExtra(INTENT_VIEW_NUMBER_KEY,
+                    VIEW_PAGER_STEPS_LIST)
+        }
+    }
+
+    private var dyHistory: List<Timestamped<Int>> = ArrayList(100)
+    override fun onMainFragmentScroll(dx: Int, dy: Int) {
+        if (isTablet) return
+        if (dy != 0) {
+            val useMoreComplexChangeDetection = false
+            if (useMoreComplexChangeDetection) {
+                val now = DateTime.now().millis
+                (dyHistory as ArrayList).add(Timestamped(now, dy))
+                dyHistory = dyHistory.takeLast(20).filter { (now - it.timestampMillis) < 500 }
+                val dySum = dyHistory.sumBy { it.value }
+
+                val dyDp = ResourcesUtils.pxToDp(this, dySum)
+                if (Math.abs(dyDp) > 32) {
+                    if (dyDp < 0) {
+                        expandToolbar()
+                    } else {
+                        shrinkToolbar()
+                    }
+                }
+            } else {
+                if (dy < 0) {
+                    expandToolbar()
+                } else {
+                    shrinkToolbar()
+                }
+            }
+        }
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        super.onNavigationItemSelected(item)
+        val id = item.itemId
+        when (id) {
+            R.id.nav_steps_list -> {
+                if (!isTablet) {
+                    mainViewPager?.setCurrentItem(VIEW_PAGER_STEPS_LIST, true)
+                    expandToolbar()
+                } else {
+                    mainFragment = MainFragment.newInstance(true)
+                    detailFragment = StepDetailFragment.newInstance(true, 1)
+                    supportFragmentManager.beginTransaction()
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .replace(R.id.main_fragment_container, mainFragment)
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .replace(R.id.detail_fragment_container, detailFragment)
+                            .commit()
+                    tmAdjustPanes(true)
+                }
+            }
+            R.id.nav_news_list -> {
+                if (!isTablet) {
+                    mainViewPager?.setCurrentItem(VIEW_PAGER_NEWS_LIST, true)
+                    shrinkToolbar()
+                } else {
+                    supportFragmentManager.beginTransaction()
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .replace(R.id.main_fragment_container, NewsFragment.newInstance(true))
+                            .commit()
+                    tmAdjustPanes(false)
+                    detailFragment = null
+                    mainFragment = null
+                }
+            }
+            R.id.nav_credits -> {
+                if (!isTablet) {
+                    CreditsActivity.launch(this)
+                } else {
+                    supportFragmentManager.beginTransaction()
+                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
+                            .replace(R.id.main_fragment_container, CreditsFragment.newInstance())
+                            .commit()
+                    tmAdjustPanes(false)
+                    detailFragment = null
+                    mainFragment = null
+                }
+            }
+            R.id.nav_last_update -> {
+                if (mainViewPager?.currentItem == VIEW_PAGER_STEPS_LIST) {
+                    expandToolbar()
+                }
+            }
+        }
+
+        drawer?.closeDrawer(GravityCompat.START)
+        return true
+    }
+
+
     override fun getNavigationView(): NavigationView {
         return navView
     }
@@ -173,45 +299,25 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     private fun tmSetupMainFragment(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
             navView.setCheckedItem(R.id.nav_steps_list)
-            val mainFragment = MainFragment.newInstance(isTablet)
-            detailFragment = StepDetailFragment.newInstance(isTablet, 1)
+            mainFragment = MainFragment.newInstance(isTablet)
+            detailFragment = StepDetailFragment.newInstance(isTablet, -1)
             supportFragmentManager.beginTransaction()
                     .add(R.id.main_fragment_container, mainFragment, TM_MAIN_FRAG_TAG)
                     .add(R.id.detail_fragment_container, detailFragment, TM_DETAIL_FRAG_TAG)
                     .commit()
+            tmAdjustPanes(true)
         } else {
+            mainFragment = supportFragmentManager.findFragmentById(
+                    R.id.main_fragment_container) as MainFragment
             detailFragment = supportFragmentManager.findFragmentById(
                     R.id.detail_fragment_container) as StepDetailFragment
+
+            selectedStepPosition = savedInstanceState.getInt(SAVED_STATE_SELECTED_STEP_POSITION, -2)
+            if (selectedStepPosition != -1) {
+                mainFragment?.stepPositionToSelect = selectedStepPosition
+            }
         }
     }
-
-
-    private fun tmSetupFirstStepSubscription() {
-        firstStepSubscription?.unsubscribeIfSubscribed()
-        firstStepSubscription =
-                DiApp.diProvider.get()
-                        .`object`(Step::class.java)
-                        .withQuery(
-                                Query.builder().uri(StepsContract.URI)
-                                        .sortOrder("${StepsContract.COL_POSITION}").build()
-                        )
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Step> {
-                            override fun onCompleted() {
-                            }
-
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error loading first step.")
-                            }
-
-                            override fun onNext(t: Step) {
-                                detailFragment?.stepPosition = t.position
-                            }
-                        })
-    }
-
 
     private fun setupNumberOfStepsSubscriptions() {
         numberOfStepsSubscription =
@@ -355,84 +461,21 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         updateNavLastUpdateTitle()
     }
 
-    override fun onBackPressed() {
-        if (!isTablet) {
-            if (drawer!!.isDrawerOpen(GravityCompat.START)) {
-                drawer!!.closeDrawer(GravityCompat.START)
-            } else {
-                super.onBackPressed()
-            }
-        } else {
-            super.onBackPressed()
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        super.onNavigationItemSelected(item)
-        val id = item.itemId
-        when (id) {
-            R.id.nav_steps_list -> {
-                if (!isTablet) {
-                    mainViewPager?.setCurrentItem(VIEW_PAGER_STEPS_LIST, true)
-                    expandToolbar()
-                } else {
-                    val mainFragment = MainFragment.newInstance(true)
-                    detailFragment = StepDetailFragment.newInstance(true, 1)
-                    supportFragmentManager.beginTransaction()
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, mainFragment)
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.detail_fragment_container, detailFragment)
-                            .commit()
-                    tmAdjustPanes(true)
-                    tmSetupFirstStepSubscription()
-                }
-            }
-            R.id.nav_news_list -> {
-                if (!isTablet) {
-                    mainViewPager?.setCurrentItem(VIEW_PAGER_NEWS_LIST, true)
-                    shrinkToolbar()
-                } else {
-                    detailFragment = null
-                    supportFragmentManager.beginTransaction()
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, NewsFragment.newInstance(true))
-                            .commit()
-                    tmAdjustPanes(false)
-                    detailFragment = null
-                }
-            }
-            R.id.nav_credits -> {
-                if (!isTablet) {
-                    CreditsActivity.launch(this)
-                } else {
-                    supportFragmentManager.beginTransaction()
-                            .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, CreditsFragment.newInstance())
-                            .commit()
-                    tmAdjustPanes(false)
-                    detailFragment = null
-                }
-            }
-            R.id.nav_last_update -> {
-                if (mainViewPager?.currentItem == VIEW_PAGER_STEPS_LIST) {
-                    expandToolbar()
-                }
-            }
-        }
-
-        drawer?.closeDrawer(GravityCompat.START)
-        return true
-    }
-
     fun tmAdjustPanes(twoPanes: Boolean) {
-        val targetWeight = if (twoPanes) 1.0f else 0.0f
-        val initialWeight = (detailFl!!.layoutParams as LinearLayout.LayoutParams).weight
-        val anim = ValueAnimator.ofFloat(initialWeight, targetWeight)
+        val ll = findViewById(R.id.main_containers_ll) as LinearLayout
+        val mainContainer = findViewById(R.id.main_fragment_container) as FrameLayout
+        val maxContainerSize = ll.measuredWidth - navView.measuredWidth
+        if (maxContainerSize == 0) {
+            // if the view is not ready yet, queue it for later :)
+            Handler().post { tmAdjustPanes(true) }
+        }
+        val mainContainerTarget = if (twoPanes) maxContainerSize / 2 else maxContainerSize
+        val initialWidth = mainContainer.layoutParams.width
+        val anim = ValueAnimator.ofInt(initialWidth, mainContainerTarget)
         anim.addUpdateListener {
-            val oldLayoutParams = detailFl?.layoutParams as LinearLayout.LayoutParams
-            oldLayoutParams.weight = it.animatedValue as Float
-            detailFl?.layoutParams = oldLayoutParams
+            val oldLayoutParams = mainContainer.layoutParams as LinearLayout.LayoutParams
+            oldLayoutParams.width = it.animatedValue as Int
+            mainContainer.layoutParams = oldLayoutParams
         }
         anim.startDelay = 200
         anim.duration = 150
@@ -445,51 +488,6 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
             return fragment is MainFragment
         }
         return false
-    }
-
-    override fun onItemStepClicked(step: Step) {
-        if (!isTablet) {
-            StepDetailActivity.launch(this, step)
-        } else {
-            detailFragment?.stepPosition = step.position
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (data != null) {
-            mainViewPager?.currentItem = data.getIntExtra(INTENT_VIEW_NUMBER_KEY,
-                    VIEW_PAGER_STEPS_LIST)
-        }
-    }
-
-    private var dyHistory: List<Timestamped<Int>> = ArrayList(100)
-    override fun onMainFragmentScroll(dx: Int, dy: Int) {
-        if (isTablet) return
-        if (dy != 0) {
-            val useMoreComplexChangeDetection = false
-            if (useMoreComplexChangeDetection) {
-                val now = DateTime.now().millis
-                (dyHistory as ArrayList).add(Timestamped(now, dy))
-                dyHistory = dyHistory.takeLast(20).filter { (now - it.timestampMillis) < 500 }
-                val dySum = dyHistory.sumBy { it.value }
-
-                val dyDp = ResourcesUtils.pxToDp(this, dySum)
-                if (Math.abs(dyDp) > 32) {
-                    if (dyDp < 0) {
-                        expandToolbar()
-                    } else {
-                        shrinkToolbar()
-                    }
-                }
-            } else {
-                if (dy < 0) {
-                    expandToolbar()
-                } else {
-                    shrinkToolbar()
-                }
-            }
-        }
     }
 
     private val toolbarMaxHeightDp = 128
@@ -570,5 +568,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         const val TM_MAIN_FRAG_TAG = "main_frag_tag"
         const val TM_DETAIL_FRAG_TAG = "detail_frag_tag"
         const val TM_NEWS_FRAG_TAG = "news_frag_tag"
+
+        const val SAVED_STATE_SELECTED_STEP_POSITION = "selected_step_position"
     }
 }

@@ -35,16 +35,16 @@ import timber.log.Timber
 import java.util.ArrayList
 
 class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
-                     val isTablet: Boolean) :
+                     val isTablet: Boolean,
+                     var stepPositionToSelect: Int) :
         RecyclerView.Adapter<StepViewHolder>() {
     interface RvClickListener {
-        fun onItemSelect(position: Int)
+        fun onItemSelect(holder: StepViewHolder)
     }
 
     class Item(var type: Int, var step: Step?)
 
     class StepViewHolder(view: View,
-                         val mainFragmentListener: OnMainFragmentListener? = null,
                          val clickListener: RvClickListener? = null) :
             RecyclerView.ViewHolder(view) {
 
@@ -56,8 +56,7 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
             itemStepView.step = step
             itemStepView.isSelected = selected
             itemStepView.setOnClickListener({
-                clickListener?.onItemSelect(adapterPosition)
-                mainFragmentListener?.onItemStepClicked(step)
+                clickListener?.onItemSelect(this)
             })
         }
     }
@@ -67,18 +66,16 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
     private var stepsSubscription: Subscription? = null
 
     private var selectedItem = -1
+    private var requestedStepPositionToSelect = -1
     private val rvClickListener =
             object : RvClickListener {
-                override fun onItemSelect(position: Int) {
-                    selectItem(position)
+                override fun onItemSelect(holder: StepViewHolder) {
+                    selectItem(holder.adapterPosition)
                 }
             }
 
 
     init {
-        if (isTablet) {
-            selectedItem = 0
-        }
         stepsSubscription =
                 DiApp.diProvider
                         .get()
@@ -92,7 +89,6 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                             val arr = ArrayList<Item>(it.size + 2)
                             if (!isTablet) {
                                 arr.add(Item(TYPE_SPACE, null))
-//                                arr.add(Item(TYPE_BEGINNING, null))
                             }
                             arr.addAll(it.map { Item(TYPE_STEP, it) })
 
@@ -104,8 +100,7 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                             notifyItemRangeRemoved(0, items)
                             arr
                         }
-                        .flatMapIterable { it }
-                        .subscribe(object : Observer<Item> {
+                        .subscribe(object : Observer<List<Item>> {
                             override fun onCompleted() {
                             }
 
@@ -113,9 +108,21 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                                 Timber.d(e, "Error updating StepsRvAdapter.")
                             }
 
-                            override fun onNext(t: Item) {
-                                stepsCache.add(t)
-                                notifyItemChanged(stepsCache.size - 1)
+                            override fun onNext(t: List<Item>?) {
+                                if (t != null && t.size > 0) {
+                                    stepsCache.addAll(t)
+                                    notifyItemRangeInserted(0, stepsCache.size - 1)
+                                    if (isTablet) {
+                                        val index = stepsCache.indexOfFirst {
+                                            it.step?.position == stepPositionToSelect
+                                        }
+                                        if (index != -1) {
+                                            selectItem(index)
+                                        } else {
+                                            selectItem(0)
+                                        }
+                                    }
+                                }
                             }
                         })
     }
@@ -126,11 +133,13 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
     }
 
     fun selectItem(position: Int) {
+        mainFragmentListener.onItemStepClicked(stepsCache[position].step!!)
+
         if (isTablet) {
             val oldSelectedItem = selectedItem
             selectedItem = position
-            notifyItemChanged(oldSelectedItem)
             notifyItemChanged(selectedItem)
+            notifyItemChanged(oldSelectedItem)
         }
     }
 
@@ -153,8 +162,7 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): StepViewHolder? {
         return when (viewType) {
-            TYPE_STEP -> StepViewHolder(ItemStepView(parent!!.context, null),
-                    mainFragmentListener, rvClickListener)
+            TYPE_STEP -> StepViewHolder(ItemStepView(parent!!.context, null), rvClickListener)
             TYPE_SPACE -> {
                 val spaceView = LayoutInflater.from(parent!!.context)
                         .inflate(R.layout.item_step_space, parent, false)

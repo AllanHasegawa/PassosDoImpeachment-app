@@ -40,6 +40,8 @@ class MainFragment : Fragment() {
     }
 
     lateinit var stepsRv: RecyclerView
+    var stepsAdapter: StepsRvAdapter? = null
+    var stepPositionToSelect = -1
 
     private var mainListener: OnMainFragmentListener? = null
     private var isTablet = false
@@ -54,7 +56,7 @@ class MainFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        (stepsRv.adapter as StepsRvAdapter).close()
+        stepsAdapter?.close()
     }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?,
@@ -64,13 +66,15 @@ class MainFragment : Fragment() {
         stepsRv = root.findViewById(R.id.main_steps_rv) as RecyclerView
 
         stepsRv.layoutManager = LinearLayoutManager(activity)
-        stepsRv.adapter = StepsRvAdapter(mainListener!!, isTablet)
+
+        stepsAdapter = StepsRvAdapter(mainListener!!, isTablet, stepPositionToSelect)
+        stepsRv.adapter = stepsAdapter
         val itemAnimator = SlideInLeftAnimator()
         itemAnimator.setInterpolator(AccelerateDecelerateInterpolator())
         stepsRv.itemAnimator = itemAnimator
         stepsRv.itemAnimator.addDuration = 300
         stepsRv.itemAnimator.removeDuration = 300
-        stepsRv.itemAnimator.changeDuration = 0
+        stepsRv.itemAnimator.changeDuration = 300
         stepsRv.itemAnimator.moveDuration = 300
 
         stepsRv.addOnScrollListener(object : RecyclerView.OnScrollListener() {
