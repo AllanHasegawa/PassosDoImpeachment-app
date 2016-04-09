@@ -6,6 +6,6 @@
 
     <Space
         android:layout_width="fill_parent"
-        android:layout_height="112dp"
+        android:layout_height="104dp"
         />
 </FrameLayout>

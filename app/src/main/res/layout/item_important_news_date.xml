@@ -2,17 +2,39 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="0dp"
-                android:layout_marginTop="16dp"
     >
 
-    <TextView
-        android:id="@+id/important_news_date_tv"
-        style="@style/DetailTitle"
-        android:layout_width="wrap_content"
+    <FrameLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_margin="0dp"
-        android:text="..."
-        />
+        android:background="#cccccc"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_calendar"
+            />
+
+        <TextView
+            android:id="@+id/important_news_date_tv"
+            style="@style/DetailTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:text="31/12/2099"
+            android:textColor="#6e000000"
+            android:textSize="18sp"
+            />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_gravity="bottom"
+            android:background="#aaa"
+            >
+        </FrameLayout>
+    </FrameLayout>
 </RelativeLayout>
