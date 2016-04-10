@@ -78,7 +78,6 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
                             val arr = ArrayList<Item>(it.size + 2)
                             if (!isTablet) {
                                 arr.add(Item(TYPE_SPACE, null, null))
-//                                arr.add(Item(TYPE_BEGINNING, null, null))
                             }
                             for (date in it.keys) {
                                 arr.add(Item(TYPE_DATE, null, date))
@@ -136,9 +135,6 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
             TYPE_SPACE ->
                 NewsViewHolder(LayoutInflater.from(parent!!.context)
                         .inflate(R.layout.item_important_news_space, parent, false))
-            TYPE_BEGINNING ->
-                NewsViewHolder(LayoutInflater.from(parent!!.context)
-                        .inflate(R.layout.item_step_beginning, parent, false))
             TYPE_DATE ->
                 NewsViewHolder(LayoutInflater.from(parent!!.context)
                         .inflate(R.layout.item_important_news_date, parent, false))
@@ -149,7 +145,6 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
     companion object {
         const val TYPE_NEWS = 5
         const val TYPE_SPACE = 6
-        const val TYPE_BEGINNING = 7
         const val TYPE_DATE = 8
     }
 }

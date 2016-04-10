@@ -32,7 +32,6 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
     private lateinit var positionFl: FrameLayout
     private lateinit var possibleDateTv: TextView
     private lateinit var titleTv: TextView
-    private lateinit var timeCompletedTv: TextView
 
     private var colorSelected: Int = 0
     private var colorUnselected: Int = 0
@@ -51,7 +50,6 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
         positionTv = this.findViewById(R.id.view_position_tv) as TextView
         possibleDateTv = this.findViewById(R.id.step_possible_date_tv) as TextView
         titleTv = this.findViewById(R.id.step_title_tv) as TextView
-        timeCompletedTv = this.findViewById(R.id.step_completed_tv) as TextView
 
         val colorStateList =
                 ContextCompat.getColorStateList(context, R.color.selector_step_selection_color)
@@ -66,12 +64,6 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
                 positionTv.text = s.position.toString()
                 titleTv.text = s.title
                 possibleDateTv.text = s.possibleDate
-                if (s.completed) {
-                    timeCompletedTv.text = context.getString(R.string.step_item_completed_in,
-                            step!!.possibleDate)
-                } else {
-                    timeCompletedTv.visibility = View.GONE
-                }
                 val positionDrawable = when (s.completed) {
                     true -> R.drawable.border_item_step_number_completed
                     false -> R.drawable.border_item_step_number_incomplete

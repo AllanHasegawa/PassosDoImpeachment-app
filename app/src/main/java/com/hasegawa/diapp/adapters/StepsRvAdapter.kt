@@ -168,11 +168,6 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                         .inflate(R.layout.item_step_space, parent, false)
                 StepViewHolder(spaceView)
             }
-            TYPE_BEGINNING -> {
-                val view = LayoutInflater.from(parent!!.context)
-                        .inflate(R.layout.item_step_beginning, parent, false)
-                StepViewHolder(view)
-            }
             else -> throw RuntimeException("Unknown viewType $viewType")
         }
     }
@@ -180,6 +175,5 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
     companion object {
         val TYPE_STEP = 1
         val TYPE_SPACE = 4
-        val TYPE_BEGINNING = 6
     }
 }
