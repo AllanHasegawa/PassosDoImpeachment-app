@@ -59,11 +59,23 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
-                        android:layout_marginBottom="8dp"
+                        android:layout_marginBottom="16dp"
                         android:textColor="#AFFF"
                         android:textSize="32sp"
                         />
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/detail_date_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="sans-serif-regular"
+                    android:text="30 de dezembro de 1999"
+                    android:textColor="@color/colorSecondary"
+                    android:textSize="18sp"
+                    />
 
                 <TextView
                     android:id="@+id/detail_title_tv"
@@ -72,36 +84,31 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_marginTop="16dp"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:text="big ass title as placeholder just to make sure everything is looking good =D"
+                    android:textSize="24sp"
                     />
-
-                <TextView
-                    android:id="@+id/detail_date_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:layout_marginRight="8dp"
-                    android:textColor="@color/colorSecondary"
-                    android:textSize="14sp"
-                    />
-
 
                 <TextView
                     android:id="@+id/detail_description_tv"
                     style="@style/DetailText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="32dp"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginTop="19dp"
+                    android:fontFamily="sans-serif-regular"
+                    android:text="Aliquam vestibulum egestas neque vel rutrum. Mauris et faucibus lectus. Pellentesque ut nisi eros. Aliquam erat volutpat. Suspendisse vitae dolor luctus, tincidunt orci sagittis, maximus ex. Suspendisse potenti. Sed sit amet scelerisque metus. Aenean auctor, odio vel scelerisque gravida, purus sapien euismod sem, at pharetra arcu felis nec est. Phasellus scelerisque ultrices imperdie."
                     android:textColor="@color/colorSecondaryText"
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     />
 
                 <LinearLayout
                     android:id="@+id/detail_links_ll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
                     android:orientation="vertical"
                     >
                 </LinearLayout>
