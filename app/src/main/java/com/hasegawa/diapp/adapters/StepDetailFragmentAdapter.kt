@@ -19,7 +19,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import com.hasegawa.diapp.DiApp
-import com.hasegawa.diapp.fragments.StepDetailFragment
+import com.hasegawa.diapp.fragments.StepDetailSubFragment
 import com.hasegawa.diapp.models.DiContract.StepsContract
 import com.hasegawa.diapp.models.Step
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
@@ -62,7 +62,7 @@ class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
     }
 
     override fun getItem(position: Int): Fragment? {
-        val fragment = StepDetailFragment.newInstance(false, stepsCache[position].position)
+        val fragment = StepDetailSubFragment.newInstance(stepsCache[position].position)
         return fragment
     }
 

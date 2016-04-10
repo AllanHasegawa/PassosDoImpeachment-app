@@ -42,7 +42,7 @@
 
 
     <string name="step_detail_description_empty">Sem descrição.</string>
-    <string name="step_detail_step_from_to">%1$d de %2$d</string>
+    <string name="step_detail_middle_of_numbers">de</string>
 
 
     <string name="share_main_chooser_header">Compartilhe o processo do impeachment…</string>

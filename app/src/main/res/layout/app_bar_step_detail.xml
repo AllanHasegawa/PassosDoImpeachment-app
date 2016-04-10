@@ -7,108 +7,38 @@
                                                  android:fitsSystemWindows="true"
                                                  tools:context=".activities.StepDetailActivity">
 
-    <android.support.design.widget.AppBarLayout
+    <FrameLayout
+        android:id="@+id/detail_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/detail_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:theme="@style/AppTheme"
+        app:popupTheme="@style/AppTheme.PopupOverlay">
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <FrameLayout
-                android:id="@+id/detail_toolbar_fl"
-                android:layout_width="match_parent"
-                android:layout_height="128dp"
-                android:layout_margin="0dp"
-                android:background="@color/colorPrimary"
-                android:padding="0dp">
-
-                <RelativeLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="32dp"
-                    android:padding="0dp">
-
-                    <FrameLayout
-                        android:id="@+id/detail_pos_number_fl"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginTop="16dp">
-                        <!-- Can't "find" views when <include> has id -->
-                        <include
-                            layout="@layout/view_position_number"
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"/>
-                    </FrameLayout>
-
-
-                    <TextView
-                        android:id="@+id/detail_toolbar_expanded_date_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@id/detail_pos_number_fl"
-                        android:layout_marginLeft="8dp"
-                        android:layout_toRightOf="@id/detail_pos_number_fl"
-                        android:text="4 de abril de 2016"
-                        android:textSize="14sp"/>
-
-                    <TextView
-                        android:id="@+id/detail_toolbar_expanded_tv"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/detail_pos_number_fl"
-                        android:layout_marginTop="8dp"
-                        android:text="23 de 43"
-                        android:textSize="18sp"/>
-
-                    <ProgressBar
-                        android:id="@+id/detail_toolbar_expanded_pb"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:layout_width="170dp"
-                        android:layout_height="18dp"
-                        android:layout_below="@+id/detail_toolbar_expanded_tv"
-                        android:indeterminate="false"
-                        android:max="43"
-                        android:progress="23"/>
-
-                    <ImageView
-                        android:layout_width="104dp"
-                        android:layout_height="104dp"
-                        android:layout_alignParentRight="true"
-                        android:layout_marginRight="32dp"
-                        app:srcCompat="@drawable/app_icon_plain"/>
-
-                </RelativeLayout>
-            </FrameLayout>
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/detail_toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="@android:color/transparent"
-                android:theme="@style/AppTheme"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+            <ImageView
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="right|center_vertical"
+                android:layout_marginRight="8dp"
+                app:srcCompat="@drawable/app_icon_plain"
+                />
         </FrameLayout>
-
-    </android.support.design.widget.AppBarLayout>
-
-    <android.support.v4.view.ViewPager
-        android:id="@+id/detail_view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        >
-
-    </android.support.v4.view.ViewPager>
+    </android.support.v7.widget.Toolbar>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/detail_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
-        app:layout_anchor="@id/detail_toolbar_fl"
-        app:layout_anchorGravity="bottom|end"
         app:srcCompat="@drawable/ic_share"/>
 
 </android.support.design.widget.CoordinatorLayout>

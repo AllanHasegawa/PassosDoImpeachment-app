@@ -31,6 +31,7 @@ import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.widget.TextView
 import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.adapters.StepsRvAdapter
 import org.hamcrest.Matchers.`is`
@@ -149,10 +150,14 @@ class MainActivityTest {
         Thread.sleep(300)
         onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(1))
                 .perform(ViewActions.click())
+        var stepPosition = ""
+        onView(RecyclerViewMatcher(R.id.main_steps_rv).atPositionOnView(1,
+                R.id.view_position_tv)).perform(TestUtils.customAction {
+            stepPosition = (it as TextView).text.toString()
+        })
         Thread.sleep(100)
-        onView(allOf(withId(R.id.view_position_tv),
-                withParent(withParent(withId(R.id.detail_pos_number_fl)))))
-                .check(matches(withText("2")))
+        onView(allOf(withId(R.id.detail_step_number_tv), isDisplayed()))
+                .check(matches(withText(stepPosition)))
     }
 
     @Test

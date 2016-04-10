@@ -2,41 +2,33 @@
              xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
-             android:orientation="vertical"
              tools:context=".fragments.StepDetailFragment"
     >
 
-    <ScrollView
+    <FrameLayout
+        android:id="@+id/detail_is_completed_fl"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-150dp"
+        android:background="@drawable/border_item_step_number_completed">
+    </FrameLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+    <ProgressBar
+        android:id="@+id/detail_pb"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:indeterminate="false"
+        android:max="10"
+        android:progress="5"
+        android:scaleY="2"/>
 
-            <TextView
-                android:id="@+id/detail_title_tv"
-                style="@style/DetailTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-
-            <TextView
-                android:id="@+id/detail_description_tv"
-                style="@style/DetailText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
-
-            <LinearLayout
-                android:id="@+id/detail_links_ll"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                />
-        </LinearLayout>
-    </ScrollView>
+    <com.hasegawa.diapp.views.MaybeSwipeViewPager
+        android:id="@+id/detail_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.hasegawa.diapp.views.MaybeSwipeViewPager>
 
 
 </FrameLayout>
