@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="@color/colorSecondaryLight"
+            android:background="@color/colorSecondary"
             android:orientation="vertical">
 
             <TextView
@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quis metus lectus."
-                android:textColor="@color/colorPrimaryText"
+                android:textColor="#DFFF"
                 />
 
             <TextView
@@ -39,7 +39,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Sed tincidunt ipsum quis est sagittis, eu posuere ante finibus. Nunc in tincidunt est. Cras tempus tortor at congue convallis. Nunc ac malesuada neque."
-                android:textColor="@color/colorSecondaryText"
+                android:textColor="#AFFF"
                 />
 
         </LinearLayout>
