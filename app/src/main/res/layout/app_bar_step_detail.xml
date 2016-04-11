@@ -7,31 +7,45 @@
                                                  android:fitsSystemWindows="true"
                                                  tools:context=".activities.StepDetailActivity">
 
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/detail_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:theme="@style/AppTheme"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/main_toolbar_shrunk_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left|center_vertical"
+                    android:text="@string/main_toolbar_shrunk_title"/>
+
+                <ImageView
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="right|center_vertical"
+                    android:layout_marginRight="8dp"
+                    app:srcCompat="@drawable/app_icon_plain"
+                    />
+            </FrameLayout>
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
     <FrameLayout
         android:id="@+id/detail_fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/detail_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:theme="@style/AppTheme"
-        app:popupTheme="@style/AppTheme.PopupOverlay">
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:layout_gravity="right|center_vertical"
-                android:layout_marginRight="8dp"
-                app:srcCompat="@drawable/app_icon_plain"
-                />
-        </FrameLayout>
-    </android.support.v7.widget.Toolbar>
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/detail_fab"
