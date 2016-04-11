@@ -25,9 +25,9 @@ import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.NewsRvAdapter.NewsViewHolder
 import com.hasegawa.diapp.models.DiContract.ImportantNewsContract
 import com.hasegawa.diapp.models.ImportantNews
+import com.hasegawa.diapp.utils.DateTimeExtensions
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.ItemImportantNewsView
-import com.hasegawa.diapp.utils.DateTimeExtensions
 import com.pushtorefresh.storio.contentresolver.queries.Query
 import org.joda.time.format.DateTimeFormat
 import rx.Observer
@@ -79,7 +79,10 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
                             if (!isTablet) {
                                 arr.add(Item(TYPE_SPACE, null, null))
                             }
-                            for (date in it.keys) {
+                            it.keys.forEachIndexed { i, date ->
+                                if (i != 0) {
+                                    arr.add(Item(TYPE_SPACE_BEFORE_DATE, null, null))
+                                }
                                 arr.add(Item(TYPE_DATE, null, date))
                                 arr.addAll(it[date]!!.map { Item(TYPE_NEWS, it, null) })
                             }
@@ -138,6 +141,9 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
             TYPE_DATE ->
                 NewsViewHolder(LayoutInflater.from(parent!!.context)
                         .inflate(R.layout.item_important_news_date, parent, false))
+            TYPE_SPACE_BEFORE_DATE ->
+                NewsViewHolder(LayoutInflater.from(parent!!.context)
+                        .inflate(R.layout.item_important_news_before_date_space, parent, false))
             else -> throw RuntimeException("Unknown type $viewType")
         }
     }
@@ -146,5 +152,6 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
         const val TYPE_NEWS = 5
         const val TYPE_SPACE = 6
         const val TYPE_DATE = 8
+        const val TYPE_SPACE_BEFORE_DATE = 9
     }
 }
