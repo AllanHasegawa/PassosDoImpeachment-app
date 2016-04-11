@@ -77,7 +77,7 @@
                 android:id="@+id/main_tablayout"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@color/colorPrimaryDark"
+                android:background="@color/colorPrimary"
                 />
         </LinearLayout>
 
@@ -105,7 +105,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@drawable/ic_share"
-        app:layout_anchor="@id/main_toolbar_fl"
+        app:layout_anchor="@id/main_tablayout"
         app:layout_anchorGravity="bottom|end"/>
 
 </android.support.design.widget.CoordinatorLayout>

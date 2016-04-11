@@ -30,7 +30,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorSecondary"
+                    android:background="@color/colorPrimary"
                     android:orientation="vertical"
                     >
 
@@ -40,7 +40,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="-8dp"
-                        android:textColor="#AFFF"
+                        android:textColor="#5000"
                         android:textSize="128sp"
                         />
 
@@ -50,7 +50,7 @@
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="-24dp"
                         android:text="@string/step_detail_middle_of_numbers"
-                        android:textColor="#8FFF"
+                        android:textColor="#3000"
                         android:textSize="14sp"
                         />
 
@@ -60,22 +60,10 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginBottom="16dp"
-                        android:textColor="#AFFF"
+                        android:textColor="#5000"
                         android:textSize="32sp"
                         />
                 </LinearLayout>
-
-                <TextView
-                    android:id="@+id/detail_date_tv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="8dp"
-                    android:fontFamily="sans-serif-regular"
-                    android:text="30 de dezembro de 1999"
-                    android:textColor="@color/colorSecondary"
-                    android:textSize="18sp"
-                    />
 
                 <TextView
                     android:id="@+id/detail_title_tv"
@@ -87,12 +75,23 @@
                     android:layout_marginTop="4dp"
                     android:fontFamily="sans-serif-medium"
                     android:text="big ass title as placeholder just to make sure everything is looking good =D"
+                    android:textColor="@color/colorPrimaryText"
                     android:textSize="24sp"
                     />
 
                 <TextView
+                    android:id="@+id/detail_date_tv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:fontFamily="sans-serif-regular"
+                    android:text="30 de dezembro de 1999"
+                    android:textColor="@color/colorPrimaryText"
+                    android:textSize="15sp"
+                    />
+
+                <TextView
                     android:id="@+id/detail_description_tv"
-                    style="@style/DetailText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
@@ -101,7 +100,7 @@
                     android:fontFamily="sans-serif-regular"
                     android:text="Aliquam vestibulum egestas neque vel rutrum. Mauris et faucibus lectus. Pellentesque ut nisi eros. Aliquam erat volutpat. Suspendisse vitae dolor luctus, tincidunt orci sagittis, maximus ex. Suspendisse potenti. Sed sit amet scelerisque metus. Aenean auctor, odio vel scelerisque gravida, purus sapien euismod sem, at pharetra arcu felis nec est. Phasellus scelerisque ultrices imperdie."
                     android:textColor="@color/colorSecondaryText"
-                    android:textSize="13sp"
+                    android:textSize="15sp"
                     />
 
                 <LinearLayout
