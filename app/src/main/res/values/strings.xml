@@ -1,74 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Passos do Impeachment</string>
-    <string name="app_play_store_short_url" translatable="false">https://goo.gl/W30vp7</string>
-    <string name="app_opensource_url" translatable="false">https://goo.gl/xFTz4f</string>
-    <string name="app_feedback_url" translatable="false">http://goo.gl/forms/WMEJrpocfj</string>
-    <string name="title_activity_step_detail" translatable="false">StepDetailActivity</string>
-    <string name="title_activity_credits">Créditos</string>
-
-    <string name="nav_drawer_open">Abrir a tela de navegação</string>
-    <string name="nav_drawer_close">Fechar a tela de navegação</string>
-
-    <string name="nav_drawer_title">Passos do Impeachment</string>
-    <string name="nav_drawer_step_list">Passos</string>
-    <string name="nav_drawer_news_list">Notícias</string>
-    <string name="nav_drawer_credits">Créditos</string>
-    <string name="nav_drawer_feedback">Envie sugestões</string>
-    <string name="nav_drawer_opensource">Opensource</string>
-    <string name="nav_drawer_sync_title">Última atualização</string>
-
-    <string name="sync_on_going">Atualização em progresso.</string>
-    <string name="sync_manual_request_started">Atualizações são feitas automaticamente.</string>
-    <string name="sync_never_updated">Nunca</string>
-    <string name="sync_first">Baixando conteúdo da internet.</string>
-    <string name="sync_done">Atualização completada com sucesso.</string>
-
-    <string name="notification_default_title">Atualização do Impeachment</string>
-    <string name="notification_default_message">Nova notícia publicada.</string>
-
-
-    <string name="main_toolbar_shrunk_title">Passos do Impeachment</string>
+    <string name="action_settings">Settings</string>
+    <string name="credits_email_chooser_header">Send e-mail…</string>
+    <string name="credits_hase_position">Developer</string>
+    <string name="error_invalid_link">Invalid link.</string>
+    <string name="error_no_app_to_share">No app to share was found.</string>
     <string name="main_toolbar_expanded_title">Passos\ndo Impeachment</string>
-
+    <string name="main_toolbar_shrunk_title">Passos do Impeachment</string>
     <string name="main_toolbar_tablet_title">Passos do Impeachment</string>
-
-    <string name="news_toolbar_shrunk_title">Notícias do Impeachment</string>
-    <string name="news_toolbar_tablet_title">Notícias</string>
-
-    <string name="step_item_completed_in">Concluído em %1$s</string>
-
-    <string name="news_item_share_button">Compartilhar</string>
-    <string name="news_item_access_button">Abrir</string>
-
-
-    <string name="step_detail_description_empty">Sem descrição.</string>
-    <string name="step_detail_middle_of_numbers">de</string>
-
-
-    <string name="share_main_chooser_header">Compartilhe o processo do impeachment…</string>
-    <string name="share_main_text">%1$d dos %2$d passos do impeachment já foram completados. Acompanhe você também: %3$s</string>
-
-    <string name="share_step_detail_chooser_header">Compartilhe o processo do impeachment…</string>
-    <string name="share_step_detail_text">Passo %1$d de %2$d %3$s %4$s. %5$s. Acompanhe você também: %6$s</string>
-    <string name="share_step_detail_state_completed">concluído em</string>
-    <string name="share_step_detail_state_incomplete">em andamento até</string>
-    <string name="share_news_item_chooser_header">Compartilhe essa notícia…</string>
+    <string name="nav_drawer_close">Close navigation drawer</string>
+    <string name="nav_drawer_credits">Credits</string>
+    <string name="nav_drawer_feedback">Feedback</string>
+    <string name="nav_drawer_news_list">News</string>
+    <string name="nav_drawer_open">Open navigation drawer</string>
+    <string name="nav_drawer_opensource">Opensource</string>
+    <string name="nav_drawer_step_list">Steps</string>
+    <string name="nav_drawer_sync_title">Last update</string>
+    <string name="nav_drawer_title">Passos do Impeachment</string>
+    <string name="news_item_access_button">Open</string>
+    <string name="news_item_share_button">Share</string>
+    <string name="news_toolbar_shrunk_title">Impeachment News</string>
+    <string name="news_toolbar_tablet_title">News</string>
+    <string name="notification_default_message">Latest news published.</string>
+    <string name="notification_default_title">Impeachment Update</string>
+    <string name="share_main_chooser_header">Share the impeachment process...</string>
+    <string name="share_main_text">%1$d of %2$d steps of the impeachment process completed. Follow with: %3$s</string>
+    <string name="share_news_item_chooser_header">Share this news...</string>
     <string name="share_news_item_text">%1$s. %2$s</string>
-
-    <string name="error_invalid_link">Link inválido.</string>
-    <string name="error_no_app_to_share">Não foi possível encontrar um app para compartilhamento.</string>
-
-    <string name="action_settings">Configurações</string>
-
-    <string name="credits_toolbar_shrunk_title">Créditos</string>
-
-    <string name="credits_email_chooser_header">Enviar e-mail…</string>
-
-    <string name="credits_hase_position">Desenvolvedor</string>
-    <string name="credits_hase_name" translatable="false">Allan Yoshio Hasegawa</string>
+    <string name="share_step_detail_chooser_header">Share the impeachment process...</string>
+    <string name="share_step_detail_state_completed">completed in</string>
+    <string name="share_step_detail_state_incomplete">on going until</string>
+    <string name="share_step_detail_text">Step %1$d of %2$d %3$s %4$s. %5$s Follow with: %6$s</string>
+    <string name="step_detail_description_empty">No description.</string>
+    <string name="step_item_completed_in">Completed in %1$s</string>
+    <string name="sync_done">Update completed successfully.</string>
+    <string name="sync_first">Downloading content...</string>
+    <string name="sync_manual_request_started">Updates are automatic.</string>
+    <string name="sync_never_updated">Never</string>
+    <string name="sync_on_going">Update in progress.</string>
+    <string name="title_activity_credits">Credits</string>
+    <string name="step_detail_middle_of_numbers">of</string>
+    <string name="credits_toolbar_shrunk_title">Credits</string>
+    <string name="app_feedback_url" translatable="false">http://goo.gl/forms/WMEJrpocfj</string>
+    <string name="app_name" translatable="false">Passos do Impeachment</string>
+    <string name="app_opensource_url" translatable="false">https://goo.gl/xFTz4f</string>
+    <string name="app_play_store_short_url" translatable="false">https://goo.gl/W30vp7</string>
+    <string name="credits_hase_email" translatable="false">hasegawa.aran@gmail.com</string>
+    <string name="credits_hase_email_subject" translatable="false">[Passos do Impeachment]</string>
     <string name="credits_hase_github" translatable="false">AranHase</string>
     <string name="credits_hase_github_url" translatable="false">https://github.com/AranHase</string>
-    <string name="credits_hase_email" translatable="false">hasegawa.aran@gmail.com</string>
-    <string name="credits_hase_email_subject" translatable="false">[Passos do Impeachment] </string>
-
+    <string name="credits_hase_name" translatable="false">Allan Yoshio Hasegawa</string>
+    <string name="title_activity_step_detail" translatable="false">StepDetailActivity</string>
 </resources>
