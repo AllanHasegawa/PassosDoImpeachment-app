@@ -110,7 +110,7 @@
             android:fillAlpha="0.03999999" />
         <path
             android:pathData="M203.21428 876.77693l21.78572 -17.5 36.42857 38.57143 -55 70 -10.89286 8.03572 0.17858 -8.39286 -57.85714 -74.28572 40.71428 -37.85714z"
-            android:fillColor="#ffb641"
+            android:fillColor="#ff9d11"
             android:strokeLineJoin="miter"
             android:strokeLineCap="butt" />
         <path
@@ -121,12 +121,12 @@
             android:fillAlpha="0.07333332" />
         <path
             android:pathData="M135.55425 890.41299l11.04175 17.53312 22.2896 -1.86136 23.78678 3.96584 7.92191 -6.22437 8.48777 7.07314 17.82432 -3.11218 23.48283 5.09267 12.1658 -15.27799 -11.59995 -16.97554 -50.92662 5.37559 -49.79492 -9.90239z"
-            android:fillColor="#947f61"
+            android:fillColor="#99834e"
             android:strokeLineJoin="miter"
             android:strokeLineCap="butt" />
         <path
             android:pathData="M203.04551 875.3009l-9.40076 -14.49278 22.64317 -25.88862 0.48712 18.08742z"
-            android:fillColor="#62c994"
+            android:fillColor="#50bda8"
             android:strokeLineJoin="miter"
             android:strokeLineCap="butt" />
         <path

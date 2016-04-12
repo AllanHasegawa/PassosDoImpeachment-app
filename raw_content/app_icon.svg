@@ -16,7 +16,10 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.91 r13725"
-   sodipodi:docname="app_icon.svg">
+   sodipodi:docname="app_icon.svg"
+   inkscape:export-filename="D:\libs\Android\di\PassosDoImpeachment-app\raw_content\ic_app.png"
+   inkscape:export-xdpi="352.85999"
+   inkscape:export-ydpi="352.85999">
   <defs
      id="defs4">
     <filter
@@ -67,7 +70,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="3.5344973"
-     inkscape:cx="16.500611"
+     inkscape:cx="-31.738215"
      inkscape:cy="70.417666"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -98,7 +101,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -223,7 +226,7 @@
        d="m 205.57282,878.08495 21.78572,-17.5 36.42857,38.57143 -55,70 -16.07143,9.28572 5.35715,-9.64286 -57.85714,-74.28572 40.71428,-37.85714 z"
        style="fill:#000000;fill-opacity:0.03999999;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;filter:url(#filter4375)" />
     <path
-       style="fill:#ffbd5f;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       style="fill:#ff9d11;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 203.21428,876.77693 21.78572,-17.5 36.42857,38.57143 -55,70 -10.89286,8.03572 0.17858,-8.39286 -57.85714,-74.28572 40.71428,-37.85714 z"
        id="path4160"
        inkscape:connector-curvature="0"
@@ -244,7 +247,7 @@
        inkscape:connector-curvature="0"
        id="path4166"
        d="m 203.04551,875.3009 -9.40076,-14.49278 22.64317,-25.88862 0.48712,18.08742 z"
-       style="fill:#6bc7b5;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       style="fill:#50bda8;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <g
        id="g4177">
       <path
