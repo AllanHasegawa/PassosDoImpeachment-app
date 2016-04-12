@@ -29,7 +29,6 @@ import android.view.MenuItem
 import android.view.View
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.string
-import timber.log.Timber
 
 class CreditsActivity : BaseNavDrawerActivity() {
 
@@ -64,6 +63,7 @@ class CreditsActivity : BaseNavDrawerActivity() {
 
         supportActionBar?.setDisplayShowHomeEnabled(true)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
         toolbar.setNavigationOnClickListener { onBackPressed() }
 
         navView.setNavigationItemSelectedListener(this)

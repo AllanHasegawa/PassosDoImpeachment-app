@@ -60,6 +60,8 @@
 
     <string name="action_settings">Configurações</string>
 
+    <string name="credits_toolbar_shrunk_title">Créditos</string>
+
     <string name="credits_email_chooser_header">Enviar e-mail…</string>
 
     <string name="credits_hase_position">Desenvolvedor</string>

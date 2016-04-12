@@ -57,7 +57,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:layout_marginTop="10dp"
                 android:fontFamily="sans-serif-regular"
                 android:text="Maecenas vel est volutpat, semper lectus sed, sagittis elit. Nunc mollis nisi sit amet ornare laoreet. Nam sollicitudin arcu non elit ultricies placerat. Morbi volutpat feugiat placerat."
                 android:textColor="@color/colorSecondaryText"

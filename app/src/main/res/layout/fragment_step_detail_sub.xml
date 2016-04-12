@@ -72,9 +72,8 @@
                     android:layout_marginBottom="4dp"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="12dp"
                     android:fontFamily="sans-serif-medium"
-                    android:text="big ass title as placeholder just to make sure everything is looking good =D"
                     android:textColor="@color/colorPrimaryText"
                     android:textSize="24sp"
                     />
@@ -85,7 +84,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="8dp"
                     android:fontFamily="sans-serif-regular"
-                    android:text="30 de dezembro de 1999"
                     android:textColor="@color/colorPrimaryText"
                     android:textSize="15sp"
                     />
@@ -98,7 +96,6 @@
                     android:layout_marginRight="8dp"
                     android:layout_marginTop="19dp"
                     android:fontFamily="sans-serif-regular"
-                    android:text="Aliquam vestibulum egestas neque vel rutrum. Mauris et faucibus lectus. Pellentesque ut nisi eros. Aliquam erat volutpat. Suspendisse vitae dolor luctus, tincidunt orci sagittis, maximus ex. Suspendisse potenti. Sed sit amet scelerisque metus. Aenean auctor, odio vel scelerisque gravida, purus sapien euismod sem, at pharetra arcu felis nec est. Phasellus scelerisque ultrices imperdie."
                     android:textColor="@color/colorSecondaryText"
                     android:textSize="15sp"
                     />

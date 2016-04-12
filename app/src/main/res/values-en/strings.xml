@@ -40,4 +40,5 @@
     <string name="sync_on_going">Update in progress.</string>
     <string name="title_activity_credits">Credits</string>
     <string name="step_detail_middle_of_numbers">of</string>
+    <string name="credits_toolbar_shrunk_title">Credits</string>
 </resources>

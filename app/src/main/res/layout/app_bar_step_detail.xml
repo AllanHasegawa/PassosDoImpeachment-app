@@ -24,10 +24,12 @@
 
                 <TextView
                     android:id="@+id/main_toolbar_shrunk_tv"
+                    style="@style/ToolbarShrunkText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left|center_vertical"
-                    android:text="@string/main_toolbar_shrunk_title"/>
+                    android:text="@string/main_toolbar_shrunk_title"
+                    />
 
                 <ImageView
                     android:layout_width="32dp"

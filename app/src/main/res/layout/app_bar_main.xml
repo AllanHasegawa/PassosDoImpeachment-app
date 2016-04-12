@@ -91,10 +91,12 @@
 
             <TextView
                 android:id="@+id/main_toolbar_shrunk_tv"
+                style="@style/ToolbarShrunkText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:alpha="0"
-                android:text="@string/main_toolbar_shrunk_title"/>
+                android:text="@string/main_toolbar_shrunk_title"
+                />
         </android.support.v7.widget.Toolbar>
 
     </FrameLayout>
@@ -104,8 +106,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@drawable/ic_share"
         app:layout_anchor="@id/main_tablayout"
-        app:layout_anchorGravity="bottom|end"/>
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/ic_share"/>
 
 </android.support.design.widget.CoordinatorLayout>
