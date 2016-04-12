@@ -15,7 +15,9 @@
  ******************************************************************************/
 package com.hasegawa.diapp.adapters
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
+import android.text.format.DateUtils
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,14 +31,14 @@ import com.hasegawa.diapp.utils.DateTimeExtensions
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.ItemImportantNewsView
 import com.pushtorefresh.storio.contentresolver.queries.Query
-import org.joda.time.format.DateTimeFormat
 import rx.Observer
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import timber.log.Timber
 import java.util.ArrayList
 
-class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder>() {
+class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
+        RecyclerView.Adapter<NewsViewHolder>() {
 
     class NewsViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var dateTv: TextView? = null
@@ -67,12 +69,11 @@ class NewsRvAdapter(val isTablet: Boolean) : RecyclerView.Adapter<NewsViewHolder
                         .prepare()
                         .asRxObservable()
                         .map {
-                            it.sortedByDescending { it.date }
-                                    .groupBy {
-                                        DateTimeExtensions.fromUnixTimestamp(it.date).toString(
-                                                DateTimeFormat.forPattern("dd/MM/yyyy")
-                                        )
-                                    }
+                            it.sortedByDescending { it.date }.groupBy {
+                                val millis = DateTimeExtensions.fromUnixTimestamp(it.date).millis
+                                DateUtils.formatDateTime(ctx, millis,
+                                        DateUtils.FORMAT_SHOW_DATE)
+                            }
                         }
                         .map {
                             val arr = ArrayList<Item>(it.size + 2)

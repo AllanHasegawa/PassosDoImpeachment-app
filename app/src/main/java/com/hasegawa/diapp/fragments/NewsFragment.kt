@@ -51,7 +51,7 @@ class NewsFragment : Fragment() {
         newsRv = root.findViewById(R.id.main_news_rv) as RecyclerView
 
         newsRv.layoutManager = LinearLayoutManager(context)
-        newsRvAdapter = NewsRvAdapter(isTablet)
+        newsRvAdapter = NewsRvAdapter(context, isTablet)
         newsRv.adapter = newsRvAdapter
         val itemAnimator = SlideInLeftAnimator()
         itemAnimator.setInterpolator(AccelerateDecelerateInterpolator())
