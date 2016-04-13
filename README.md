@@ -2,7 +2,7 @@
 
 [![Play Link](http://steverichey.github.io/google-play-badge-svg/img/en_get.svg)](https://play.google.com/store/apps/details?id=com.hasegawa.diapp)
 
-A *full* **demo** Android app showcasing data syncing with a RESTful server. Android [SyncAdapter](http://developer.android.com/training/sync-adapters/creating-sync-adapter.html) is used to trigger the fetch of the data using Retrofit. StorIO caches the data for offline usage. To keep devices up-to-date, the server issues GCM messages to the client when things changes. Kotlin and RxJava makes everything beautiful.
+A *full* **demo** Android app showcasing data syncing with a RESTful server. Android [SyncAdapter](http://developer.android.com/training/sync-adapters/creating-sync-adapter.html) is used to schedule the appropriate time to sync the data, a process done with Retrofit. StorIO caches the data for offline usage. To keep devices up-to-date, the server issues GCM messages to the client when things changes. Kotlin and RxJava makes everything beautiful.
 
 In short, the following awesome projects were used:
 
@@ -13,7 +13,7 @@ In short, the following awesome projects were used:
   * [Google Cloud Messaging (GCM)](https://developers.google.com/cloud-messaging/)
   * [Espresso](https://google.github.io/android-testing-support-library/docs/espresso/)
 
-The app has an accompanying **server** to sync the data with the app. Check it here: [PassosDoImpeachment-server](https://github.com/AranHase/PassosDoImpeachment-server)
+The app has an accompanying **server** to sync the data with. Check it here: [PassosDoImpeachment-server](https://github.com/AranHase/PassosDoImpeachment-server)
 
 ## Running
 
