@@ -21,3 +21,10 @@ data class NewsEntity(var id: String? = null,
                       var url: String,
                       var date: Long,
                       var tldr: String? = null)
+
+fun NewsEntity.equalsNoId(n: NewsEntity): Boolean {
+    return this.title == n.title &&
+            this.url == n.url &&
+            this.date == n.date &&
+            this.tldr == n.tldr
+}

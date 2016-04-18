@@ -17,11 +17,19 @@
 package com.hasegawa.diapp.data
 
 import com.hasegawa.diapp.data.models.NewsEntity
-import com.hasegawa.diapp.data.repositories.datasources.contentprovider.ContentProviderStepsRepository
+import com.hasegawa.diapp.data.models.equalsNoId
+import com.hasegawa.diapp.data.repositories.datasources.contentprovider.ContentProviderNewsRepository
+import org.junit.Assert
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import rx.Observable
+import rx.schedulers.Schedulers
+import java.util.ArrayList
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
@@ -29,10 +37,94 @@ class ContentProviderNewsRepositoryTest {
 
     val contentResolver = RuntimeEnvironment.application.contentResolver
 
-    fun db() = ContentProviderStepsRepository(contentResolver)
+    fun db() = ContentProviderNewsRepository(contentResolver)
 
     fun newsList() = listOf(
-            NewsEntity("A", "NewsA", "UrlA", 0, null)
+            NewsEntity("A", "NewsA", "UrlA", 0, null),
+            NewsEntity("B", "NewsB", "UrlB", 2, null),
+            NewsEntity("C", "NewsC", "UrlC", 1, null),
+            NewsEntity("D", "NewsD", "UrlD", 3, null),
+            NewsEntity("E", "NewsE", "UrlE", 4, null),
+            NewsEntity("F", "NewsF", "UrlF", 5, null)
     )
+
+    @Test
+    fun testGetNewsEmpty() {
+        val n = db().getNews().toBlocking().first().size
+        Assert.assertEquals(0, n)
+    }
+
+    @Test
+    fun testAddNews() {
+        val inserted = db().addAllNews(newsList()).toBlocking().first()
+        val n = inserted.map { newsList().contains(it) }.sumBy { if (it) 1 else 0 }
+        Assert.assertEquals(newsList().size, n)
+    }
+
+    @Test
+    fun testAddNewsNoId() {
+        val inserted = db().addAllNews(
+                newsList().map { it.id = null; it }
+        ).toBlocking().first()
+        val n = inserted.map { news -> newsList().find { it.equalsNoId(news) } != null }
+                .sumBy { if (it) 1 else 0 }
+        Assert.assertEquals(newsList().size, n)
+    }
+
+    @Test
+    fun testGetNewsSorted() {
+        db().addAllNews(newsList()).toBlocking().first()
+        val news = db().getNews().toBlocking().first()
+        Assert.assertEquals(newsList().size, news.size)
+
+        val n = newsList().sortedByDescending { it.date }
+                .mapIndexed { i, newsEntity -> news[i] == newsEntity }
+                .sumBy { if (it) 1 else 0 }
+        Assert.assertEquals(newsList().size, n)
+    }
+
+    @Test
+    fun testClearNews() {
+        db().addAllNews(newsList()).toBlocking().first()
+
+        val cleared = db().clearNews().toBlocking().first()
+        Assert.assertEquals(newsList().size, cleared)
+
+        val n = db().getNews().toBlocking().first().size
+        Assert.assertEquals(0, n)
+    }
+
+    @Test
+    fun testNotifyChange() {
+        var barrier = CyclicBarrier(2)
+        var results = ArrayList<Int>()
+        val subscription = db().getNews()
+                .take(3)
+                .subscribe({
+                    results.add(it.size)
+                    barrier.await()
+                })
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        db().addAllNews(newsList()).toBlocking().first()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+
+        val expected = listOf(0, 0, newsList().size)
+        Assert.assertEquals(expected, results)
+        Assert.assertEquals(true, subscription.isUnsubscribed)
+    }
 }
 

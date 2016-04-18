@@ -62,7 +62,7 @@ class ContentProviderNewsRepository : NewsRepository {
                 .listOfObjects(NewsEntity::class.java)
                 .withQuery(Query.builder()
                         .uri(NewsContract.URI)
-                        .sortOrder("${NewsContract.COL_DATE}")
+                        .sortOrder("${NewsContract.COL_DATE} desc")
                         .build())
                 .prepare()
                 .asRxObservable()
