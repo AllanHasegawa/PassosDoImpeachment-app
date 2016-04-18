@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.hasegawa.diapp.data">
+
+    <application
+        android:allowBackup="true"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        >
+
+        <provider
+            android:name=".repositories.datasources.contentprovider.DiContentProvider"
+            android:authorities="com.hasegawa.diapp.provider"
+            android:exported="false"
+            android:syncable="true"/>
+
+    </application>
+
+</manifest>
