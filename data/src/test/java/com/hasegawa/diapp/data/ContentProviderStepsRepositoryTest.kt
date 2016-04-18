@@ -19,7 +19,6 @@ package com.hasegawa.diapp.data
 import com.hasegawa.diapp.data.models.StepEntity
 import com.hasegawa.diapp.data.models.StepLinkEntity
 import com.hasegawa.diapp.data.models.equalsNotId
-import com.hasegawa.diapp.data.models.equalsNotId
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.ContentProviderStepsRepository
 import com.pushtorefresh.storio.StorIOException
 import junit.framework.Assert
@@ -28,7 +27,11 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
-import rx.Subscriber
+import rx.Observable
+import rx.schedulers.Schedulers
+import java.util.ArrayList
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
@@ -178,55 +181,51 @@ class ContentProviderStepsRepositoryTest {
         Assert.assertEquals("after size", 0, afterSize)
     }
 
+    fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
+                                      changes: (() -> Unit)): List<Int> {
+        var barrier = CyclicBarrier(2)
+        var results = ArrayList<Int>()
+        obs
+                .take(3)
+                .subscribe({
+                    results.add(it.size)
+                    barrier.await()
+                })
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        changes()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        return results
+    }
+
     @Test
     fun testNotifyChangeSteps() {
-        val subscriber = object : Subscriber<Int>() {
-            var expected = listOf(0, 0, 5)
-
-            override fun onCompleted() {
-            }
-
-            override fun onError(e: Throwable?) {
-                throw e!!
-            }
-
-            override fun onNext(t: Int?) {
-                Assert.assertNotNull(t)
-                Assert.assertEquals(expected.first(), t)
-                expected = expected.drop(1)
-            }
-        }
-        db().getNumberOfCompletedSteps().take(3).subscribe(subscriber)
-        Thread.sleep(100)
-        db().notifyChange()
-        db().addSteps(stepsList()).toBlocking().first()
-        db().notifyChange()
+        val results = doNotifyChangeTestResults(db().getSteps(),
+                { db().addSteps(stepsList()).toBlocking().first() })
+        Assert.assertEquals(listOf(0, 0, stepsList().size), results)
     }
 
     @Test
     fun testNotifyChangeStepLinks() {
-        val subscriber = object : Subscriber<List<StepLinkEntity>>() {
-            var expected = listOf(0, 0, stepLinksList().size)
-
-            override fun onCompleted() {
-            }
-
-            override fun onError(e: Throwable?) {
-                throw e!!
-            }
-
-            override fun onNext(t: List<StepLinkEntity>?) {
-                Assert.assertNotNull(t)
-                Assert.assertEquals(expected.first(), t!!.size)
-                expected = expected.drop(1)
-            }
-        }
-        db().getStepLinks().take(3).subscribe(subscriber)
-        Thread.sleep(100)
-        db().notifyChange()
-        db().addSteps(stepsList()).toBlocking().first()
-        db().addStepLinks(stepLinksList()).toBlocking().first()
-        db().notifyChange()
+        val results = doNotifyChangeTestResults(db().getStepLinks(),
+                {
+                    db().addSteps(stepsList()).toBlocking().first();
+                    db().addStepLinks(stepLinksList()).toBlocking().first()
+                })
+        Assert.assertEquals(listOf(0, 0, stepLinksList().size), results)
     }
 
     @Test
