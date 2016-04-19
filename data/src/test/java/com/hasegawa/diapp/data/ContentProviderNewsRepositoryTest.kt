@@ -19,6 +19,7 @@ package com.hasegawa.diapp.data
 import com.hasegawa.diapp.data.models.NewsEntity
 import com.hasegawa.diapp.data.models.equalsNoId
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.ContentProviderNewsRepository
+import org.hamcrest.Matchers
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,8 +58,7 @@ class ContentProviderNewsRepositoryTest {
     @Test
     fun testAddNews() {
         val inserted = db().addAllNews(newsList()).toBlocking().first()
-        val n = inserted.map { newsList().contains(it) }.sumBy { if (it) 1 else 0 }
-        Assert.assertEquals(newsList().size, n)
+        Assert.assertThat(inserted, Matchers.containsInAnyOrder(*newsList().toTypedArray()))
     }
 
     @Test
@@ -76,11 +76,8 @@ class ContentProviderNewsRepositoryTest {
         db().addAllNews(newsList()).toBlocking().first()
         val news = db().getNews().toBlocking().first()
         Assert.assertEquals(newsList().size, news.size)
-
-        val n = newsList().sortedByDescending { it.date }
-                .mapIndexed { i, newsEntity -> news[i] == newsEntity }
-                .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals(newsList().size, n)
+        Assert.assertThat(news,
+                Matchers.contains(*newsList().sortedByDescending { it.date }.toTypedArray()))
     }
 
     @Test
