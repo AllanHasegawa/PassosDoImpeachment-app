@@ -22,6 +22,7 @@ import com.hasegawa.diapp.data.models.NewsEntity
 import com.hasegawa.diapp.data.repositories.NewsRepository
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.DiContract.NewsContract
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.mappings.NewsEntityMapping
+import com.hasegawa.diapp.data.utils.IdUtils
 import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolver
 import com.pushtorefresh.storio.contentresolver.queries.DeleteQuery
 import com.pushtorefresh.storio.contentresolver.queries.Query

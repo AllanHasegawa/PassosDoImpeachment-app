@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.data.repositories.datasources.contentprovider
+package com.hasegawa.diapp.data.utils
 
 import java.util.UUID
 

@@ -27,6 +27,7 @@ import com.hasegawa.diapp.data.repositories.datasources.contentprovider.DiContra
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.mappings.GCMMessageEntityMapping
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.mappings.GCMRegistrationEntityMapping
 import com.hasegawa.diapp.data.repositories.datasources.contentprovider.mappings.SyncEntityMapping
+import com.hasegawa.diapp.data.utils.IdUtils
 import com.pushtorefresh.storio.StorIOException
 import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolver
 import com.pushtorefresh.storio.contentresolver.queries.Query
