@@ -19,5 +19,6 @@ package com.hasegawa.diapp.data.restservices.responses
 data class NewsResponse(
         val title: String? = null,
         val url: String? = null,
-        val tldr: String? = null
+        val tldr: String? = null,
+        val date: Long? = null
 )

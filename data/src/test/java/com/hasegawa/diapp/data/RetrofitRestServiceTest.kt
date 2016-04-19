@@ -16,7 +16,6 @@
 
 package com.hasegawa.diapp.data
 
-import com.google.gson.Gson
 import com.hasegawa.diapp.data.restservices.impls.retrofit.RetrofitRestService
 import com.hasegawa.diapp.data.restservices.responses.NewsResponse
 import com.hasegawa.diapp.data.restservices.responses.StepLinkResponse
@@ -38,27 +37,32 @@ import java.util.concurrent.TimeUnit
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
 class RetrofitRestServiceTest {
-    fun <T> buildResponse(body: T): MockResponse {
+    fun buildResponse(body: String): MockResponse {
         val response = MockResponse()
         response.addHeader("Content-Type: application/json;charset=utf-8")
-        val responseBody = Gson().toJson(body)
-        response.body = Buffer().readFrom(responseBody.byteInputStream())
+        response.body = Buffer().readFrom(body.byteInputStream())
         response.throttleBody(256, 1, TimeUnit.SECONDS)
         return response
     }
 
     @Test
     fun testGetNews() {
+        val expectedNewsResponse =
+                """[{"title":"titleA","date":1,"url":"http://urlA","tldr":"tldrA"},""" +
+                        """{"title":"titleB","date":2,"url":"http://urlB","tldr":"tldrB"},""" +
+                        """{"title":"titleC","date":3,"url":"http://urlC","tldr":"tldrC"},""" +
+                        """{"title":"titleD","date":4,"url":"http://urlD","tldr":"tldrD"},""" +
+                        """{"title":"titleE","date":5,"url":"http://urlE","tldr":"tldrE"}]"""
         val expectedNews = listOf(
-                NewsResponse("A", "urlA", "tldrA"),
-                NewsResponse("B", "urlB", "tldrB"),
-                NewsResponse("C", "urlC", "tldrC"),
-                NewsResponse("D", "urlD", "tldrD"),
-                NewsResponse("E", "urlE", "tldrE")
+                NewsResponse("titleA", "http://urlA", "tldrA", 1),
+                NewsResponse("titleB", "http://urlB", "tldrB", 2),
+                NewsResponse("titleC", "http://urlC", "tldrC", 3),
+                NewsResponse("titleD", "http://urlD", "tldrD", 4),
+                NewsResponse("titleE", "http://urlE", "tldrE", 5)
         )
 
         val server = MockWebServer()
-        server.enqueue(buildResponse(expectedNews))
+        server.enqueue(buildResponse(expectedNewsResponse))
         server.start()
 
         val url = server.url("/")
@@ -72,27 +76,31 @@ class RetrofitRestServiceTest {
                     Assert.assertEquals(expectedNews, it)
                     barrier.await()
                 }
-        barrier.await(10, TimeUnit.SECONDS)
+        barrier.await(3, TimeUnit.SECONDS)
         val request = server.takeRequest()
-        Assert.assertEquals("/important_news", request.path)
+        Assert.assertEquals("/importantNews", request.path)
         server.shutdown()
         Assert.assertEquals(true, subscription.isUnsubscribed)
     }
 
     @Test
     fun testGetSteps() {
+        val expectedNewsResponse = "[" +
+                """{"title":"StepA","description":"DescA","possibleDate":"PosA","position":1,"completed":true,"links":[{"title":"LA","url":"http://LA"}]},""" +
+                """{"title":"StepB","description":"","possibleDate":"PosB","position":2,"completed":true,"links":[]},""" +
+                """{"title":"StepC","description":"DescC","possibleDate":"PosC","position":3,"completed":false,"links":[]}""" +
+                "]"
+
         val expectedNews = listOf(
-                StepResponse("A", "descA", 1, listOf(
-                        StepLinkResponse("LinkA", "UrlA"),
-                        StepLinkResponse("LinkB", "UrlB"),
-                        StepLinkResponse("LinkC", "UrlC")
+                StepResponse("StepA", "DescA", "PosA", 1, true, listOf(
+                        StepLinkResponse("LA", "http://LA")
                 )),
-                StepResponse("B", "descB", 2, null),
-                StepResponse("C", "descC", 3, ArrayList())
+                StepResponse("StepB", "", "PosB", 2, true, ArrayList()),
+                StepResponse("StepC", "DescC", "PosC", 3, false, ArrayList())
         )
 
         val server = MockWebServer()
-        server.enqueue(buildResponse(expectedNews))
+        server.enqueue(buildResponse(expectedNewsResponse))
         server.start()
 
         val url = server.url("/")
@@ -106,7 +114,7 @@ class RetrofitRestServiceTest {
                     Assert.assertEquals(expectedNews, it)
                     barrier.await()
                 }
-        barrier.await(10, TimeUnit.SECONDS)
+        barrier.await(3, TimeUnit.SECONDS)
         val request = server.takeRequest()
         Assert.assertEquals("/steps", request.path)
         server.shutdown()
@@ -133,7 +141,7 @@ class RetrofitRestServiceTest {
                 .subscribe {
                     barrier.await()
                 }
-        barrier.await(10, TimeUnit.SECONDS)
+        barrier.await(3, TimeUnit.SECONDS)
         val request = server.takeRequest()
         Assert.assertEquals("/gcm/tokens", request.path)
         Assert.assertEquals(expectedBody, request.body.readUtf8())

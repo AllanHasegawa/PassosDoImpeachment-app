@@ -67,7 +67,7 @@ class RetrofitRestService(url: String) : RestService {
     private data class TokenPost(val token: String? = null)
 
     private interface RetrofitCalls {
-        @GET("important_news")
+        @GET("importantNews")
         fun callGetNews(): Call<List<NewsResponse>>
 
         @GET("steps")

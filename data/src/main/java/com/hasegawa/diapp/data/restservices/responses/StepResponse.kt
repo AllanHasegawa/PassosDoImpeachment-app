@@ -19,6 +19,8 @@ package com.hasegawa.diapp.data.restservices.responses
 data class StepResponse(
         val title: String? = null,
         val description: String? = null,
+        val possibleDate: String? = null,
         val position: Int? = null,
+        val completed: Boolean? = null,
         val links: List<StepLinkResponse>? = null
 )
