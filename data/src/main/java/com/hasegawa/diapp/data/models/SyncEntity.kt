@@ -21,3 +21,10 @@ data class SyncEntity(var id: String? = null,
                       var pendingTime: Long,
                       var success: Boolean,
                       var timeCreated: Long)
+
+fun SyncEntity.equalsNoId(s: SyncEntity): Boolean {
+    return this.pending == s.pending &&
+            this.pendingTime == s.pendingTime &&
+            this.success == s.success &&
+            this.timeCreated == s.timeCreated
+}

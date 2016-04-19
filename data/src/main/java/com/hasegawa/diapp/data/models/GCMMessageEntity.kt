@@ -26,3 +26,10 @@ data class GCMMessageEntity(var id: String? = null,
         const val TYPE_NEWS_NOTIFICATION = 2
     }
 }
+
+fun GCMMessageEntity.equalsNoId(m: GCMMessageEntity): Boolean {
+    return this.syncsId == m.syncsId &&
+            this.type == m.type &&
+            this.data == m.data &&
+            this.timeCreated == m.timeCreated
+}

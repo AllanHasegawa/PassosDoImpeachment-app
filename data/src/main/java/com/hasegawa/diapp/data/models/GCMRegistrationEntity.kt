@@ -20,3 +20,9 @@ data class GCMRegistrationEntity(var id: String? = null,
                                  var token: String?,
                                  var success: Boolean,
                                  var timeCreated: Long)
+
+fun GCMRegistrationEntity.equalsNoId(r: GCMRegistrationEntity): Boolean {
+    return this.token == r.token &&
+            this.success == r.success &&
+            this.timeCreated == r.timeCreated
+}
