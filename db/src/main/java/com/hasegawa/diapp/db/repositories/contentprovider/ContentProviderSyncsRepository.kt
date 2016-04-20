@@ -73,12 +73,12 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .asRxObservable()
     }
 
-    override fun getNumberGCMRegistrationsSuccessfully(): Observable<Int> {
+    override fun getGCMRegistrationsByToken(token: String): Observable<GCMRegistrationEntity?> {
         return provider.get()
-                .numberOfResults()
+                .`object`(GCMRegistrationEntity::class.java)
                 .withQuery(Query.builder().uri(GCMRegistrationsContract.URI)
-                        .where("${GCMRegistrationsContract.COL_SUCCESS}>?")
-                        .whereArgs(0)
+                        .where("${GCMRegistrationsContract.COL_TOKEN}=?")
+                        .whereArgs(token)
                         .build())
                 .prepare()
                 .asRxObservable()
@@ -95,29 +95,35 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .asRxObservable()
     }
 
-    override fun upsertGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity> {
-        registration.id = IdUtils.genIdIfNull(registration.id)
+    override fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?> {
         registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
-        return provider.put()
-                .`object`(registration)
-                .prepare()
-                .asRxObservable()
+        return getGCMRegistrationsByToken(registration.token)
                 .flatMap {
-                    val uri = if (it.wasInserted()) {
-                        it.insertedUri()!!
-                    } else if (it.wasUpdated()) {
-                        it.affectedUri()
+                    if (it == null) {
+                        provider.put()
+                                .`object`(registration)
+                                .prepare()
+                                .asRxObservable()
+                                .flatMap {
+                                    val uri = if (it.wasInserted()) {
+                                        it.insertedUri()!!
+                                    } else if (it.wasUpdated()) {
+                                        it.affectedUri()
+                                    } else {
+                                        throw StorIOException("GCMRegistration was not updated or inserted.")
+                                    }
+                                    provider.get().`object`(GCMRegistrationEntity::class.java)
+                                            .withQuery(Query.builder().uri(uri).build())
+                                            .prepare()
+                                            .asRxObservable()
+                                }
                     } else {
-                        throw StorIOException("GCMRegistration was not updated or inserted.")
+                        Observable.just(it)
                     }
-                    provider.get().`object`(GCMRegistrationEntity::class.java)
-                            .withQuery(Query.builder().uri(uri).build())
-                            .prepare()
-                            .asRxObservable()
                 }
     }
 
-    override fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity> {
+    override fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity?> {
         message.id = IdUtils.genIdIfNull(message.id)
         message.timeCreated = DateTimeUtils.nowIfNull(message.timeCreated)
         return provider.put()
@@ -139,7 +145,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 }
     }
 
-    override fun upsertSync(sync: SyncEntity): Observable<SyncEntity> {
+    override fun upsertSync(sync: SyncEntity): Observable<SyncEntity?> {
         sync.id = IdUtils.genIdIfNull(sync.id)
         sync.timeCreated = DateTimeUtils.nowIfNull(sync.timeCreated)
         return provider.put()

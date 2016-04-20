@@ -19,10 +19,8 @@ package com.hasegawa.diapp.db.repositories.contentprovider.mappings
 import android.content.ContentValues
 import android.database.Cursor
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.GCMRegistrationsContract
-import com.hasegawa.diapp.db.utils.getIntByColumnName
 import com.hasegawa.diapp.db.utils.getLongByColumnName
 import com.hasegawa.diapp.db.utils.getStringByColumnName
-import com.hasegawa.diapp.db.utils.isNullByColmnName
 import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
 import com.pushtorefresh.storio.contentresolver.ContentResolverTypeMapping
 import com.pushtorefresh.storio.contentresolver.operations.delete.DefaultDeleteResolver
@@ -41,12 +39,8 @@ object GCMRegistrationEntityMapping {
 
     fun getResolver() = object : DefaultGetResolver<GCMRegistrationEntity>() {
         override fun mapFromCursor(c: Cursor): GCMRegistrationEntity {
-            val token = if (c.isNullByColmnName(GCMRegistrationsContract.COL_TOKEN)) null else
-                c.getStringByColumnName(GCMRegistrationsContract.COL_TOKEN)
             return GCMRegistrationEntity(
-                    c.getStringByColumnName(GCMRegistrationsContract.COL_ID),
-                    token,
-                    c.getIntByColumnName(GCMRegistrationsContract.COL_SUCCESS) > 0,
+                    c.getStringByColumnName(GCMRegistrationsContract.COL_TOKEN),
                     c.getLongByColumnName(GCMRegistrationsContract.COL_TIME_CREATED)
             )
         }
@@ -60,8 +54,8 @@ object GCMRegistrationEntityMapping {
         override fun mapToUpdateQuery(s: GCMRegistrationEntity): UpdateQuery {
             return UpdateQuery.builder()
                     .uri(GCMRegistrationsContract.URI)
-                    .where("${GCMRegistrationsContract.COL_ID} = ?")
-                    .whereArgs(s.id)
+                    .where("${GCMRegistrationsContract.COL_TOKEN} = ?")
+                    .whereArgs(s.token)
                     .build()
         }
 
@@ -76,8 +70,8 @@ object GCMRegistrationEntityMapping {
         override fun mapToDeleteQuery(s: GCMRegistrationEntity): DeleteQuery {
             return DeleteQuery.builder()
                     .uri(GCMRegistrationsContract.URI)
-                    .where("${GCMRegistrationsContract.COL_ID} = ?")
-                    .whereArgs(s.id)
+                    .where("${GCMRegistrationsContract.COL_TOKEN} = ?")
+                    .whereArgs(s.token)
                     .build()
         }
     }
@@ -85,9 +79,7 @@ object GCMRegistrationEntityMapping {
 
 fun GCMRegistrationEntity.toContentValues(): ContentValues {
     val c = ContentValues()
-    c.put(GCMRegistrationsContract.COL_ID, this.id)
     c.put(GCMRegistrationsContract.COL_TOKEN, this.token)
-    c.put(GCMRegistrationsContract.COL_SUCCESS, if (this.success) 1 else 0)
     c.put(GCMRegistrationsContract.COL_TIME_CREATED, this.timeCreated)
     return c
 }

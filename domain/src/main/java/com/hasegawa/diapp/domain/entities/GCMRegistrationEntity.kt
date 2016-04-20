@@ -16,13 +16,5 @@
 
 package com.hasegawa.diapp.domain.entities
 
-data class GCMRegistrationEntity(var id: String? = null,
-                                 var token: String?,
-                                 var success: Boolean,
+data class GCMRegistrationEntity(var token: String,
                                  var timeCreated: Long? = null)
-
-fun GCMRegistrationEntity.equalsNoId(r: GCMRegistrationEntity): Boolean {
-    return this.token == r.token &&
-            this.success == r.success &&
-            this.timeCreated == r.timeCreated
-}
