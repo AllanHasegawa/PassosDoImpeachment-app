@@ -99,7 +99,7 @@ class ContentProviderStepsRepository : StepsRepository {
                 .asRxObservable()
     }
 
-    override fun getStepById(id: String): Observable<StepEntity> {
+    override fun getStepById(id: String): Observable<StepEntity?> {
         return provider.get()
                 .`object`(StepEntity::class.java)
                 .withQuery(Query.builder()
@@ -111,7 +111,7 @@ class ContentProviderStepsRepository : StepsRepository {
                 .asRxObservable()
     }
 
-    override fun getStepByPosition(position: Int): Observable<StepEntity> {
+    override fun getStepByPosition(position: Int): Observable<StepEntity?> {
         return provider.get()
                 .`object`(StepEntity::class.java)
                 .withQuery(Query.builder()

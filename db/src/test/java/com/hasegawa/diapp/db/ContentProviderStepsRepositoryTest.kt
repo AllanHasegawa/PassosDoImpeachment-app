@@ -137,6 +137,12 @@ class ContentProviderStepsRepositoryTest {
     }
 
     @Test
+    fun testGetStepsEmpty() {
+        val steps = db().getSteps().toBlocking().first()
+        Assert.assertEquals(emptyList<StepEntity>(), steps)
+    }
+
+    @Test
     fun testGetStepLinksByStepId() {
         db().addSteps(stepsList()).toBlocking().first()
         db().addStepLinks(stepLinksList()).toBlocking().first()
@@ -147,6 +153,24 @@ class ContentProviderStepsRepositoryTest {
         val equals = stepLinks.map { link -> stepLinksList().find { it == link } != null }
                 .sumBy { if (it) 1 else 0 }
         Assert.assertEquals(3, equals)
+    }
+
+    @Test
+    fun testGetStepLinksWithInvalidStepId() {
+        val links = db().getStepLinksByStepId("Hey :)").toBlocking().first()
+        Assert.assertEquals(emptyList<StepLinkEntity>(), links)
+    }
+
+    @Test
+    fun testGetStepWithInvalidId() {
+        val step = db().getStepById("who are you? :)").toBlocking().first()
+        Assert.assertEquals(null, step)
+    }
+
+    @Test
+    fun testGetStepWithInvalidPosition() {
+        val step = db().getStepByPosition(42).toBlocking().first()
+        Assert.assertEquals(null, step)
     }
 
     @Test

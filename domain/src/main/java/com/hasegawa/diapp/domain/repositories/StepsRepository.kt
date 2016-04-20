@@ -23,8 +23,8 @@ import rx.Observable
 interface StepsRepository {
     fun getSteps(): Observable<List<StepEntity>>
     fun getStepLinks(): Observable<List<StepLinkEntity>>
-    fun getStepById(id: String): Observable<StepEntity>
-    fun getStepByPosition(position: Int): Observable<StepEntity>
+    fun getStepById(id: String): Observable<StepEntity?>
+    fun getStepByPosition(position: Int): Observable<StepEntity?>
     fun getStepLinksByStepId(stepId: String): Observable<List<StepLinkEntity>>
     fun getNumberOfCompletedSteps(): Observable<Int>
 
