@@ -1,0 +1,62 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.github.ben-manes.versions'
+
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
+android {
+    def globalConfig = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfig.getAt("androidCompileSdkVersion")
+    buildToolsVersion globalConfig.getAt("androidBuildToolsVersion")
+
+    defaultConfig {
+        minSdkVersion globalConfig.getAt("androidMinSdkVersion")
+        targetSdkVersion globalConfig.getAt("androidTargetSdkVersion")
+        versionCode globalConfig.getAt("androidVersionCode")
+        versionName globalConfig.getAt("androidVersionName")
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+}
+
+kapt {
+    generateStubs = true
+}
+
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+dependencies {
+    compile project(":domain")
+
+    def dependencies = rootProject.ext.dbDependencies
+    def testDependencies = rootProject.ext.dbTestDependencies
+
+    testCompile testDependencies.junit
+    testCompile testDependencies.robolectric
+    compile dependencies.appcompat
+    compile dependencies.kotlin_stdlib
+    compile dependencies.kotlin_reflect
+    compile dependencies.rxkotlin
+    compile dependencies.joda
+    compile dependencies.rxandroid
+    compile dependencies.storio
+}

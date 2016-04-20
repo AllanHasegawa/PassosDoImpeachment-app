@@ -1,0 +1,80 @@
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+ext {
+    // Android
+    androidBuildToolsVersion = "23.0.3"
+    androidMinSdkVersion = 16
+    androidTargetSdkVersion = 23
+    androidCompileSdkVersion = 23
+    androidVersionCode = 12
+    androidVersionName = "1.12"
+    testInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
+    androidApplicationId = 'com.hasegawa.diapp'
+    testApplicationId = 'com.hasegawa.diapp.test'
+
+    // AndroidLibraries
+    appCompatVersion = '23.3.0'
+    rxAndroidVersion = '1.1.0'
+    timberVersion = '4.1.1'
+    retrofitVersion = '2.0.0'
+    storIoVersion = '1.8.0'
+
+    // Libraries
+    kotlinVersion = '1.0.1'
+    rxKotlinVersion = '0.55.0'
+    jodaVersion = '2.9.2'
+
+    // Testing
+    junitVersion = '4.12'
+    robolectricVersion = '3.1-SNAPSHOT'
+    mockWebServerVersion = '3.3.0-SNAPSHOT'
+
+    // Release
+
+    buildscriptDependencies = [
+            kotlin: ""
+    ]
+
+    domainDependencies = [
+            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion",
+    ]
+
+    domainTestDependencies = [
+            junit: "junit:junit:$junitVersion",
+    ]
+
+    cloudDependencies = [
+            appcompat     : "com.android.support:appcompat-v7:$appCompatVersion",
+            kotlin_stdlib : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
+            kotlin_reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            rxkotlin      : "io.reactivex:rxkotlin:$rxKotlinVersion",
+            rxandroid     : "io.reactivex:rxandroid:$rxAndroidVersion",
+            retrofit      : "com.squareup.retrofit2:retrofit:$retrofitVersion",
+            retrofit_gson : "com.squareup.retrofit2:converter-gson:$retrofitVersion",
+    ]
+
+    cloudTestDependencies = [
+            junit        : "junit:junit:$junitVersion",
+            robolectric  : "org.robolectric:robolectric:$robolectricVersion",
+            mockwebserver: "com.squareup.okhttp3:mockwebserver:$mockWebServerVersion"
+    ]
+
+    dbDependencies = [
+            appcompat     : "com.android.support:appcompat-v7:$appCompatVersion",
+            kotlin_stdlib : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
+            kotlin_reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            rxkotlin      : "io.reactivex:rxkotlin:$rxKotlinVersion",
+            rxandroid     : "io.reactivex:rxandroid:$rxAndroidVersion",
+            joda          : "net.danlew:android.joda:$jodaVersion",
+            storio        : "com.pushtorefresh.storio:content-resolver:$storIoVersion"
+    ]
+
+    dbTestDependencies = [
+            junit      : "junit:junit:$junitVersion",
+            robolectric: "org.robolectric:robolectric:$robolectricVersion"
+    ]
+}
