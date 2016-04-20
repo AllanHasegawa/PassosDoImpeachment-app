@@ -23,6 +23,7 @@ import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.SyncsContra
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.GCMMessageEntityMapping
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.GCMRegistrationEntityMapping
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.SyncEntityMapping
+import com.hasegawa.diapp.db.utils.DateTimeUtils
 import com.hasegawa.diapp.db.utils.IdUtils
 import com.hasegawa.diapp.domain.entities.GCMMessageEntity
 import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
@@ -96,6 +97,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
 
     override fun upsertGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity> {
         registration.id = IdUtils.genIdIfNull(registration.id)
+        registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
         return provider.put()
                 .`object`(registration)
                 .prepare()
@@ -117,6 +119,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
 
     override fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity> {
         message.id = IdUtils.genIdIfNull(message.id)
+        message.timeCreated = DateTimeUtils.nowIfNull(message.timeCreated)
         return provider.put()
                 .`object`(message)
                 .prepare()
@@ -138,6 +141,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
 
     override fun upsertSync(sync: SyncEntity): Observable<SyncEntity> {
         sync.id = IdUtils.genIdIfNull(sync.id)
+        sync.timeCreated = DateTimeUtils.nowIfNull(sync.timeCreated)
         return provider.put()
                 .`object`(sync)
                 .prepare()
@@ -159,7 +163,11 @@ class ContentProviderSyncsRepository : SyncsRepository {
 
     override fun upsertSyncs(syncs: List<SyncEntity>): Observable<List<SyncEntity>> {
         return provider.put()
-                .objects(syncs.map { it.id = IdUtils.genIdIfNull(it.id); it })
+                .objects(syncs.map {
+                    it.id = IdUtils.genIdIfNull(it.id)
+                    it.timeCreated = DateTimeUtils.nowIfNull(it.timeCreated)
+                    it
+                })
                 .prepare()
                 .asRxObservable()
                 .map { syncs ->

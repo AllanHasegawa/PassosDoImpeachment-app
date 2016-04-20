@@ -20,7 +20,7 @@ data class SyncEntity(var id: String? = null,
                       var pending: Boolean,
                       var pendingTime: Long,
                       var success: Boolean,
-                      var timeCreated: Long)
+                      var timeCreated: Long? = null)
 
 fun SyncEntity.equalsNoId(s: SyncEntity): Boolean {
     return this.pending == s.pending &&

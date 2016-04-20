@@ -34,7 +34,7 @@ data class GCMMessageEntity(var id: String? = null,
                             var syncsId: String?,
                             var type: GCMMessageType,
                             var data: String,
-                            var timeCreated: Long)
+                            var timeCreated: Long? = null)
 
 fun GCMMessageEntity.equalsNoId(m: GCMMessageEntity): Boolean {
     return this.syncsId == m.syncsId &&

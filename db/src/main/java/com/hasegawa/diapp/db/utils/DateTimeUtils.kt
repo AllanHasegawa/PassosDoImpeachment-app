@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.domain.entities
+package com.hasegawa.diapp.db.utils
 
-data class GCMRegistrationEntity(var id: String? = null,
-                                 var token: String?,
-                                 var success: Boolean,
-                                 var timeCreated: Long? = null)
+import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 
-fun GCMRegistrationEntity.equalsNoId(r: GCMRegistrationEntity): Boolean {
-    return this.token == r.token &&
-            this.success == r.success &&
-            this.timeCreated == r.timeCreated
+object DateTimeUtils {
+    fun nowIfNull(n: Long?): Long = n ?: DateTime.now(DateTimeZone.UTC).millis / 1000
 }
