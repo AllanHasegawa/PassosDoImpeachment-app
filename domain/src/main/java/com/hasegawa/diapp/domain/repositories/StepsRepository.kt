@@ -28,8 +28,9 @@ interface StepsRepository {
     fun getStepLinksByStepPosition(position: Int): Observable<List<StepLinkEntity>>
     fun getNumberOfCompletedSteps(): Observable<Int>
 
-    fun addSteps(steps: List<com.hasegawa.diapp.domain.entities.StepEntity>): Observable<List<StepEntity>>
-    fun addStepLinks(links: List<com.hasegawa.diapp.domain.entities.StepLinkEntity>): Observable<List<StepLinkEntity>>
+    fun addStep(step: StepEntity): Observable<StepEntity>
+    fun addSteps(steps: List<StepEntity>): Observable<List<StepEntity>>
+    fun addStepLinks(links: List<StepLinkEntity>): Observable<List<StepLinkEntity>>
 
     fun clearSteps(): Observable<Int>
     fun clearStepLinks(): Observable<Int>

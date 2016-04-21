@@ -58,6 +58,15 @@ class ContentProviderStepsRepository : StepsRepository {
                 }
     }
 
+    override fun addStep(step: StepEntity): Observable<StepEntity> {
+        step.id = IdUtils.genIdIfNull(step.id)
+        return provider.put()
+                .`object`(step)
+                .prepare()
+                .asRxObservable()
+                .map { step }
+    }
+
     override fun addSteps(steps: List<StepEntity>): Observable<List<StepEntity>> {
         return provider.put()
                 .objects(steps.map {

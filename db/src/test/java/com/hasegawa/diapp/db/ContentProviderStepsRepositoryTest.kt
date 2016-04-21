@@ -21,8 +21,8 @@ import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.entities.equalsNotId
 import com.pushtorefresh.storio.StorIOException
-import org.junit.Assert.*
 import org.hamcrest.Matchers.*
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -105,6 +105,15 @@ class ContentProviderStepsRepositoryTest {
     @Test(expected = StorIOException::class)
     fun testAddStepLinksWithNoSteps() {
         db().addStepLinks(stepLinksList()).toBlocking().first()
+    }
+
+    @Test
+    fun addStep() {
+        val step = db().addStep(stepsList()[0]).toBlocking().first()
+        assertThat(step, `is`(stepsList()[0]))
+
+        val steps = db().getSteps().toBlocking().first()
+        assertThat(steps[0], `is`(stepsList()[0]))
     }
 
     @Test
@@ -260,6 +269,16 @@ class ContentProviderStepsRepositoryTest {
             steps.find { it.equalsNotId(s) }
         }.sumBy { if (it != null) 1 else 0 }
         assertThat(n, `is`(steps.size))
+    }
+
+    @Test
+    fun testAddStepIdCreation() {
+        val step = stepsList()[0]
+        step.id = null
+        db().addStep(step).toBlocking().first()
+        val steps = db().getSteps().toBlocking().first()
+        assertThat(steps[0].id, notNullValue())
+        assertThat(steps[0].equalsNotId(stepsList()[0]), `is`(true))
     }
 
     @Test
