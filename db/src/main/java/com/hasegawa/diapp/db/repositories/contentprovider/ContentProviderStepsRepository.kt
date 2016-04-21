@@ -108,6 +108,15 @@ class ContentProviderStepsRepository : StepsRepository {
                 .asRxObservable()
     }
 
+    override fun getNumberOfSteps(): Observable<Int> {
+        return provider.get()
+                .numberOfResults()
+                .withQuery(Query.builder().uri(StepsContract.URI)
+                        .build())
+                .prepare()
+                .asRxObservable()
+    }
+
     override fun getStepById(id: String): Observable<StepEntity?> {
         return provider.get()
                 .`object`(StepEntity::class.java)

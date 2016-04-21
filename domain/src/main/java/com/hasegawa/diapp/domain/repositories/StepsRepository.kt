@@ -27,6 +27,7 @@ interface StepsRepository {
     fun getStepByPosition(position: Int): Observable<StepEntity?>
     fun getStepLinksByStepPosition(position: Int): Observable<List<StepLinkEntity>>
     fun getNumberOfCompletedSteps(): Observable<Int>
+    fun getNumberOfSteps(): Observable<Int>
 
     fun addStep(step: StepEntity): Observable<StepEntity>
     fun addSteps(steps: List<StepEntity>): Observable<List<StepEntity>>

@@ -183,6 +183,13 @@ class ContentProviderStepsRepositoryTest {
     }
 
     @Test
+    fun testGetNumberOfSteps() {
+        db().addSteps(stepsList()).toBlocking().first()
+        val n = db().getNumberOfSteps().toBlocking().first()
+        assertThat(n, `is`(stepsList().size))
+    }
+
+    @Test
     fun testClearSteps() {
         val initialSize = db().addSteps(stepsList()).toBlocking().first().size
         assertThat(initialSize, `is`(stepsList().size))
