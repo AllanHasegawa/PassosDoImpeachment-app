@@ -16,27 +16,19 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.entities.NewsEntity
+import com.hasegawa.diapp.domain.repositories.NewsRepository
 import rx.Observable
 import rx.Scheduler
-import rx.Subscriber
-import rx.subscriptions.Subscriptions
 
-abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThread: Scheduler) {
 
-    private var subscription = Subscriptions.empty()
+class GetNewsUseCase(
+        val newsRepository: NewsRepository,
+        executionThread: Scheduler,
+        postExecutionThread: Scheduler) :
+        UseCase<List<NewsEntity>>(executionThread, postExecutionThread) {
 
-    protected abstract fun buildUseCaseObservable(): Observable<T>
-
-    fun execute(subscriber: Subscriber<T>) {
-        subscription = buildUseCaseObservable()
-                .subscribeOn(executionThread)
-                .observeOn(postExecutionThread)
-                .subscribe(subscriber)
-    }
-
-    fun unsubscribe() {
-        if (!subscription.isUnsubscribed) {
-            subscription.unsubscribe()
-        }
+    override fun buildUseCaseObservable(): Observable<List<NewsEntity>> {
+        return newsRepository.getNews().map { it.sortedByDescending { it.date } }
     }
 }

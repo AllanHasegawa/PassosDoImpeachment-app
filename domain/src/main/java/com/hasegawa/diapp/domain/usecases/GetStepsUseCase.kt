@@ -17,15 +17,17 @@
 package com.hasegawa.diapp.domain.usecases
 
 import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
 import rx.Scheduler
 
 
-class GetStepsUseCase(onSubscribeThread: Scheduler,
+class GetStepsUseCase(val stepsRepository: StepsRepository,
+                      executionThread: Scheduler,
                       postExecutionThread: Scheduler) :
-        UseCase<List<StepEntity>>(onSubscribeThread, postExecutionThread) {
+        UseCase<List<StepEntity>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<StepEntity>> {
-        throw UnsupportedOperationException()
+        return stepsRepository.getSteps().map { it.sortedBy { it.position } }
     }
 }

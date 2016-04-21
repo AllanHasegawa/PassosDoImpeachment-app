@@ -16,27 +16,19 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.entities.StepLinkEntity
+import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
 import rx.Scheduler
-import rx.Subscriber
-import rx.subscriptions.Subscriptions
 
-abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThread: Scheduler) {
+class GetStepLinksByStepPositionUseCase(
+        val stepPosition: Int,
+        val stepsRepository: StepsRepository,
+        executionThread: Scheduler,
+        postExecutionThread: Scheduler) :
+        UseCase<List<StepLinkEntity>>(executionThread, postExecutionThread) {
 
-    private var subscription = Subscriptions.empty()
-
-    protected abstract fun buildUseCaseObservable(): Observable<T>
-
-    fun execute(subscriber: Subscriber<T>) {
-        subscription = buildUseCaseObservable()
-                .subscribeOn(executionThread)
-                .observeOn(postExecutionThread)
-                .subscribe(subscriber)
-    }
-
-    fun unsubscribe() {
-        if (!subscription.isUnsubscribed) {
-            subscription.unsubscribe()
-        }
+    override fun buildUseCaseObservable(): Observable<List<StepLinkEntity>> {
+        return stepsRepository.getStepLinksByStepPosition(stepPosition)
     }
 }

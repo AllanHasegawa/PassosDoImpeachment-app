@@ -16,27 +16,17 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
 import rx.Scheduler
-import rx.Subscriber
-import rx.subscriptions.Subscriptions
 
-abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThread: Scheduler) {
+class GetNumStepsCompletedUseCase(
+        val stepsRepository: StepsRepository,
+        executionThread: Scheduler,
+        postExecutionThread: Scheduler) :
+        UseCase<Int>(executionThread, postExecutionThread) {
 
-    private var subscription = Subscriptions.empty()
-
-    protected abstract fun buildUseCaseObservable(): Observable<T>
-
-    fun execute(subscriber: Subscriber<T>) {
-        subscription = buildUseCaseObservable()
-                .subscribeOn(executionThread)
-                .observeOn(postExecutionThread)
-                .subscribe(subscriber)
-    }
-
-    fun unsubscribe() {
-        if (!subscription.isUnsubscribed) {
-            subscription.unsubscribe()
-        }
+    override fun buildUseCaseObservable(): Observable<Int> {
+        return stepsRepository.getNumberOfCompletedSteps()
     }
 }
