@@ -16,7 +16,12 @@
 
 package com.hasegawa.diapp.domain.restservices.responses
 
+import com.hasegawa.diapp.domain.entities.StepLinkEntity
+
 data class StepLinkResponse(
         val title: String? = null,
         val url: String? = null
 )
+
+fun StepLinkResponse.toEntity(id: String?, stepId: String) =
+        StepLinkEntity(id, stepId, this.title!!, this.url!!)

@@ -19,14 +19,13 @@ package com.hasegawa.diapp.domain
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.hasegawa.diapp.domain.usecases.GetNewsUseCase
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.Matchers.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import rx.Observable
 import rx.Subscriber
 import rx.lang.kotlin.BehaviorSubject
 import rx.schedulers.Schedulers

@@ -16,9 +16,13 @@
 
 package com.hasegawa.diapp.domain.restservices.responses
 
+import com.hasegawa.diapp.domain.entities.NewsEntity
+
 data class NewsResponse(
         val title: String? = null,
         val url: String? = null,
         val tldr: String? = null,
         val date: Long? = null
 )
+
+fun NewsResponse.toEntity(id: String?) = NewsEntity(id, this.title!!, this.url!!, this.date!!)

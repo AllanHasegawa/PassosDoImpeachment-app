@@ -16,6 +16,8 @@
 
 package com.hasegawa.diapp.domain.restservices.responses
 
+import com.hasegawa.diapp.domain.entities.StepEntity
+
 data class StepResponse(
         val title: String? = null,
         val description: String? = null,
@@ -24,3 +26,8 @@ data class StepResponse(
         val completed: Boolean? = null,
         val links: List<StepLinkResponse>? = null
 )
+
+
+fun StepResponse.toEntity(id: String?) =
+        StepEntity(id, this.position!!, this.title!!, this.description!!,
+                this.completed!!, this.possibleDate!!)
