@@ -23,7 +23,8 @@ import com.hasegawa.diapp.domain.restservices.responses.StepResponse
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import okio.Buffer
-import org.junit.Assert
+import org.hamcrest.CoreMatchers.*
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -70,28 +71,32 @@ class RetrofitRestServiceTest {
         val restService = RetrofitRestService(url.toString())
 
         val barrier = CyclicBarrier(2)
+        var result: List<NewsResponse>? = null
         val subscription = restService.getNews()
                 .subscribeOn(Schedulers.io())
                 .subscribe {
-                    Assert.assertEquals(expectedNews, it)
+                    result = it
                     barrier.await()
                 }
         barrier.await(3, TimeUnit.SECONDS)
+        assertThat(result, `is`(expectedNews))
+
+
         val request = server.takeRequest()
-        Assert.assertEquals("/importantNews", request.path)
+        assertThat(request.path, `is`("/importantNews"))
         server.shutdown()
-        Assert.assertEquals(true, subscription.isUnsubscribed)
+        assertThat(subscription.isUnsubscribed, `is`(true))
     }
 
     @Test
     fun testGetSteps() {
-        val expectedNewsResponse = "[" +
+        val expectedStepsResponse = "[" +
                 """{"title":"StepA","description":"DescA","possibleDate":"PosA","position":1,"completed":true,"links":[{"title":"LA","url":"http://LA"}]},""" +
                 """{"title":"StepB","description":"","possibleDate":"PosB","position":2,"completed":true,"links":[]},""" +
                 """{"title":"StepC","description":"DescC","possibleDate":"PosC","position":3,"completed":false,"links":[]}""" +
                 "]"
 
-        val expectedNews = listOf(
+        val expectedSteps = listOf(
                 StepResponse("StepA", "DescA", "PosA", 1, true, listOf(
                         StepLinkResponse("LA", "http://LA")
                 )),
@@ -100,7 +105,7 @@ class RetrofitRestServiceTest {
         )
 
         val server = MockWebServer()
-        server.enqueue(buildResponse(expectedNewsResponse))
+        server.enqueue(buildResponse(expectedStepsResponse))
         server.start()
 
         val url = server.url("/")
@@ -108,17 +113,21 @@ class RetrofitRestServiceTest {
         val restService = RetrofitRestService(url.toString())
 
         val barrier = CyclicBarrier(2)
+        var result: List<StepResponse>? = null
         val subscription = restService.getSteps()
                 .subscribeOn(Schedulers.io())
                 .subscribe {
-                    Assert.assertEquals(expectedNews, it)
+                    result = it
                     barrier.await()
                 }
         barrier.await(3, TimeUnit.SECONDS)
+        assertThat(result, `is`(expectedSteps))
+
+
         val request = server.takeRequest()
-        Assert.assertEquals("/steps", request.path)
+        assertThat(request.path, `is`("/steps"))
         server.shutdown()
-        Assert.assertEquals(true, subscription.isUnsubscribed)
+        assertThat(subscription.isUnsubscribed, `is`(true))
     }
 
     @Test
@@ -136,16 +145,21 @@ class RetrofitRestServiceTest {
         val restService = RetrofitRestService(url.toString())
 
         val barrier = CyclicBarrier(2)
+        var result = false
         val subscription = restService.postGCMToken(token)
                 .subscribeOn(Schedulers.io())
                 .subscribe {
+                    result = true
                     barrier.await()
                 }
         barrier.await(3, TimeUnit.SECONDS)
+        assertThat(result, `is`(true))
+
         val request = server.takeRequest()
-        Assert.assertEquals("/gcm/tokens", request.path)
-        Assert.assertEquals(expectedBody, request.body.readUtf8())
+        assertThat(request.path, `is`("/gcm/tokens"))
+
+        assertThat(request.body.readUtf8(), `is`(expectedBody))
         server.shutdown()
-        Assert.assertEquals(true, subscription.isUnsubscribed)
+        assertThat(subscription.isUnsubscribed, `is`(true))
     }
 }

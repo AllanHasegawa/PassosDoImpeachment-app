@@ -21,7 +21,8 @@ import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.entities.equalsNotId
 import com.pushtorefresh.storio.StorIOException
-import junit.framework.Assert
+import org.junit.Assert.*
+import org.hamcrest.Matchers.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -71,37 +72,34 @@ class ContentProviderStepsRepositoryTest {
     @Test
     fun testEmptyDb() {
         val n = db().getSteps().toBlocking().first().size
-        Assert.assertEquals("Empty steps", 0, n)
+        assertThat(n, `is`(0))
 
         val nLinks = db().getStepLinks().toBlocking().first().size
-        Assert.assertEquals("Empty links", 0, nLinks)
+        assertThat(nLinks, `is`(0))
     }
 
     @Test
     fun testGetSteps() {
         val stepsAdded = db().addSteps(stepsList()).toBlocking().first()
-        Assert.assertNotNull(stepsAdded)
+        assertThat(stepsAdded, notNullValue())
 
         val steps = db().getSteps().toBlocking().first()
-        Assert.assertEquals("Get same size", stepsList().size, steps.size)
-
-        val equals = stepsList().map { mock -> steps.find { it == mock } != null }
-                .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals("Get same content", stepsList().size, equals)
+        assertThat(steps.size, `is`(stepsList().size))
+        assertThat(steps, containsInAnyOrder(*stepsList().toTypedArray()))
     }
 
     @Test
     fun testGetStepById() {
         db().addSteps(stepsList()).toBlocking().first()
-        val step = db().getStepById("H").toBlocking().first()
-        Assert.assertEquals(stepsList().first { it.id == "H" }, step)
+        val step = db().getStepById(stepsList()[2].id!!).toBlocking().first()
+        assertThat(step, `is`(stepsList()[2]))
     }
 
     @Test
     fun testGetStepByPosition() {
         db().addSteps(stepsList()).toBlocking().first()
         val step = db().getStepByPosition(5).toBlocking().first()
-        Assert.assertEquals(stepsList().first { it.position == 5 }, step)
+        assertThat(step, `is`(stepsList().first { it.position == 5 }))
     }
 
     @Test(expected = StorIOException::class)
@@ -112,15 +110,14 @@ class ContentProviderStepsRepositoryTest {
     @Test
     fun testAddStepLinks() {
         db().addSteps(stepsList()).toBlocking().first()
-        val n = db().addStepLinks(stepLinksList()).toBlocking().first()
-        Assert.assertEquals(stepLinksList().size, n.size)
+        val links = db().addStepLinks(stepLinksList()).toBlocking().first()
+        assertThat(links, containsInAnyOrder(*stepLinksList().toTypedArray()))
     }
 
     @Test(expected = StorIOException::class)
     fun testAddStepLinksWithInvalidStepId() {
         db().addSteps(stepsList()).toBlocking().first()
-        val n = db().addStepLinks(stepLinksWithInvalidStepIds()).toBlocking().first()
-        Assert.assertEquals(5, n.size)
+        db().addStepLinks(stepLinksWithInvalidStepIds()).toBlocking().first()
     }
 
     @Test
@@ -129,17 +126,14 @@ class ContentProviderStepsRepositoryTest {
         db().addStepLinks(stepLinksList()).toBlocking().first()
 
         val stepLinks = db().getStepLinks().toBlocking().first()
-        Assert.assertEquals("Get same size", stepLinksList().size, stepLinks.size)
-
-        val equals = stepLinksList().map { mock -> stepLinks.find { it == mock } != null }
-                .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals("Get same content", stepLinksList().size, equals)
+        assertThat(stepLinks.size, `is`(stepLinksList().size))
+        assertThat(stepLinks, containsInAnyOrder(*stepLinksList().toTypedArray()))
     }
 
     @Test
     fun testGetStepsEmpty() {
         val steps = db().getSteps().toBlocking().first()
-        Assert.assertEquals(emptyList<StepEntity>(), steps)
+        assertThat(steps, `is`(emptyList()))
     }
 
     @Test
@@ -148,61 +142,60 @@ class ContentProviderStepsRepositoryTest {
         db().addStepLinks(stepLinksList()).toBlocking().first()
 
         val stepLinks = db().getStepLinksByStepPosition(1).toBlocking().first()
-        Assert.assertEquals(3, stepLinks.size)
-
-        val equals = stepLinks.map { link -> stepLinksList().find { it == link } != null }
-                .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals(3, equals)
+        assertThat(stepLinks.size, `is`(3))
+        assertThat(
+                stepLinks, containsInAnyOrder(
+                *stepLinksList().filter { it.stepsId == "A" }.toTypedArray()))
     }
 
     @Test
     fun testGetStepLinksWithInvalidStepPosition() {
         val links = db().getStepLinksByStepPosition(55).toBlocking().first()
-        Assert.assertEquals(emptyList<StepLinkEntity>(), links)
+        assertThat(links, `is`(emptyList()))
     }
 
     @Test
     fun testGetStepWithInvalidId() {
         val step = db().getStepById("who are you? :)").toBlocking().first()
-        Assert.assertEquals(null, step)
+        assertThat(step, nullValue())
     }
 
     @Test
     fun testGetStepWithInvalidPosition() {
         val step = db().getStepByPosition(42).toBlocking().first()
-        Assert.assertEquals(null, step)
+        assertThat(step, nullValue())
     }
 
     @Test
     fun testGetNumberOfCompletedSteps() {
         db().addSteps(stepsList()).toBlocking().first()
         val n = db().getNumberOfCompletedSteps().toBlocking().first()
-        Assert.assertEquals(5, n)
+        assertThat(n, `is`(5))
     }
 
     @Test
     fun testClearSteps() {
         val initialSize = db().addSteps(stepsList()).toBlocking().first().size
-        Assert.assertEquals("initial size", stepsList().size, initialSize)
+        assertThat(initialSize, `is`(stepsList().size))
 
         val removed = db().clearSteps().toBlocking().first()
-        Assert.assertEquals("number removed", initialSize, removed)
+        assertThat(removed, `is`(initialSize))
 
         val afterSize = db().getSteps().toBlocking().first().size
-        Assert.assertEquals("after size", 0, afterSize)
+        assertThat(afterSize, `is`(0))
     }
 
     @Test
     fun testClearStepLinks() {
         db().addSteps(stepsList()).toBlocking().first()
         val initialSize = db().addStepLinks(stepLinksList()).toBlocking().first().size
-        Assert.assertEquals("initial size", stepLinksList().size, initialSize)
+        assertThat(initialSize, `is`(stepLinksList().size))
 
         val removed = db().clearStepLinks().toBlocking().first()
-        Assert.assertEquals("number removed", initialSize, removed)
+        assertThat(removed, `is`(initialSize))
 
         val afterSize = db().getStepLinks().toBlocking().first().size
-        Assert.assertEquals("after size", 0, afterSize)
+        assertThat(afterSize, `is`(0))
     }
 
     fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
@@ -239,7 +232,7 @@ class ContentProviderStepsRepositoryTest {
     fun testNotifyChangeSteps() {
         val results = doNotifyChangeTestResults(db().getSteps(),
                 { db().addSteps(stepsList()).toBlocking().first() })
-        Assert.assertEquals(listOf(0, 0, stepsList().size), results)
+        assertThat(results, `is`(listOf(0, 0, stepsList().size)))
     }
 
     @Test
@@ -249,17 +242,14 @@ class ContentProviderStepsRepositoryTest {
                     db().addSteps(stepsList()).toBlocking().first();
                     db().addStepLinks(stepLinksList()).toBlocking().first()
                 })
-        Assert.assertEquals(listOf(0, 0, stepLinksList().size), results)
+        assertThat(results, `is`(listOf(0, 0, stepLinksList().size)))
     }
 
     @Test
     fun testGetStepsOrdering() {
         db().addSteps(stepsList()).toBlocking().first()
         val steps = db().getSteps().toBlocking().first()
-        val equals = stepsList().sortedBy { it.position }
-                .mapIndexed { i, stepEntity -> steps[i] == stepEntity }
-                .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals(stepsList().size, equals)
+        assertThat(steps, `is`(stepsList().sortedBy { it.position }))
     }
 
     @Test
@@ -269,7 +259,7 @@ class ContentProviderStepsRepositoryTest {
         val n = db().getSteps().toBlocking().first().map { s ->
             steps.find { it.equalsNotId(s) }
         }.sumBy { if (it != null) 1 else 0 }
-        Assert.assertEquals(steps.size, n)
+        assertThat(n, `is`(steps.size))
     }
 
     @Test
@@ -280,6 +270,6 @@ class ContentProviderStepsRepositoryTest {
         val n = db().getStepLinks().toBlocking().first().map { s ->
             links.find { it.equalsNotId(s) }
         }.sumBy { if (it != null) 1 else 0 }
-        Assert.assertEquals(links.size, n)
+        assertThat(n, `is`(links.size))
     }
 }

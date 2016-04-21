@@ -19,8 +19,9 @@ package com.hasegawa.diapp.db
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderNewsRepository
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.entities.equalsNoId
-import org.hamcrest.Matchers
+import org.hamcrest.Matchers.*
 import org.junit.Assert
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -52,13 +53,13 @@ class ContentProviderNewsRepositoryTest {
     @Test
     fun testGetNewsEmpty() {
         val n = db().getNews().toBlocking().first().size
-        Assert.assertEquals(0, n)
+        assertThat(n, `is`(0))
     }
 
     @Test
     fun testAddNews() {
         val inserted = db().addAllNews(newsList()).toBlocking().first()
-        Assert.assertThat(inserted, Matchers.containsInAnyOrder(*newsList().toTypedArray()))
+        assertThat(inserted, containsInAnyOrder(*newsList().toTypedArray()))
     }
 
     @Test
@@ -68,16 +69,16 @@ class ContentProviderNewsRepositoryTest {
         ).toBlocking().first()
         val n = inserted.map { news -> newsList().find { it.equalsNoId(news) } != null }
                 .sumBy { if (it) 1 else 0 }
-        Assert.assertEquals(newsList().size, n)
+        assertThat(n, `is`(newsList().size))
     }
 
     @Test
     fun testGetNewsSorted() {
         db().addAllNews(newsList()).toBlocking().first()
         val news = db().getNews().toBlocking().first()
-        Assert.assertEquals(newsList().size, news.size)
-        Assert.assertThat(news,
-                Matchers.contains(*newsList().sortedByDescending { it.date }.toTypedArray()))
+        assertThat(news.size, `is`(newsList().size))
+        assertThat(news,
+                contains(*newsList().sortedByDescending { it.date }.toTypedArray()))
     }
 
     @Test
@@ -85,10 +86,10 @@ class ContentProviderNewsRepositoryTest {
         db().addAllNews(newsList()).toBlocking().first()
 
         val cleared = db().clearNews().toBlocking().first()
-        Assert.assertEquals(newsList().size, cleared)
+        assertThat(cleared, `is`(newsList().size))
 
         val n = db().getNews().toBlocking().first().size
-        Assert.assertEquals(0, n)
+        assertThat(n, `is`(0))
     }
 
     @Test
@@ -120,8 +121,8 @@ class ContentProviderNewsRepositoryTest {
         barrier.await(15, TimeUnit.SECONDS)
 
         val expected = listOf(0, 0, newsList().size)
-        Assert.assertEquals(expected, results)
-        Assert.assertEquals(true, subscription.isUnsubscribed)
+        assertThat(results, `is`(expected))
+        assertThat(subscription.isUnsubscribed, `is`(true))
     }
 }
 
