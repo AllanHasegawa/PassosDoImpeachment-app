@@ -32,19 +32,18 @@ ext {
     junitVersion = '4.12'
     robolectricVersion = '3.1-SNAPSHOT'
     mockWebServerVersion = '3.3.0-SNAPSHOT'
+    mockitoVersion = '2.0.49-beta'
 
     // Release
 
-    buildscriptDependencies = [
-            kotlin: ""
-    ]
 
     domainDependencies = [
-            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion",
+            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion"
     ]
 
     domainTestDependencies = [
-            junit: "junit:junit:$junitVersion",
+            junit  : "junit:junit:$junitVersion",
+            mockito: "org.mockito:mockito-core:$mockitoVersion"
     ]
 
     cloudDependencies = [

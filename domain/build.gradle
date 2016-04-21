@@ -22,6 +22,7 @@ dependencies {
     def dependencies = rootProject.ext.domainDependencies
     def testDependencies = rootProject.ext.domainTestDependencies
 
-    compile dependencies.rxkotlin
     testCompile testDependencies.junit
+    testCompile testDependencies.mockito
+    compile dependencies.rxkotlin
 }
