@@ -25,6 +25,10 @@ data class StepEntity(var id: String? = null,
                       var possibleDate: String
 )
 
+
+data class StepWithLinksEntity(val step: StepEntity?, val links: List<StepLinkEntity>)
+
+
 fun StepEntity.equalsNotId(s: StepEntity): Boolean {
     return this.position == s.position &&
             this.title == s.title &&
