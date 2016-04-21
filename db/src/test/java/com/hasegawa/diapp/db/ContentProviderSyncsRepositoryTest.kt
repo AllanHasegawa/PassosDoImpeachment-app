@@ -104,14 +104,14 @@ class ContentProviderSyncsRepositoryTest {
     fun testGetRegistrationByToken() {
         val reg = gcmRegistrationsList()[0]
         db().addGCMRegistration(reg).toBlocking().first()
-        val retReg = db().getGCMRegistrationsByToken(reg.token).toBlocking().first()
+        val retReg = db().getGCMRegistrationByToken(reg.token).toBlocking().first()
         Assert.assertEquals(reg, retReg)
     }
 
     @Test
     fun testGetRegistrationByTokenNotInDb() {
         val reg = gcmRegistrationsList()[0]
-        val retReg = db().getGCMRegistrationsByToken(reg.token).toBlocking().first()
+        val retReg = db().getGCMRegistrationByToken(reg.token).toBlocking().first()
         Assert.assertEquals(null, retReg)
     }
 

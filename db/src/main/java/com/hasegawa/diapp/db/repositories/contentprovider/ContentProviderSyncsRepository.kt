@@ -73,7 +73,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .asRxObservable()
     }
 
-    override fun getGCMRegistrationsByToken(token: String): Observable<GCMRegistrationEntity?> {
+    override fun getGCMRegistrationByToken(token: String): Observable<GCMRegistrationEntity?> {
         return provider.get()
                 .`object`(GCMRegistrationEntity::class.java)
                 .withQuery(Query.builder().uri(GCMRegistrationsContract.URI)
@@ -97,7 +97,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
 
     override fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?> {
         registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
-        return getGCMRegistrationsByToken(registration.token)
+        return getGCMRegistrationByToken(registration.token)
                 .flatMap {
                     if (it == null) {
                         provider.put()

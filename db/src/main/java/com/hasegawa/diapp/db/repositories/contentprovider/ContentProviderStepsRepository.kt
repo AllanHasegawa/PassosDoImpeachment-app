@@ -133,16 +133,31 @@ class ContentProviderStepsRepository : StepsRepository {
                 .asRxObservable()
     }
 
-    override fun getStepLinksByStepId(stepId: String): Observable<List<StepLinkEntity>> {
+    override fun getStepLinksByStepPosition(position: Int): Observable<List<StepLinkEntity>> {
         return provider.get()
-                .listOfObjects(StepLinkEntity::class.java)
-                .withQuery(Query.builder()
-                        .uri(LinksContract.URI)
-                        .where("${LinksContract.COL_STEPS_ID}=?")
-                        .whereArgs(stepId)
+                .`object`(StepEntity::class.java)
+                .withQuery(Query.builder().uri(StepsContract.URI)
+                        .where("${StepsContract.COL_POSITION}=?")
+                        .whereArgs(position)
                         .build())
                 .prepare()
                 .asRxObservable()
+                .flatMap {
+                    if (it != null) {
+                        provider.get()
+                                .listOfObjects(StepLinkEntity::class.java)
+                                .withQuery(Query.builder()
+                                        .uri(LinksContract.URI)
+                                        .where("${LinksContract.COL_STEPS_ID}=?")
+                                        .whereArgs(it.id)
+                                        .build())
+                                .prepare()
+                                .asRxObservable()
+                    } else {
+                        Observable.just(emptyList<StepLinkEntity>())
+                    }
+                }
+
     }
 
     override fun getSteps(): Observable<List<StepEntity>> {

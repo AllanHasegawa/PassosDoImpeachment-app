@@ -26,7 +26,7 @@ interface SyncsRepository {
     fun getMessagesByType(type: Int): Observable<List<GCMMessageEntity>>
     fun getPendingSyncs(): Observable<List<SyncEntity>>
     fun getGCMRegistrations(): Observable<List<GCMRegistrationEntity>>
-    fun getGCMRegistrationsByToken(token: String): Observable<GCMRegistrationEntity?>
+    fun getGCMRegistrationByToken(token: String): Observable<GCMRegistrationEntity?>
 
     fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity?>
     fun upsertSyncs(syncs: List<SyncEntity>): Observable<List<SyncEntity>>
