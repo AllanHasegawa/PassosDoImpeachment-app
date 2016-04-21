@@ -58,11 +58,11 @@ class RetrofitRestService(url: String) : RestService {
                 .map { it.body() }
     }
 
-    override fun postGCMToken(token: String): Observable<Unit> {
+    override fun postGCMToken(token: String): Observable<Boolean> {
         val requestBody = TokenPost(token)
         val tokenCall = calls.callPostGcmTokenPost(requestBody)
         return Observable.fromCallable { tokenCall.execute() }
-                .map {}
+                .map { it.isSuccessful }
     }
 
     private data class TokenPost(val token: String? = null)

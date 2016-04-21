@@ -25,5 +25,5 @@ interface RestService {
 
     fun getNews(): Observable<List<NewsResponse>>
 
-    fun postGCMToken(token: String): Observable<Unit>
+    fun postGCMToken(token: String): Observable<Boolean>
 }
