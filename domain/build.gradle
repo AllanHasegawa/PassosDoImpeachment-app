@@ -23,6 +23,7 @@ dependencies {
     def testDependencies = rootProject.ext.domainTestDependencies
 
     testCompile testDependencies.junit
+    testCompile testDependencies.hamcrest_junit
     testCompile testDependencies.mockito
     compile dependencies.rxkotlin
 }
