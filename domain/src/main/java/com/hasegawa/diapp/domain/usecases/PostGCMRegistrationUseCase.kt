@@ -28,9 +28,9 @@ class PostGCMRegistrationUseCase(
         val restService: RestService,
         executionThread: Scheduler,
         postExecutionThread: Scheduler) :
-        UseCase<Unit>(executionThread, postExecutionThread) {
+        UseCase<Boolean>(executionThread, postExecutionThread) {
 
-    override fun buildUseCaseObservable(): Observable<Unit> {
+    override fun buildUseCaseObservable(): Observable<Boolean> {
         return syncsRepository.getGCMRegistrationByToken(gcmToken)
                 .take(1)
                 .flatMap {
@@ -39,12 +39,12 @@ class PostGCMRegistrationUseCase(
                                 .flatMap {
                                     syncsRepository
                                             .addGCMRegistration(
-                                                    GCMRegistrationEntity(gcmToken, null))
+                                                    GCMRegistrationEntity(gcmToken, null)
+                                            ).map { it != null }
                                 }
                     } else {
-                        Observable.empty()
+                        Observable.just(false)
                     }
                 }
-                .flatMap { Observable.empty<Unit>() }
     }
 }

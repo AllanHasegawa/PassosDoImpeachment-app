@@ -20,7 +20,8 @@ import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.usecases.PostGCMRegistrationUseCase
-import org.hamcrest.CoreMatchers.*
+import org.hamcrest.CoreMatchers.`is`
+import org.hamcrest.CoreMatchers.nullValue
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -67,7 +68,8 @@ class PostGCMRegistrationUseCaseTest {
         var completed = false
         var calls = 0
         val lock = CountDownLatch(1)
-        useCase.execute(object : Subscriber<Unit>() {
+        var result: Boolean? = null
+        useCase.execute(object : Subscriber<Boolean>() {
             override fun onCompleted() {
                 completed = true
                 lock.countDown()
@@ -77,8 +79,9 @@ class PostGCMRegistrationUseCaseTest {
                 throw UnsupportedOperationException()
             }
 
-            override fun onNext(t: Unit?) {
+            override fun onNext(t: Boolean?) {
                 calls++
+                result = t
             }
         })
 
@@ -86,7 +89,8 @@ class PostGCMRegistrationUseCaseTest {
         useCase.unsubscribe()
 
         assertThat(completed, `is`(true))
-        assertThat(calls, `is`(0))
+        assertThat(calls, `is`(1))
+        assertThat(result, `is`(true))
 
         verify(syncsRepository!!).getGCMRegistrationByToken(token)
         verify(syncsRepository!!).addGCMRegistration(anyObject())
@@ -105,8 +109,9 @@ class PostGCMRegistrationUseCaseTest {
 
         var completed = false
         var calls = 0
+        var result: Boolean? = null
         val lock = CountDownLatch(1)
-        useCase.execute(object : Subscriber<Unit>() {
+        useCase.execute(object : Subscriber<Boolean>() {
             override fun onCompleted() {
                 completed = true
                 lock.countDown()
@@ -116,8 +121,9 @@ class PostGCMRegistrationUseCaseTest {
                 throw UnsupportedOperationException()
             }
 
-            override fun onNext(t: Unit?) {
+            override fun onNext(t: Boolean?) {
                 calls++
+                result = t
             }
         })
 
@@ -125,7 +131,8 @@ class PostGCMRegistrationUseCaseTest {
         useCase.unsubscribe()
 
         assertThat(completed, `is`(true))
-        assertThat(calls, `is`(0))
+        assertThat(calls, `is`(1))
+        assertThat(result, `is`(false))
 
         verify(syncsRepository!!).getGCMRegistrationByToken(token)
         verifyNoMoreInteractions(syncsRepository!!)
@@ -151,8 +158,9 @@ class PostGCMRegistrationUseCaseTest {
         var completed = false
         var foundError = false
         var calls = 0
+        var result: Boolean? = null
         val lock = CountDownLatch(1)
-        useCase.execute(object : Subscriber<Unit>() {
+        useCase.execute(object : Subscriber<Boolean>() {
             override fun onCompleted() {
                 completed = true
             }
@@ -163,8 +171,9 @@ class PostGCMRegistrationUseCaseTest {
                 lock.countDown()
             }
 
-            override fun onNext(t: Unit?) {
+            override fun onNext(t: Boolean?) {
                 calls++
+                result = t
             }
         })
 
@@ -174,6 +183,7 @@ class PostGCMRegistrationUseCaseTest {
         assertThat(completed, `is`(false))
         assertThat(foundError, `is`(true))
         assertThat(calls, `is`(0))
+        assertThat(result, nullValue())
 
         verify(syncsRepository!!).getGCMRegistrationByToken(token)
         verify(syncsRepository!!, never()).addGCMRegistration(anyObject())
