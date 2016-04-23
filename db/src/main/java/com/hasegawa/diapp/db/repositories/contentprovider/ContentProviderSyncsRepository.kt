@@ -96,7 +96,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .asRxObservable()
     }
 
-    override fun getSuccessfullySyncs(): Observable<List<SyncEntity>> {
+    override fun getSuccessfulSyncs(): Observable<List<SyncEntity>> {
         return provider.get()
                 .listOfObjects(SyncEntity::class.java)
                 .withQuery(Query.builder().uri(SyncsContract.URI)

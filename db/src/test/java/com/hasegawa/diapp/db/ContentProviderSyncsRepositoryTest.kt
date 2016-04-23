@@ -279,14 +279,14 @@ class ContentProviderSyncsRepositoryTest {
     @Test
     fun testGetSuccessfullySyncs() {
         db().upsertSyncs(syncsList()).toBlocking().first()
-        val syncs = db().getSuccessfullySyncs().toBlocking().first()
+        val syncs = db().getSuccessfulSyncs().toBlocking().first()
         assertThat(syncs, `is`(syncsList().filter { it.pending == false }))
     }
 
     @Test
     fun testGetSuccessfullySyncsNotifyChange() {
         val results =
-                doNotifyChangeTestResults(db().getSuccessfullySyncs(), {
+                doNotifyChangeTestResults(db().getSuccessfulSyncs(), {
                     db().upsertSyncs(syncsList()).toBlocking().first()
                 })
         assertThat(results.size, `is`(3))
