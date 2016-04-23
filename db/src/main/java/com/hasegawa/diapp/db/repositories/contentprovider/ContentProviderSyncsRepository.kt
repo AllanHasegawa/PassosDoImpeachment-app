@@ -99,7 +99,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
         return provider.get()
                 .listOfObjects(SyncEntity::class.java)
                 .withQuery(Query.builder().uri(SyncsContract.URI)
-                        .where("${SyncsContract.COL_SUCCESS}>?")
+                        .where("${SyncsContract.COL_PENDING}=?")
                         .whereArgs(0)
                         .build())
                 .prepare()
@@ -159,6 +159,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
     override fun upsertSync(sync: SyncEntity): Observable<SyncEntity?> {
         sync.id = IdUtils.genIdIfNull(sync.id)
         sync.timeCreated = DateTimeUtils.nowIfNull(sync.timeCreated)
+        sync.timeSynced = DateTimeUtils.nowIfNull(sync.timeSynced)
         return provider.put()
                 .`object`(sync)
                 .prepare()
@@ -183,6 +184,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .objects(syncs.map {
                     it.id = IdUtils.genIdIfNull(it.id)
                     it.timeCreated = DateTimeUtils.nowIfNull(it.timeCreated)
+                    it.timeSynced = DateTimeUtils.nowIfNull(it.timeSynced)
                     it
                 })
                 .prepare()

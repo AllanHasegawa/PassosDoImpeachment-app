@@ -43,8 +43,7 @@ object SyncEntityMapping {
             return SyncEntity(
                     c.getStringByColumnName(SyncsContract.COL_ID),
                     c.getIntByColumnName(SyncsContract.COL_PENDING) > 0,
-                    c.getLongByColumnName(SyncsContract.COL_PENDING_TO_TIME),
-                    c.getIntByColumnName(SyncsContract.COL_SUCCESS) > 0,
+                    c.getLongByColumnName(SyncsContract.COL_TIME_SYNCED),
                     c.getLongByColumnName(SyncsContract.COL_TIME_CREATED)
             )
         }
@@ -85,8 +84,7 @@ fun SyncEntity.toContentValues(): ContentValues {
     val c = ContentValues()
     c.put(SyncsContract.COL_ID, this.id)
     c.put(SyncsContract.COL_PENDING, if (this.pending) 1 else 0)
-    c.put(SyncsContract.COL_PENDING_TO_TIME, this.pendingTime)
-    c.put(SyncsContract.COL_SUCCESS, if (this.success) 1 else 0)
+    c.put(SyncsContract.COL_TIME_SYNCED, this.timeSynced)
     c.put(SyncsContract.COL_TIME_CREATED, this.timeCreated)
     return c
 }

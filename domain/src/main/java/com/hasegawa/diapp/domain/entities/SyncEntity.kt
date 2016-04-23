@@ -18,13 +18,11 @@ package com.hasegawa.diapp.domain.entities
 
 data class SyncEntity(var id: String? = null,
                       var pending: Boolean,
-                      var pendingTime: Long,
-                      var success: Boolean,
+                      var timeSynced: Long? = null,
                       var timeCreated: Long? = null)
 
 fun SyncEntity.equalsNoId(s: SyncEntity): Boolean {
     return this.pending == s.pending &&
-            this.pendingTime == s.pendingTime &&
-            this.success == s.success &&
+            this.timeSynced == s.timeSynced &&
             this.timeCreated == s.timeCreated
 }

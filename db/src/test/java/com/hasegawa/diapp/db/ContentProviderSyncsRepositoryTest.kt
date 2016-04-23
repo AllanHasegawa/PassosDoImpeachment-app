@@ -48,11 +48,11 @@ class ContentProviderSyncsRepositoryTest {
     )
 
     fun syncsList() = listOf(
-            SyncEntity("A", false, 0, false, 0),
-            SyncEntity("B", false, 0, true, 1),
-            SyncEntity("C", true, 0, false, 2),
-            SyncEntity("D", true, 0, false, 3),
-            SyncEntity("E", false, 0, false, 4)
+            SyncEntity("A", false, 1, 0),
+            SyncEntity("B", false, 2, 1),
+            SyncEntity("C", true, 2, 2),
+            SyncEntity("D", true, 3, 3),
+            SyncEntity("E", false, 6, 4)
     )
 
     fun gcmMessagesList() = listOf(
@@ -70,7 +70,7 @@ class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testUpsertSyncWithNullTimeCreated() {
-        var reg = db().upsertSync(SyncEntity(null, false, 10, true, null)).toBlocking().first()
+        var reg = db().upsertSync(SyncEntity(null, false, 10, null)).toBlocking().first()
         assertThat(reg, notNullValue())
         assertThat(reg!!.id, notNullValue())
         assertThat(reg.timeCreated, notNullValue())
@@ -81,6 +81,21 @@ class ContentProviderSyncsRepositoryTest {
         val syncs = syncsList().map { it.timeCreated = null; it }
         var reg = db().upsertSyncs(syncs).toBlocking().first()
         assertThat(reg.sumBy { if (it.timeCreated != null) 1 else 0 }, `is`(syncsList().size))
+    }
+
+    @Test
+    fun testUpsertSyncWithNullTimeSynced() {
+        var reg = db().upsertSync(SyncEntity(null, false, null, 10)).toBlocking().first()
+        assertThat(reg, notNullValue())
+        assertThat(reg!!.id, notNullValue())
+        assertThat(reg.timeCreated, notNullValue())
+    }
+
+    @Test
+    fun testUpsertSyncsWithNullTimeSynced() {
+        val syncs = syncsList().map { it.timeSynced = null; it }
+        var reg = db().upsertSyncs(syncs).toBlocking().first()
+        assertThat(reg.sumBy { if (it.timeSynced != null) 1 else 0 }, `is`(syncsList().size))
     }
 
     @Test
@@ -196,8 +211,7 @@ class ContentProviderSyncsRepositoryTest {
 
         val modifiedSync = sync
         modifiedSync!!.pending = Random().nextBoolean()
-        modifiedSync.pendingTime = Random().nextLong()
-        modifiedSync.success = Random().nextBoolean()
+        modifiedSync.timeSynced = Random().nextLong()
         modifiedSync.timeCreated = Random().nextLong()
         val newSync = db().upsertSync(modifiedSync).toBlocking().first()
         assertThat(newSync, `is`(modifiedSync))
@@ -229,6 +243,6 @@ class ContentProviderSyncsRepositoryTest {
     fun testGetSuccessfullySyncs() {
         db().upsertSyncs(syncsList()).toBlocking().first()
         val syncs = db().getSuccessfullySyncs().toBlocking().first()
-        assertThat(syncs, `is`(syncsList().filter { it.success }))
+        assertThat(syncs, `is`(syncsList().filter { it.pending == false }))
     }
 }

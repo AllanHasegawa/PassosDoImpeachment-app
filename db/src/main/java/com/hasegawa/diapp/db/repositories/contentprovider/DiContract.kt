@@ -164,16 +164,14 @@ object DiContract {
 
         const val COL_ID = "id"
         const val COL_PENDING = "pending"
-        const val COL_PENDING_TO_TIME = "pending_to_time"
-        const val COL_SUCCESS = "success"
+        const val COL_TIME_SYNCED = "time_synced"
         const val COL_TIME_CREATED = "time_created"
 
         const val SQL_CREATE_TABLE =
                 "create table ${TABLE_NAME} (" +
                         "${COL_ID} text primary key not null," +
                         "${COL_PENDING} integer not null," +
-                        "${COL_PENDING_TO_TIME} integer not null," +
-                        "${COL_SUCCESS} integer not null," +
+                        "${COL_TIME_SYNCED} integer not null," +
                         "${COL_TIME_CREATED} integer not null" +
                         ")"
 
