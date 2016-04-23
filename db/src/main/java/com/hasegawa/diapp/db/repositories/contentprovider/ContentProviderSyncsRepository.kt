@@ -179,6 +179,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                             .withQuery(Query.builder().uri(uri).build())
                             .prepare()
                             .asRxObservable()
+                            .take(1)
                 }
     }
 
