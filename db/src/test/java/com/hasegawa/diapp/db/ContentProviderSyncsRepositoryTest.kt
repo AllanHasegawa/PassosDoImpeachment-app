@@ -224,4 +224,11 @@ class ContentProviderSyncsRepositoryTest {
         val syncs = db().getPendingSyncs().toBlocking().first()
         assertThat(syncs, `is`(syncsList().filter { it.pending }))
     }
+
+    @Test
+    fun testGetSuccessfullySyncs() {
+        db().upsertSyncs(syncsList()).toBlocking().first()
+        val syncs = db().getSuccessfullySyncs().toBlocking().first()
+        assertThat(syncs, `is`(syncsList().filter { it.success }))
+    }
 }

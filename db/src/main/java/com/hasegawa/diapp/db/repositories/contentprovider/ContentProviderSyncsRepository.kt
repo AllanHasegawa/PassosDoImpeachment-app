@@ -95,6 +95,17 @@ class ContentProviderSyncsRepository : SyncsRepository {
                 .asRxObservable()
     }
 
+    override fun getSuccessfullySyncs(): Observable<List<SyncEntity>> {
+        return provider.get()
+                .listOfObjects(SyncEntity::class.java)
+                .withQuery(Query.builder().uri(SyncsContract.URI)
+                        .where("${SyncsContract.COL_SUCCESS}>?")
+                        .whereArgs(0)
+                        .build())
+                .prepare()
+                .asRxObservable()
+    }
+
     override fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?> {
         registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
         return getGCMRegistrationByToken(registration.token)
