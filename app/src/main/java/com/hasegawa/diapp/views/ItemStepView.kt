@@ -25,7 +25,7 @@ import android.view.animation.AnimationUtils
 import android.widget.FrameLayout
 import android.widget.TextView
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.models.Step
+import com.hasegawa.diapp.domain.entities.StepEntity
 
 class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, attrs) {
     private lateinit var positionTv: TextView
@@ -57,8 +57,8 @@ class ItemStepView(ctx: Context, val attrs: AttributeSet?) : FrameLayout(ctx, at
         colorUnselected = colorStateList.defaultColor
     }
 
-    var step: Step? = null
-        set(s: Step?) {
+    var step: StepEntity? = null
+        set(s: StepEntity?) {
             field = s
             if (s != null) {
                 positionTv.text = s.position.toString()

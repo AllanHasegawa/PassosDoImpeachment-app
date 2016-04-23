@@ -43,21 +43,23 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.drawable
+import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
+import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
+import com.hasegawa.diapp.domain.usecases.SyncIfNecessaryUseCase
 import com.hasegawa.diapp.fragments.CreditsFragment
 import com.hasegawa.diapp.fragments.MainFragment
 import com.hasegawa.diapp.fragments.MainFragment.OnMainFragmentListener
 import com.hasegawa.diapp.fragments.NewsFragment
 import com.hasegawa.diapp.fragments.StepDetailFragment
-import com.hasegawa.diapp.models.DiContract.StepsContract
-import com.hasegawa.diapp.models.Step
 import com.hasegawa.diapp.services.GCMRegistrationService
 import com.hasegawa.diapp.utils.ResourcesUtils
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
-import com.pushtorefresh.storio.contentresolver.queries.Query
 import org.joda.time.DateTime
-import rx.Observer
+import rx.Subscriber
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import rx.schedulers.Timestamped
 import timber.log.Timber
 import java.util.ArrayList
@@ -83,9 +85,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     private var detailFl: FrameLayout? = null
 
 
-    private var numberOfStepsSubscription: Subscription? = null
-    private var numberOfCompletedStepsSubscription: Subscription? = null
-    private var firstStepSubscription: Subscription? = null
+    private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
 
     private var numberOfSteps = 0
     private var numberOfCompletedSteps = 0
@@ -133,11 +133,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
         fab.setOnClickListener({ launchShareIntent() })
 
-        setupNumberOfStepsSubscriptions()
-
-        updateNavLastUpdateTitle()
-
-        forceSyncIfFirstTime()
+        setupNumberOfStepsUc()
 
         val gcmRegistrationIntent = Intent(this, GCMRegistrationService::class.java)
         startService(gcmRegistrationIntent)
@@ -151,9 +147,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
     override fun onDestroy() {
         super.onDestroy()
-        numberOfCompletedStepsSubscription?.unsubscribeIfSubscribed()
-        numberOfStepsSubscription?.unsubscribeIfSubscribed()
-        firstStepSubscription?.unsubscribeIfSubscribed()
+        getNumStepsUc?.unsubscribe()
     }
 
     override fun onResume() {
@@ -183,7 +177,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     }
 
 
-    override fun onItemStepClicked(step: Step) {
+    override fun onItemStepClicked(step: StepEntity) {
         if (!isTablet) {
             StepDetailActivity.launch(this, step)
         } else {
@@ -319,57 +313,26 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         }
     }
 
-    private fun setupNumberOfStepsSubscriptions() {
-        numberOfStepsSubscription =
-                DiApp.diProvider.get()
-                        .numberOfResults()
-                        .withQuery(
-                                Query.builder().uri(StepsContract.URI).build()
-                        )
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                object : Observer<Int> {
-                                    override fun onCompleted() {
-                                    }
+    private fun setupNumberOfStepsUc() {
+        getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
 
-                                    override fun onError(e: Throwable?) {
-                                        Timber.d(e, "Error fetching number of steps.")
-                                    }
+        getNumStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
+            override fun onCompleted() {
+            }
 
-                                    override fun onNext(t: Int) {
-                                        numberOfSteps = t
-                                        updateToolbarProgressbar()
-                                    }
-                                }
-                        )
-        numberOfCompletedStepsSubscription =
-                DiApp.diProvider.get()
-                        .numberOfResults()
-                        .withQuery(
-                                Query.builder().uri(StepsContract.URI)
-                                        .where("${StepsContract.COL_COMPLETED} = ?")
-                                        .whereArgs("1").build()
-                        )
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(
-                                object : Observer<Int> {
-                                    override fun onCompleted() {
-                                    }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error fetching number of steps.")
+            }
 
-                                    override fun onError(e: Throwable?) {
-                                        Timber.d(e, "Error fetching number of completed steps.")
-                                    }
-
-                                    override fun onNext(t: Int) {
-                                        numberOfCompletedSteps = t
-                                        updateToolbarProgressbar()
-                                    }
-                                }
-                        )
+            override fun onNext(t: NumCompletedAndTotal?) {
+                if (t != null) {
+                    numberOfSteps = t.total
+                    numberOfCompletedSteps = t.completed
+                    updateToolbarProgressbar()
+                }
+            }
+        })
     }
 
     private fun launchShareIntent() {
@@ -458,7 +421,6 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     private fun updateToolbarProgressbar() {
         toolbarProgressBar.max = numberOfSteps
         toolbarProgressBar.progress = numberOfCompletedSteps
-        updateNavLastUpdateTitle()
     }
 
     fun tmAdjustPanes(twoPanes: Boolean) {

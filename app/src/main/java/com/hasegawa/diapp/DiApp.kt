@@ -16,14 +16,17 @@
 package com.hasegawa.diapp
 
 import android.app.Application
-import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteOpenHelper
-import com.hasegawa.diapp.models.DiDbHelper
-import com.hasegawa.diapp.models.ImportantNews
-import com.hasegawa.diapp.models.Step
-import com.hasegawa.diapp.models.StepLink
-import com.pushtorefresh.storio.contentresolver.StorIOContentResolver
-import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolver
+import com.hasegawa.diapp.cloud.RestInfo
+import com.hasegawa.diapp.cloud.restservices.retrofit.RetrofitRestService
+import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderNewsRepository
+import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderStepsRepository
+import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderSyncsRepository
+import com.hasegawa.diapp.domain.devices.SyncScheduler
+import com.hasegawa.diapp.domain.repositories.NewsRepository
+import com.hasegawa.diapp.domain.repositories.StepsRepository
+import com.hasegawa.diapp.domain.repositories.SyncsRepository
+import com.hasegawa.diapp.domain.restservices.RestService
+import com.hasegawa.diapp.syncadapters.SyncAdapterScheduler
 import net.danlew.android.joda.JodaTimeAndroid
 import timber.log.Timber
 
@@ -35,28 +38,26 @@ open class DiApp : Application() {
 
         JodaTimeAndroid.init(this)
 
-        dbHelper = DiDbHelper(applicationContext)
-        db = dbHelper.writableDatabase
-
-        diProvider = DefaultStorIOContentResolver.builder()
-                .contentResolver(applicationContext.contentResolver)
-                .addTypeMapping(Step::class.java, Step.typeMapping())
-                .addTypeMapping(StepLink::class.java, StepLink.typeMapping())
-                .addTypeMapping(ImportantNews::class.java, ImportantNews.typeMapping())
-                .build()
+        stepsRepository = ContentProviderStepsRepository(applicationContext.contentResolver)
+        newsRepository = ContentProviderNewsRepository(applicationContext.contentResolver)
+        syncsRepository = ContentProviderSyncsRepository(applicationContext.contentResolver)
+        restServices = RetrofitRestService(RestInfo.API_URL)
+        syncScheduler = SyncAdapterScheduler(applicationContext)
 
         Timber.d("App initiated")
     }
 
     override fun onTerminate() {
         super.onTerminate()
-        db.close()
     }
 
     companion object {
-        lateinit var diProvider: StorIOContentResolver
-        lateinit var db: SQLiteDatabase
-        lateinit var dbHelper: SQLiteOpenHelper
+
+        lateinit var stepsRepository: StepsRepository
+        lateinit var newsRepository: NewsRepository
+        lateinit var syncsRepository: SyncsRepository
+        lateinit var restServices: RestService
+        lateinit var syncScheduler: SyncScheduler
 
         const val PREFS_KEY_SENT_TOKEN_TO_SERVER = "sent_token_to_server"
         const val PREFS_KEY_LAST_UPDATE = "last_update"

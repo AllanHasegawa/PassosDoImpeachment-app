@@ -30,14 +30,16 @@ import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.drawable
 import com.hasegawa.diapp.adapters.StepDetailFragmentAdapter
-import com.hasegawa.diapp.models.DiContract.StepsContract
-import com.hasegawa.diapp.models.Step
+import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
+import com.hasegawa.diapp.domain.usecases.GetStepByPositionUseCase
+import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.MaybeSwipeViewPager
-import com.pushtorefresh.storio.contentresolver.queries.Query
-import rx.Observer
+import rx.Subscriber
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import timber.log.Timber
 
 class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
@@ -48,19 +50,19 @@ class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
 
     var totalSteps = 0
         private set
-    private var totalStepsSubscription: Subscription? = null
     var stepPosition: Int = -1
         set(value) {
             field = value
-            loadStep()
+            getStepByPositionUc?.position = value
         }
 
-    private var stepSubscription: Subscription? = null
+    private var getStepByPositionUc: GetStepByPositionUseCase? = null
+    private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
 
     private var isTablet = false
 
     private lateinit var adapter: StepDetailFragmentAdapter
-    var step: Step? = null
+    var step: StepEntity? = null
         private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,6 +85,10 @@ class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
             stepPosition = savedInstanceState.getInt(ARG_STEP_POSITION, stepPosition)
         }
         Timber.d("Started with position $stepPosition")
+        getStepByPositionUc = GetStepByPositionUseCase(stepPosition, DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+        getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
 
         adapter = StepDetailFragmentAdapter(activity.supportFragmentManager)
         viewPager.adapter = adapter
@@ -90,15 +96,15 @@ class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
 
         (viewPager as MaybeSwipeViewPager).enableSwipe = !isTablet
 
-        loadTotalStepsSubscription()
-        loadStep()
+        loadGetStepUseCase()
+        loadTotalStepsUc()
         return root
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        totalStepsSubscription?.unsubscribeIfSubscribed()
-        stepSubscription?.unsubscribeIfSubscribed()
+        getStepByPositionUc?.unsubscribe()
+        getNumStepsUc?.unsubscribe()
         adapter.close()
     }
 
@@ -131,63 +137,48 @@ class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
         progressAnim?.start()
     }
 
-    private fun loadTotalStepsSubscription() {
-        totalStepsSubscription =
-                DiApp.diProvider
-                        .get()
-                        .numberOfResults()
-                        .withQuery(Query.builder().uri(StepsContract.URI).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Int> {
-                            override fun onCompleted() {
-                            }
+    private fun loadGetStepUseCase() {
+        getStepByPositionUc?.execute(object : Subscriber<StepEntity>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error while trying to find total steps.")
-                            }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error getting step by position")
+            }
 
-                            override fun onNext(t: Int) {
-                                totalSteps = t
-                                updateProgressBar()
-                            }
-                        })
+            override fun onNext(t: StepEntity?) {
+                step = t
+                if (t != null) {
+                    loadStepIntoViews()
+                    val index = adapter.stepsCache
+                            .indexOfFirst { it.position == t.position }
+                    if (index != -1) {
+                        viewPager.setCurrentItem(index, false)
+                    }
+                }
+            }
+        })
     }
 
+    private fun loadTotalStepsUc() {
 
-    private fun loadStep() {
-        Timber.d("Loading step with pos $stepPosition")
-        stepSubscription?.unsubscribeIfSubscribed()
-        stepSubscription =
-                DiApp.diProvider.get().`object`(Step::class.java)
-                        .withQuery(Query.builder().uri(StepsContract.URI)
-                                .where("${StepsContract.COL_POSITION}=?")
-                                .whereArgs(stepPosition).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Step> {
-                            override fun onCompleted() {
-                            }
+        getNumStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error loading step")
-                            }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error while trying to find total steps.")
+            }
 
-                            override fun onNext(t: Step?) {
-                                step = t
-                                if (t != null) {
-                                    loadStepIntoViews()
-                                    val index = adapter.stepsCache
-                                            .indexOfFirst { it.position == t.position }
-                                    if (index != -1) {
-                                        viewPager.setCurrentItem(index, false)
-                                    }
-                                }
-                            }
-                        })
+            override fun onNext(t: NumCompletedAndTotal?) {
+                if (t != null) {
+                    totalSteps = t.total
+                    updateProgressBar()
+                }
+            }
+        })
     }
+
 
     private fun loadStepIntoViews() {
         if (step == null) return

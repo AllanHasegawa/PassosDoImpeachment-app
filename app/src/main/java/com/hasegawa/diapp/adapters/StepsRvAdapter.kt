@@ -22,15 +22,15 @@ import android.view.ViewGroup
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.StepsRvAdapter.StepViewHolder
+import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.fragments.MainFragment.OnMainFragmentListener
-import com.hasegawa.diapp.models.DiContract.StepsContract
-import com.hasegawa.diapp.models.Step
 import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.ItemStepView
-import com.pushtorefresh.storio.contentresolver.queries.Query
-import rx.Observer
+import rx.Subscriber
 import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -42,15 +42,15 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
         fun onItemSelect(holder: StepViewHolder)
     }
 
-    class Item(var type: Int, var step: Step?)
+    class Item(var type: Int, var step: StepEntity?)
 
     class StepViewHolder(view: View,
                          val clickListener: RvClickListener? = null) :
             RecyclerView.ViewHolder(view) {
 
-        private var step: Step? = null
+        private var step: StepEntity? = null
 
-        fun setStep(step: Step, selected: Boolean) {
+        fun setStep(step: StepEntity, selected: Boolean) {
             this.step = step
             val itemStepView = itemView as ItemStepView
             itemStepView.step = step
@@ -63,8 +63,6 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
 
     private var stepsCache: ArrayList<Item> = ArrayList()
 
-    private var stepsSubscription: Subscription? = null
-
     private var selectedItem = -1
     private var requestedStepPositionToSelect = -1
     private val rvClickListener =
@@ -74,61 +72,58 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                 }
             }
 
+    private val getStepsUseCase: GetStepsUseCase
+
 
     init {
-        stepsSubscription =
-                DiApp.diProvider
-                        .get()
-                        .listOfObjects(Step::class.java)
-                        .withQuery(Query.builder().uri(StepsContract.URI)
-                                .sortOrder(StepsContract.COL_POSITION).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map {
-                            val arr = ArrayList<Item>(it.size + 2)
-                            if (!isTablet) {
-                                arr.add(Item(TYPE_SPACE, null))
-                            }
-                            arr.addAll(it.map { Item(TYPE_STEP, it) })
+        val subscriber = object : Subscriber<List<StepEntity>>() {
+            override fun onCompleted() {
+            }
 
-                            if (isTablet) {
-                                selectedItem = 0
-                            }
-                            val items = stepsCache.size
-                            stepsCache.clear()
-                            notifyItemRangeRemoved(0, items)
-                            arr
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error updating StepsRvAdapter.")
+            }
+
+            override fun onNext(t: List<StepEntity>?) {
+                if (t != null) {
+                    val arr = ArrayList<Item>(t.size + 1)
+                    if (!isTablet) {
+                        arr.add(Item(TYPE_SPACE, null))
+                    }
+                    arr.addAll(t.map { Item(TYPE_STEP, it) })
+
+                    if (isTablet) {
+                        selectedItem = 0
+                    }
+
+                    val items = stepsCache.size
+                    stepsCache.clear()
+                    notifyItemRangeRemoved(0, items - 1)
+
+                    stepsCache.addAll(arr)
+                    notifyItemRangeInserted(0, arr.size - 1)
+
+                    if (isTablet) {
+                        val index = stepsCache.indexOfFirst {
+                            it.step?.position == stepPositionToSelect
                         }
-                        .subscribe(object : Observer<List<Item>> {
-                            override fun onCompleted() {
-                            }
+                        if (index != -1) {
+                            selectItem(index)
+                        } else {
+                            selectItem(0)
+                        }
+                    }
+                }
+            }
+        }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error updating StepsRvAdapter.")
-                            }
-
-                            override fun onNext(t: List<Item>?) {
-                                if (t != null && t.size > 0) {
-                                    stepsCache.addAll(t)
-                                    notifyItemRangeInserted(0, stepsCache.size - 1)
-                                    if (isTablet) {
-                                        val index = stepsCache.indexOfFirst {
-                                            it.step?.position == stepPositionToSelect
-                                        }
-                                        if (index != -1) {
-                                            selectItem(index)
-                                        } else {
-                                            selectItem(0)
-                                        }
-                                    }
-                                }
-                            }
-                        })
+        getStepsUseCase = GetStepsUseCase(DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+        getStepsUseCase.execute(subscriber)
     }
 
     fun close() {
-        stepsSubscription?.unsubscribeIfSubscribed()
+        getStepsUseCase.unsubscribe()
         stepsCache.clear()
     }
 

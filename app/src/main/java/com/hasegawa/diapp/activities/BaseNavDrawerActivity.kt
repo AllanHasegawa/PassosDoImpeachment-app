@@ -17,74 +17,46 @@
 package com.hasegawa.diapp.activities
 
 import android.content.ActivityNotFoundException
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.net.Uri
-import android.preference.PreferenceManager
 import android.support.design.widget.NavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
+import android.text.format.DateUtils
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.syncadapters.SyncAdapter
+import com.hasegawa.diapp.domain.entities.SyncEntity
+import com.hasegawa.diapp.domain.usecases.GetLastSuccessfulSyncUseCase
+import com.hasegawa.diapp.domain.usecases.SyncIfNecessaryUseCase
+import com.hasegawa.diapp.utils.DateTimeExtensions
+import rx.Subscriber
+import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
+import timber.log.Timber
 
 abstract class BaseNavDrawerActivity : AppCompatActivity(),
         NavigationView.OnNavigationItemSelectedListener {
-
-    protected var lastUpdateDate: String? = null
-    private var lastUpdateReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
-            val date = intent!!.getStringExtra(BROADCAST_LAST_UPDATE_DATE_KEY)
-            lastUpdateDate = date
-
-            Snackbar.make(getSnackBarAnchorView(),
-                    getString(R.string.sync_done), Snackbar.LENGTH_SHORT)
-                    .show()
-            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
-            prefs.edit().putString(DiApp.PREFS_KEY_LAST_UPDATE, lastUpdateDate).commit()
-            prefs.edit().putBoolean(DiApp.PREFS_KEY_SYNC_PENDING, false).commit()
-
-            updateNavLastUpdateTitle(date)
-        }
-    }
-
-    private var syncRequestReceiver = object : BroadcastReceiver() {
-        override fun onReceive(ctx: Context?, intent: Intent?) {
-            SyncAdapter.requestFullSync(this@BaseNavDrawerActivity, true)
-            Snackbar.make(getSnackBarAnchorView(), getString(R.string.sync_on_going),
-                    Snackbar.LENGTH_INDEFINITE).show()
-        }
-    }
+    private var getLastSuccessfulSyncUc: GetLastSuccessfulSyncUseCase? = null
+    private var syncIfNeededUc: SyncIfNecessaryUseCase? = null
+    private var initialSyncSnackbarOn = false
 
     override fun onResume() {
         super.onResume()
-        updateNavLastUpdateTitle()
-
-        val lastUpdateFilter = IntentFilter()
-        lastUpdateFilter.addAction(BROADCAST_LAST_UPDATE_ACTION)
-        registerReceiver(lastUpdateReceiver, lastUpdateFilter)
-
-        val syncRequestFilter = IntentFilter()
-        syncRequestFilter.addAction(BROADCAST_REQUEST_SYNC_ACTION)
-        registerReceiver(syncRequestReceiver, syncRequestFilter)
-
-
-        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        if (prefs.getBoolean(DiApp.PREFS_KEY_SYNC_PENDING, false)) {
-            SyncAdapter.requestFullSync(this, true)
-            prefs.edit().putBoolean(DiApp.PREFS_KEY_SYNC_PENDING, false).commit()
-        }
+        setupNavLastUpdateTitle()
+        syncIfNeeded()
     }
 
     override fun onPause() {
         super.onPause()
-        unregisterReceiver(lastUpdateReceiver)
-        unregisterReceiver(syncRequestReceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        syncIfNeededUc?.unsubscribe()
+        getLastSuccessfulSyncUc?.unsubscribe()
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
@@ -121,38 +93,68 @@ abstract class BaseNavDrawerActivity : AppCompatActivity(),
         return true
     }
 
-    fun updateNavLastUpdateTitle(date: String? = null) {
-        val newDate: String
-        if (date == null) {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-            newDate = prefs.getString(DiApp.PREFS_KEY_LAST_UPDATE,
-                    getString(R.string.sync_never_updated))
-        } else {
-            newDate = date
-        }
+    fun setupNavLastUpdateTitle() {
         val lastUpdateItem = getNavigationView().menu.findItem(R.id.nav_last_update)
-        lastUpdateItem.title = newDate
+        getLastSuccessfulSyncUc?.unsubscribe()
+
+        getLastSuccessfulSyncUc = GetLastSuccessfulSyncUseCase(DiApp.syncsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+
+        getLastSuccessfulSyncUc?.execute(object : Subscriber<SyncEntity?>() {
+            override fun onCompleted() {
+            }
+
+            override fun onError(e: Throwable?) {
+            }
+
+            override fun onNext(t: SyncEntity?) {
+                Timber.d("get last sync: $t")
+                if (t != null) {
+                    val millis = DateTimeExtensions.fromUnixTimestamp(t.timeSynced!!).millis
+                    val date = DateUtils.formatDateTime(applicationContext, millis,
+                            DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_TIME)
+                    lastUpdateItem.title = date
+                    if (initialSyncSnackbarOn) {
+                        initialSyncSnackbarOn = false
+                        Snackbar.make(getSnackBarAnchorView(), getString(R.string.sync_done),
+                                Snackbar.LENGTH_LONG).show()
+                    }
+                } else {
+                    Timber.d("SyncEntity in last sync was NULL")
+                    lastUpdateItem.title = getString(R.string.sync_never_updated)
+                    Snackbar.make(getSnackBarAnchorView(), getString(R.string.sync_on_going),
+                            Snackbar.LENGTH_LONG).show()
+                }
+            }
+        })
+
     }
 
-    fun forceSyncIfFirstTime() {
-        if (lastUpdateDate == null) {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-            if (!prefs.contains(DiApp.PREFS_KEY_LAST_UPDATE)) {
-                SyncAdapter.requestFullSync(this, true)
-                Snackbar.make(getSnackBarAnchorView(),
-                        R.string.sync_first, Snackbar.LENGTH_INDEFINITE)
-                        .show()
+    fun syncIfNeeded() {
+        syncIfNeededUc?.unsubscribe()
+
+        syncIfNeededUc = SyncIfNecessaryUseCase(DiApp.syncScheduler, DiApp.syncsRepository,
+                Schedulers.io(), Schedulers.io())
+
+        syncIfNeededUc?.execute(object : Subscriber<Boolean>() {
+            override fun onCompleted() {
             }
-        }
+
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error trying to sync if needed.")
+            }
+
+            override fun onNext(t: Boolean?) {
+                if (t != null && t) {
+                    initialSyncSnackbarOn = true
+                    Snackbar.make(getSnackBarAnchorView(),
+                            R.string.sync_first, Snackbar.LENGTH_INDEFINITE)
+                            .show()
+                }
+            }
+        })
     }
 
     abstract fun getNavigationView(): NavigationView
     abstract fun getSnackBarAnchorView(): View
-
-
-    companion object {
-        const val BROADCAST_LAST_UPDATE_ACTION = "com.hasegawa.diapp.main.last_update"
-        const val BROADCAST_LAST_UPDATE_DATE_KEY = "last_update_date"
-        const val BROADCAST_REQUEST_SYNC_ACTION = "com.hasegawa.diapp.main.request_sync"
-    }
 }

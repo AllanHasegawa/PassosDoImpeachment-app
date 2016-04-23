@@ -68,8 +68,6 @@ class CreditsActivity : BaseNavDrawerActivity() {
 
         navView.setNavigationItemSelectedListener(this)
         navView.setCheckedItem(R.id.nav_credits)
-
-        updateNavLastUpdateTitle()
     }
 
     override fun onBackPressed() {

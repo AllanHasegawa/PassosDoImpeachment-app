@@ -19,46 +19,37 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import com.hasegawa.diapp.DiApp
+import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.fragments.StepDetailSubFragment
-import com.hasegawa.diapp.models.DiContract.StepsContract
-import com.hasegawa.diapp.models.Step
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
-import com.pushtorefresh.storio.contentresolver.queries.Query
-import rx.Observer
-import rx.Subscription
+import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.ArrayList
 
 class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
         FragmentStatePagerAdapter(fragmentManager) {
-    val stepsCache = ArrayList<Step>()
-    private var stepsSubscription: Subscription? = null
+    val stepsCache = ArrayList<StepEntity>()
+    val getStepsUseCase: GetStepsUseCase
 
     init {
-        stepsSubscription =
-                DiApp.diProvider.get().listOfObjects(Step::class.java)
-                        .withQuery(Query.builder()
-                                .uri(StepsContract.URI)
-                                .sortOrder("${StepsContract.COL_POSITION}")
-                                .build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<List<Step>> {
-                            override fun onCompleted() {
-                            }
+        getStepsUseCase = GetStepsUseCase(DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+        getStepsUseCase.execute(object : Subscriber<List<StepEntity>>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error getting list of steps")
-                            }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Problem getting steps")
+            }
 
-                            override fun onNext(t: List<Step>) {
-                                stepsCache.clear()
-                                stepsCache.addAll(t)
-                                notifyDataSetChanged()
-                            }
-                        })
+            override fun onNext(t: List<StepEntity>?) {
+                stepsCache.clear()
+                stepsCache.addAll(t!!)
+                notifyDataSetChanged()
+            }
+        })
     }
 
     override fun getItem(position: Int): Fragment? {
@@ -70,12 +61,12 @@ class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
         return stepsCache.size
     }
 
-    fun stepFromCache(position: Int): Step? {
+    fun stepFromCache(position: Int): StepEntity? {
         return stepsCache.getOrNull(position)
     }
 
     fun close() {
-        stepsSubscription?.unsubscribeIfSubscribed()
         stepsCache.clear()
+        getStepsUseCase.unsubscribe()
     }
 }

@@ -25,15 +25,13 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.NewsRvAdapter.NewsViewHolder
-import com.hasegawa.diapp.models.DiContract.ImportantNewsContract
-import com.hasegawa.diapp.models.ImportantNews
+import com.hasegawa.diapp.domain.entities.NewsEntity
+import com.hasegawa.diapp.domain.usecases.GetNewsUseCase
 import com.hasegawa.diapp.utils.DateTimeExtensions
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.ItemImportantNewsView
-import com.pushtorefresh.storio.contentresolver.queries.Query
-import rx.Observer
-import rx.Subscription
+import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -47,7 +45,7 @@ class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
             dateTv = view.findViewById(R.id.important_news_date_tv) as TextView?
         }
 
-        fun setNews(news: ImportantNews) {
+        fun setNews(news: NewsEntity) {
             (itemView!! as ItemImportantNewsView).importantNews = news
         }
 
@@ -56,65 +54,57 @@ class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
         }
     }
 
-    data class Item(val type: Int, val news: ImportantNews?, val date: String?)
+    data class Item(val type: Int, val news: NewsEntity?, val date: String?)
 
     private var news = ArrayList<Item>()
-    private var newsSubscription: Subscription? = null
+    private lateinit var getNewsUc: GetNewsUseCase
 
     init {
-        newsSubscription =
-                DiApp.diProvider.get()
-                        .listOfObjects(ImportantNews::class.java)
-                        .withQuery(Query.builder().uri(ImportantNewsContract.URI).build())
-                        .prepare()
-                        .asRxObservable()
-                        .map {
-                            it.sortedByDescending { it.date }.groupBy {
-                                val millis = DateTimeExtensions.fromUnixTimestamp(it.date).millis
-                                DateUtils.formatDateTime(ctx, millis,
-                                        DateUtils.FORMAT_SHOW_DATE)
-                            }
-                        }
-                        .map {
-                            val arr = ArrayList<Item>(it.size + 2)
-                            if (!isTablet) {
-                                arr.add(Item(TYPE_SPACE, null, null))
-                            }
-                            it.keys.forEachIndexed { i, date ->
-                                if (i != 0) {
-                                    arr.add(Item(TYPE_SPACE_BEFORE_DATE, null, null))
-                                }
-                                arr.add(Item(TYPE_DATE, null, date))
-                                arr.addAll(it[date]!!.map { Item(TYPE_NEWS, it, null) })
-                            }
-                            arr
-                        }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .map {
-                            val items = news.size
-                            news.clear()
-                            notifyItemRangeRemoved(0, items)
-                            it
-                        }
-                        .flatMapIterable { it }
-                        .subscribe(object : Observer<Item> {
-                            override fun onCompleted() {
-                            }
+        getNewsUc = GetNewsUseCase(DiApp.newsRepository, Schedulers.io(),
+                AndroidSchedulers.mainThread())
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error while fetching News from db.")
-                            }
+        getNewsUc.execute(object : Subscriber<List<NewsEntity>>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onNext(t: Item) {
-                                news.add(t)
-                                notifyItemInserted(news.size - 1)
-                            }
-                        })
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error while fetching News from db.")
+            }
+
+            override fun onNext(t: List<NewsEntity>?) {
+                if (t != null) {
+                    val grouped = t.groupBy {
+                        val millis = DateTimeExtensions.fromUnixTimestamp(it.date).millis
+                        DateUtils.formatDateTime(ctx, millis,
+                                DateUtils.FORMAT_SHOW_DATE)
+                    }
+
+                    val arr = ArrayList<Item>(t.size + 1)
+                    if (!isTablet) {
+                        arr.add(Item(TYPE_SPACE, null, null))
+                    }
+
+                    grouped.keys.forEachIndexed { i, date ->
+                        if (i != 0) {
+                            arr.add(Item(TYPE_SPACE_BEFORE_DATE, null, null))
+                        }
+                        arr.add(Item(TYPE_DATE, null, date))
+                        arr.addAll(grouped[date]!!.map { Item(TYPE_NEWS, it, null) })
+                    }
+
+                    val items = news.size
+                    news.clear()
+                    notifyItemRangeRemoved(0, items - 1)
+
+                    news.addAll(arr)
+                    notifyItemRangeInserted(0, news.size - 1)
+                }
+            }
+        })
     }
 
     fun close() {
-        newsSubscription?.unsubscribeIfSubscribed()
-        newsSubscription = null
+        getNewsUc.unsubscribe()
         news.clear()
     }
 

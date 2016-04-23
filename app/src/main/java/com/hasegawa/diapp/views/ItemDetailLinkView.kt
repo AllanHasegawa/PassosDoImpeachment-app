@@ -25,14 +25,14 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.models.StepLink
+import com.hasegawa.diapp.domain.entities.StepLinkEntity
 
 class ItemDetailLinkView(ctx: Context, attrSet: AttributeSet?) : FrameLayout(ctx, attrSet),
         View.OnClickListener {
     lateinit var titleTv: TextView
     lateinit var urlTv: TextView
 
-    var stepLink: StepLink? = null
+    var stepLink: StepLinkEntity? = null
         set(value) {
             field = value
             if (value != null) {

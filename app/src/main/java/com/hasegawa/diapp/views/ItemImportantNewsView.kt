@@ -27,7 +27,7 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.models.ImportantNews
+import com.hasegawa.diapp.domain.entities.NewsEntity
 
 class ItemImportantNewsView(ctx: Context, attrSet: AttributeSet?) : FrameLayout(ctx, attrSet) {
 
@@ -58,7 +58,7 @@ class ItemImportantNewsView(ctx: Context, attrSet: AttributeSet?) : FrameLayout(
         linkBt.setOnClickListener({ launchLinkIntent() })
     }
 
-    var importantNews: ImportantNews? = null
+    var importantNews: NewsEntity? = null
         set(i) {
             field = i
             if (i != null) {

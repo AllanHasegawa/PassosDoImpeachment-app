@@ -39,12 +39,6 @@
                 android:resource="@xml/authenticator"/>
         </service>
 
-        <provider
-            android:name=".models.DiContentProvider"
-            android:authorities="com.hasegawa.diapp.provider"
-            android:exported="false"
-            android:syncable="true"/>
-
         <service
             android:name=".syncadapters.SyncService"
             android:exported="true"

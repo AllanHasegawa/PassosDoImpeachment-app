@@ -3,21 +3,34 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.google.gms.google-services'
 
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
+}
+
 android {
-    compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    def globalConfig = rootProject.extensions.getByName("ext")
+
+    compileSdkVersion globalConfig.getAt("androidCompileSdkVersion")
+    buildToolsVersion globalConfig.getAt("androidBuildToolsVersion")
 
     defaultConfig {
-        applicationId "com.hasegawa.diapp"
-        minSdkVersion 16
-        targetSdkVersion 23
-        versionCode 12
-        versionName "1.12"
+        applicationId globalConfig.getAt("androidApplicationId")
+        minSdkVersion globalConfig.getAt("androidMinSdkVersion")
+        targetSdkVersion globalConfig.getAt("androidTargetSdkVersion")
+        versionCode globalConfig.getAt("androidVersionCode")
+        versionName globalConfig.getAt("androidVersionName")
 
         vectorDrawables.useSupportLibrary = true
 
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner globalConfig.getAt("androidTestInstrumentationRunner")
     }
+
     signingConfigs {
         release {
             storeFile file(System.getenv("DIAPP_STORE_FILE"))
@@ -26,6 +39,7 @@ android {
             keyPassword System.getenv("DIAPP_KEY_PASSWORD")
         }
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -51,50 +65,43 @@ kapt {
     generateStubs = true
 }
 
-buildscript {
-    ext.kotlin_version = '1.0.1'
-    ext.support_lib_version = '23.2.1'
-    ext.espresso_version = '2.2.2'
-    repositories {
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath 'com.github.ben-manes:gradle-versions-plugin:0.12.0'
-    }
-}
 
 configurations.all {
     resolutionStrategy {
-        force 'com.android.support:recyclerview-v7:23.2.1', 'com.android.support:design:23.2.1'
+        force "com.android.support:recyclerview-v7:23.2.1", "com.android.support:design:23.2.1"
     }
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
-    testCompile 'junit:junit:4.12'
-    androidTestCompile "com.android.support:support-annotations:$support_lib_version"
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile "com.android.support.test.espresso:espresso-core:$espresso_version"
-    androidTestCompile "com.android.support.test.espresso:espresso-intents:$espresso_version"
-    androidTestCompile "com.android.support.test.espresso:espresso-contrib:$espresso_version"
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    debugCompile 'com.facebook.stetho:stetho:1.3.1'
-    compile "com.android.support:design:$support_lib_version"
-    compile "com.android.support:cardview-v7:$support_lib_version"
-    compile "com.android.support:recyclerview-v7:$support_lib_version"
-    compile "com.android.support:support-v4:$support_lib_version"
-    compile 'io.reactivex:rxkotlin:0.40.1'
-    compile 'net.danlew:android.joda:2.9.2'
-    compile 'io.reactivex:rxandroid:1.1.0'
-    compile 'jp.wasabeef:recyclerview-animators:2.2.2'
-    compile 'com.jakewharton.timber:timber:4.1.1'
-    compile 'com.squareup.retrofit2:retrofit:2.0.0'
-    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
-    compile 'com.pushtorefresh.storio:content-resolver:1.8.0'
-    compile 'com.google.android.gms:play-services-gcm:8.3.0'
+
+    compile project(":domain")
+    compile project(":db")
+    compile project(":cloud")
+
+    def androidTestDependencies = rootProject.ext.appAndroidTestDependencies
+    def debugDependencies = rootProject.ext.appDebugDependencies
+    def dependencies = rootProject.ext.appDependencies
+
+    androidTestCompile androidTestDependencies.support_annotations
+    androidTestCompile androidTestDependencies.test_runner
+    androidTestCompile androidTestDependencies.test_rules
+    androidTestCompile androidTestDependencies.espresso_core
+    androidTestCompile androidTestDependencies.espresso_intents
+    androidTestCompile androidTestDependencies.espresso_contrib
+
+    debugCompile debugDependencies.stheto
+
+    compile dependencies.kotlin_stdlib
+    compile dependencies.kotlin_reflect
+    compile dependencies.support_design
+    compile dependencies.support_cardview
+    compile dependencies.support_recyclerview
+    compile dependencies.support
+    compile dependencies.rxkotlin
+    compile dependencies.rxandroid
+    compile dependencies.joda
+    compile dependencies.recyclerview_animators
+    compile dependencies.timber
+    compile dependencies.gcm
 }
 

@@ -21,14 +21,15 @@ import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v7.app.NotificationCompat
 import com.google.android.gms.gcm.GcmListenerService
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.activities.BaseNavDrawerActivity
 import com.hasegawa.diapp.activities.MainActivity
-import com.hasegawa.diapp.syncadapters.SyncAdapter
+import com.hasegawa.diapp.domain.entities.SyncEntity
+import com.hasegawa.diapp.domain.usecases.AddPendingSyncUseCase
+import rx.Subscriber
+import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.Random
 
@@ -46,19 +47,20 @@ class GCMListenerService : GcmListenerService() {
             appMessageNotification(title, message)
         }
 
-        SyncAdapter.requestFullSync(applicationContext)
-        sendSyncRequestToActivityAlive()
-        val prefs = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        prefs.edit().putBoolean(DiApp.PREFS_KEY_SYNC_PENDING, true).commit()
-    }
+        AddPendingSyncUseCase(DiApp.syncScheduler, DiApp.syncsRepository,
+                Schedulers.io(), Schedulers.io()).executeBlocking(
+                object : Subscriber<SyncEntity?>() {
+                    override fun onCompleted() {
+                    }
 
-    private fun sendSyncRequestToActivityAlive() {
-        // The receiver is registered in the BaseNavDrawerActivity, where,
-        // if the activity is on screen to the user, the sync will happen
-        // immediately.
-        val intent = Intent()
-        intent.action = BaseNavDrawerActivity.BROADCAST_REQUEST_SYNC_ACTION
-        applicationContext.sendBroadcast(intent)
+                    override fun onError(e: Throwable?) {
+                        Timber.d("Error adding pending sync from GCM.")
+                    }
+
+                    override fun onNext(t: SyncEntity?) {
+                    }
+                }
+        )
     }
 
     private fun appMessageNotification(title: String, message: String) {

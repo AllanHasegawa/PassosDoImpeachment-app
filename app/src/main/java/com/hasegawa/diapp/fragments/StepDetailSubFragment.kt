@@ -26,16 +26,16 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.string
-import com.hasegawa.diapp.models.DiContract.LinksContract
-import com.hasegawa.diapp.models.DiContract.StepsContract
-import com.hasegawa.diapp.models.Step
-import com.hasegawa.diapp.models.StepLink
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
+import com.hasegawa.diapp.domain.entities.StepEntity
+import com.hasegawa.diapp.domain.entities.StepLinkEntity
+import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
+import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
+import com.hasegawa.diapp.domain.usecases.GetStepWithLinksByPositionUseCase
+import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.views.ItemDetailLinkView
-import com.pushtorefresh.storio.contentresolver.queries.Query
-import rx.Observer
-import rx.Subscription
+import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
+import rx.schedulers.Schedulers
 import timber.log.Timber
 
 class StepDetailSubFragment : Fragment() {
@@ -49,19 +49,20 @@ class StepDetailSubFragment : Fragment() {
     private lateinit var dateTv: TextView
 
     private var totalSteps = 0
-    private var totalStepsSubscription: Subscription? = null
 
     var stepPosition: Int = -1
         set(value) {
             field = value
-            loadStep()
+            getStepByPositionUc?.position = value
         }
-    private var stepSubscription: Subscription? = null
-    private var stepLinkSubscription: Subscription? = null
+
+    private var getStepByPositionUc: GetStepWithLinksByPositionUseCase? = null
+    private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
 
     private var isTablet = false
 
-    private var step: Step? = null
+    private var step: StepEntity? = null
+    private var links: List<StepLinkEntity>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,69 +82,61 @@ class StepDetailSubFragment : Fragment() {
         dateTv = root.findViewById(R.id.detail_date_tv) as TextView
         linksLl = root.findViewById(R.id.detail_links_ll) as LinearLayout
 
-        loadStep()
-        loadTotalStepsSubscription()
+        getStepByPositionUc = GetStepWithLinksByPositionUseCase(stepPosition, DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+        getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
+                Schedulers.io(), AndroidSchedulers.mainThread())
+
+        loadGetStepUc()
+        loadTotalStepsUc()
         return root
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stepLinkSubscription?.unsubscribeIfSubscribed()
-        totalStepsSubscription?.unsubscribeIfSubscribed()
-        stepSubscription?.unsubscribeIfSubscribed()
+        getStepByPositionUc?.unsubscribe()
+        getNumStepsUc?.unsubscribe()
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
         outState?.putInt(ARG_STEP_POSITION, stepPosition)
     }
 
-    private fun loadTotalStepsSubscription() {
-        totalStepsSubscription =
-                DiApp.diProvider
-                        .get()
-                        .numberOfResults()
-                        .withQuery(Query.builder().uri(StepsContract.URI).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Int> {
-                            override fun onCompleted() {
-                            }
+    private fun loadTotalStepsUc() {
+        getNumStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error while trying to find total steps.")
-                            }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error while trying to find total steps.")
+            }
 
-                            override fun onNext(t: Int) {
-                                totalSteps = t
-                                totalStepsTv.text = t.toString()
-                            }
-                        })
+            override fun onNext(t: NumCompletedAndTotal?) {
+                if (t != null) {
+                    totalSteps = t.total
+                    totalStepsTv.text = t.total.toString()
+                }
+            }
+        })
     }
 
-    private fun loadStep() {
-        stepSubscription?.unsubscribeIfSubscribed()
-        stepSubscription =
-                DiApp.diProvider.get().`object`(Step::class.java)
-                        .withQuery(Query.builder().uri(StepsContract.URI)
-                                .where("${StepsContract.COL_POSITION}=?")
-                                .whereArgs(stepPosition).build())
-                        .prepare()
-                        .asRxObservable()
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(object : Observer<Step> {
-                            override fun onCompleted() {
-                            }
+    private fun loadGetStepUc() {
+        getStepByPositionUc?.execute(object : Subscriber<StepWithLinksEntity>() {
+            override fun onCompleted() {
+            }
 
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error loading step")
-                            }
+            override fun onError(e: Throwable?) {
+                Timber.d(e, "Error loading step")
+            }
 
-                            override fun onNext(t: Step?) {
-                                step = t
-                                loadStepIntoViews()
-                            }
-                        })
+            override fun onNext(t: StepWithLinksEntity?) {
+                if (t != null) {
+                    step = t.step
+                    links = t.links
+                    loadStepIntoViews()
+                }
+            }
+        })
     }
 
     private fun loadStepIntoViews() {
@@ -158,35 +151,12 @@ class StepDetailSubFragment : Fragment() {
             descriptionTv.text = step!!.description
         }
 
-        stepLinkSubscription?.unsubscribeIfSubscribed()
-        stepLinkSubscription = DiApp.diProvider.get()
-                .listOfObjects(StepLink::class.java)
-                .withQuery(Query.builder().uri(LinksContract.URI)
-                        .where("${LinksContract.COL_STEPS_ID}=?")
-                        .whereArgs(step!!.id)
-                        .build())
-                .prepare()
-                .asRxObservable()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                        object : Observer<List<StepLink>> {
-                            override fun onCompleted() {
-                            }
-
-                            override fun onError(e: Throwable?) {
-                                Timber.d(e, "Error getting the step links")
-                            }
-
-                            override fun onNext(t: List<StepLink>) {
-                                linksLl.removeAllViews()
-                                t.map {
-                                    val view = ItemDetailLinkView(context, null)
-                                    view.stepLink = it
-                                    linksLl.addView(view)
-                                }
-                            }
-                        }
-                )
+        linksLl.removeAllViews()
+        links?.map {
+            val view = ItemDetailLinkView(context, null)
+            view.stepLink = it
+            linksLl.addView(view)
+        }
     }
 
     companion object {

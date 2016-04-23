@@ -26,7 +26,7 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.StepsRvAdapter
-import com.hasegawa.diapp.models.Step
+import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.syncadapters.SyncAdapter
 import jp.wasabeef.recyclerview.animators.SlideInLeftAnimator
 import timber.log.Timber
@@ -36,7 +36,7 @@ class MainFragment : Fragment() {
 
     interface OnMainFragmentListener {
         fun onMainFragmentScroll(dx: Int, dy: Int)
-        fun onItemStepClicked(step: Step)
+        fun onItemStepClicked(step: StepEntity)
     }
 
     lateinit var stepsRv: RecyclerView
@@ -101,11 +101,6 @@ class MainFragment : Fragment() {
         mainListener = null
 
 
-    }
-
-    override fun onResume() {
-        super.onResume()
-        SyncAdapter.requestFullSync(activity, false, true)
     }
 
     companion object {

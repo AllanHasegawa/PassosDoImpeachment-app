@@ -73,11 +73,6 @@ class NewsFragment : Fragment() {
         newsRvAdapter.close()
     }
 
-    override fun onResume() {
-        super.onResume()
-        SyncAdapter.requestFullSync(activity, false, true)
-    }
-
     companion object {
         const val ARG_IS_TABLET = "is_tablet"
         fun newInstance(isTablet: Boolean): NewsFragment {

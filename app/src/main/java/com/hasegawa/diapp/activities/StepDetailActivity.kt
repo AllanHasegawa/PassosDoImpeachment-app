@@ -27,8 +27,8 @@ import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import android.view.View
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.fragments.StepDetailFragment
-import com.hasegawa.diapp.models.Step
 import timber.log.Timber
 
 class StepDetailActivity : BaseNavDrawerActivity() {
@@ -81,8 +81,6 @@ class StepDetailActivity : BaseNavDrawerActivity() {
             detailFragment = supportFragmentManager.getFragment(savedInstanceState, FRAG_TAG)
                     as StepDetailFragment
         }
-
-        updateNavLastUpdateTitle()
     }
 
     override fun onBackPressed() {
@@ -158,7 +156,7 @@ class StepDetailActivity : BaseNavDrawerActivity() {
 
         private val INTENT_STEP_POSITION_KEY = "step_position"
 
-        fun launch(activity: Activity, step: Step) {
+        fun launch(activity: Activity, step: StepEntity) {
             val intent = Intent(activity, StepDetailActivity::class.java)
             if (activity is MainActivity) {
                 intent.putExtra(INTENT_STEP_POSITION_KEY, step.position)
