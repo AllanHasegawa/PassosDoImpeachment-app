@@ -69,6 +69,38 @@ class ContentProviderStepsRepositoryTest {
                     StepLinkEntity("Z", "Z", "Should Be Ignored2", "Url Should Be Ignored2")
             )
 
+
+    fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
+                                      changes: (() -> Unit)): List<Int> {
+        var barrier = CyclicBarrier(2)
+        var results = ArrayList<Int>()
+        obs
+                .take(3)
+                .subscribe({
+                    results.add(it.size)
+                    barrier.await()
+                })
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        changes()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        return results
+    }
+
+
     @Test
     fun testEmptyDb() {
         val n = db().getSteps().toBlocking().first().size
@@ -212,36 +244,6 @@ class ContentProviderStepsRepositoryTest {
 
         val afterSize = db().getStepLinks().toBlocking().first().size
         assertThat(afterSize, `is`(0))
-    }
-
-    fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
-                                      changes: (() -> Unit)): List<Int> {
-        var barrier = CyclicBarrier(2)
-        var results = ArrayList<Int>()
-        obs
-                .take(3)
-                .subscribe({
-                    results.add(it.size)
-                    barrier.await()
-                })
-        barrier.await(15, TimeUnit.SECONDS)
-        barrier.reset()
-
-        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
-        Observable.fromCallable { db().notifyChange() }
-                .delay(100, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.computation()).subscribe()
-        barrier.await(15, TimeUnit.SECONDS)
-        barrier.reset()
-
-        changes()
-
-        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
-        Observable.fromCallable { db().notifyChange() }
-                .delay(100, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.computation()).subscribe()
-        barrier.await(15, TimeUnit.SECONDS)
-        return results
     }
 
     @Test

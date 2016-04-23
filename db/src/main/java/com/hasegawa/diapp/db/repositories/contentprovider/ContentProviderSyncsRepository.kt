@@ -17,6 +17,7 @@
 package com.hasegawa.diapp.db.repositories.contentprovider
 
 import android.content.ContentResolver
+import android.net.Uri
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.GCMMessagesContract
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.GCMRegistrationsContract
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.SyncsContract
@@ -127,6 +128,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                                             .withQuery(Query.builder().uri(uri).build())
                                             .prepare()
                                             .asRxObservable()
+                                            .take(1)
                                 }
                     } else {
                         Observable.just(it)
@@ -153,6 +155,7 @@ class ContentProviderSyncsRepository : SyncsRepository {
                             .withQuery(Query.builder().uri(uri).build())
                             .prepare()
                             .asRxObservable()
+                            .take(1)
                 }
     }
 
@@ -194,6 +197,10 @@ class ContentProviderSyncsRepository : SyncsRepository {
                         syncs.results()[it]!!.wasInserted() || syncs.results()[it]!!.wasUpdated()
                     }
                 }
+    }
+
+    override fun notifyChange() {
+        provider.internal().contentResolver().notifyChange(Uri.parse(SyncsContract.URI), null)
     }
 }
 

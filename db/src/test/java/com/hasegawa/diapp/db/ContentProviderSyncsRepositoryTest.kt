@@ -31,8 +31,13 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import rx.Observable
+import rx.schedulers.Schedulers
+import java.util.ArrayList
 import java.util.Random
 import java.util.UUID
+import java.util.concurrent.CyclicBarrier
+import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
@@ -61,6 +66,38 @@ class ContentProviderSyncsRepositoryTest {
             GCMMessageEntity("C", "B", GCMMessageType.Sync, "dataC", 0),
             GCMMessageEntity("D", null, GCMMessageType.NewsNotification, "dataD", 0)
     )
+
+
+    fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
+                                      changes: (() -> Unit)): List<List<T>> {
+        var barrier = CyclicBarrier(2)
+        var results = ArrayList<List<T>>()
+        obs
+                .take(3)
+                .subscribe({
+                    results.add(it)
+                    barrier.await()
+                })
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        barrier.reset()
+
+        changes()
+
+        // notifyChange will call "onNext" on the same thread calling notifyChange, yeks.
+        Observable.fromCallable { db().notifyChange() }
+                .delay(100, TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation()).subscribe()
+        barrier.await(15, TimeUnit.SECONDS)
+        return results
+    }
+
 
     @Test
     fun testGetRegistrationsEmpty() {
@@ -245,4 +282,17 @@ class ContentProviderSyncsRepositoryTest {
         val syncs = db().getSuccessfullySyncs().toBlocking().first()
         assertThat(syncs, `is`(syncsList().filter { it.pending == false }))
     }
+
+    @Test
+    fun testGetSuccessfullySyncsNotifyChange() {
+        val results =
+                doNotifyChangeTestResults(db().getSuccessfullySyncs(), {
+                    db().upsertSyncs(syncsList()).toBlocking().first()
+                })
+        assertThat(results.size, `is`(3))
+        assertThat(results[0], `is`(emptyList()))
+        assertThat(results[1], `is`(emptyList()))
+        assertThat(results[2], `is`(syncsList().filter { !it.pending }))
+    }
+
 }

@@ -33,4 +33,6 @@ interface SyncsRepository {
     fun upsertSyncs(syncs: List<SyncEntity>): Observable<List<SyncEntity>>
     fun upsertSync(sync: SyncEntity): Observable<SyncEntity?>
     fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?>
+
+    fun notifyChange()
 }
