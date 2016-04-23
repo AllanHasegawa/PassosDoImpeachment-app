@@ -34,6 +34,14 @@ abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThrea
                 .subscribe(subscriber)
     }
 
+    fun executeBlocking(subscriber: Subscriber<T>) {
+        buildUseCaseObservable()
+                .subscribeOn(executionThread)
+                .observeOn(postExecutionThread)
+                .toBlocking()
+                .subscribe(subscriber)
+    }
+
     fun unsubscribe() {
         if (!subscription.isUnsubscribed) {
             subscription.unsubscribe()
