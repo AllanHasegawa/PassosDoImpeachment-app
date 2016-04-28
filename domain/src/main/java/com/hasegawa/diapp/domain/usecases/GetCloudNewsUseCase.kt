@@ -16,13 +16,15 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.restservices.responses.NewsResponse
 import rx.Observable
-import rx.Scheduler
 
 class GetCloudNewsUseCase(val restService: RestService,
-                          executionThread: Scheduler, postExecutionThread: Scheduler) :
+                          executionThread: ExecutionThread,
+                          postExecutionThread: PostExecutionThread) :
         UseCase<List<NewsResponse>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<NewsResponse>> {

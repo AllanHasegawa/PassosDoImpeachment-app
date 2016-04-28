@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.domain.usecases
+package com.hasegawa.diapp.domain
 
-import com.hasegawa.diapp.domain.ExecutionThread
-import com.hasegawa.diapp.domain.PostExecutionThread
-import com.hasegawa.diapp.domain.repositories.StepsRepository
-import rx.Observable
+import rx.Scheduler
 
-class GetNumStepsCompletedUseCase(
-        val stepsRepository: StepsRepository,
-        executionThread: ExecutionThread,
-        postExecutionThread: PostExecutionThread) :
-        UseCase<Int>(executionThread, postExecutionThread) {
-
-    override fun buildUseCaseObservable(): Observable<Int> {
-        return stepsRepository.getNumberOfCompletedSteps()
-    }
-}
+class ExecutionThread(val scheduler: Scheduler)
+class PostExecutionThread(val scheduler: Scheduler)

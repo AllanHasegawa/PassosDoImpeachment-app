@@ -16,16 +16,17 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import rx.Observable
-import rx.Scheduler
 
 
 class GetNewsUseCase(
         val newsRepository: NewsRepository,
-        executionThread: Scheduler,
-        postExecutionThread: Scheduler) :
+        executionThread: ExecutionThread,
+        postExecutionThread: PostExecutionThread) :
         UseCase<List<NewsEntity>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<NewsEntity>> {

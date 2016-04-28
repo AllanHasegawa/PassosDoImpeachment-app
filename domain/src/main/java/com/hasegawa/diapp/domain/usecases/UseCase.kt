@@ -16,12 +16,14 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import rx.Observable
-import rx.Scheduler
 import rx.Subscriber
 import rx.subscriptions.Subscriptions
 
-abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThread: Scheduler) {
+abstract class UseCase<T>(val executionThread: ExecutionThread,
+                          val postExecutionThread: PostExecutionThread) {
 
     private var subscription = Subscriptions.empty()
 
@@ -29,15 +31,15 @@ abstract class UseCase<T>(val executionThread: Scheduler, val postExecutionThrea
 
     fun execute(subscriber: Subscriber<T>) {
         subscription = buildUseCaseObservable()
-                .subscribeOn(executionThread)
-                .observeOn(postExecutionThread)
+                .subscribeOn(executionThread.scheduler)
+                .observeOn(postExecutionThread.scheduler)
                 .subscribe(subscriber)
     }
 
     fun executeBlocking(subscriber: Subscriber<T>) {
         buildUseCaseObservable()
-                .subscribeOn(executionThread)
-                .observeOn(postExecutionThread)
+                .subscribeOn(executionThread.scheduler)
+                .observeOn(postExecutionThread.scheduler)
                 .toBlocking()
                 .subscribe(subscriber)
     }

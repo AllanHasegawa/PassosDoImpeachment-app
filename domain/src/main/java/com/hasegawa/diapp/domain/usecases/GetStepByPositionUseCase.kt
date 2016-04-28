@@ -16,14 +16,16 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
-import rx.Scheduler
 import rx.subjects.BehaviorSubject
 
 class GetStepByPositionUseCase(position: Int, val stepsRepository: StepsRepository,
-                               executionThread: Scheduler, postExecutionThread: Scheduler) :
+                               executionThread: ExecutionThread,
+                               postExecutionThread: PostExecutionThread) :
         UseCase<StepEntity>(executionThread, postExecutionThread) {
 
     val subject: BehaviorSubject<Int>?

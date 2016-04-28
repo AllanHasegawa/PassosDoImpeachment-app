@@ -16,18 +16,19 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.restservices.RestService
 import rx.Observable
-import rx.Scheduler
 
 class PostGCMRegistrationUseCase(
         val gcmToken: String,
         val syncsRepository: SyncsRepository,
         val restService: RestService,
-        executionThread: Scheduler,
-        postExecutionThread: Scheduler) :
+        executionThread: ExecutionThread,
+        postExecutionThread: PostExecutionThread) :
         UseCase<Boolean>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<Boolean> {

@@ -16,20 +16,21 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
 import com.hasegawa.diapp.domain.restservices.responses.toEntity
 import rx.Observable
-import rx.Scheduler
 import java.util.concurrent.TimeUnit
 
 
 class AddStepResponsesToRepoUseCase(
         val stepResponses: List<StepResponse>,
         val stepsRepository: StepsRepository,
-        onSubscribeThread: Scheduler, postExecutionThread: Scheduler) :
-        UseCase<List<StepEntity>>(onSubscribeThread, postExecutionThread) {
+        executionThread: ExecutionThread, postExecutionThread: PostExecutionThread) :
+        UseCase<List<StepEntity>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<StepEntity>> {
         return Observable

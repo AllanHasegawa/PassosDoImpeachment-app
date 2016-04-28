@@ -16,13 +16,15 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.SyncScheduler
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import rx.Observable
-import rx.Scheduler
 
 class SyncIfNecessaryUseCase(val syncScheduler: SyncScheduler, val syncsRepository: SyncsRepository,
-                             executionThread: Scheduler, postExecutionThread: Scheduler) :
+                             executionThread: ExecutionThread,
+                             postExecutionThread: PostExecutionThread) :
         UseCase<Boolean>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<Boolean> {

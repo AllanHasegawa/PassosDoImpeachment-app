@@ -16,13 +16,15 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
 import rx.Observable
-import rx.Scheduler
 
 class GetCloudStepsUseCase(val restService: RestService,
-                           executionThread: Scheduler, postExecutionThread: Scheduler) :
+                           executionThread: ExecutionThread,
+                           postExecutionThread: PostExecutionThread) :
         UseCase<List<StepResponse>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<StepResponse>> {

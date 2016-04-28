@@ -16,16 +16,17 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
-import rx.Scheduler
 
 class GetStepLinksByStepPositionUseCase(
         val stepPosition: Int,
         val stepsRepository: StepsRepository,
-        executionThread: Scheduler,
-        postExecutionThread: Scheduler) :
+        executionThread: ExecutionThread,
+        postExecutionThread: PostExecutionThread) :
         UseCase<List<StepLinkEntity>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<StepLinkEntity>> {

@@ -16,14 +16,15 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import rx.Observable
-import rx.Scheduler
 
 class UpdatePendingSyncsAsSuccessUseCase(val syncsRepository: SyncsRepository,
-                                         executionThread: Scheduler,
-                                         postExecutionThread: Scheduler) :
+                                         executionThread: ExecutionThread,
+                                         postExecutionThread: PostExecutionThread) :
         UseCase<List<SyncEntity>>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<List<SyncEntity>> {

@@ -16,14 +16,16 @@
 
 package com.hasegawa.diapp.domain.usecases
 
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import rx.Observable
-import rx.Scheduler
 
 data class NumCompletedAndTotal(val completed: Int, val total: Int)
 
 class GetNumStepsTotalCompletedUseCase(val stepsRepository: StepsRepository,
-                                       executionThread: Scheduler, postExecutionThread: Scheduler) :
+                                       executionThread: ExecutionThread,
+                                       postExecutionThread: PostExecutionThread) :
         UseCase<NumCompletedAndTotal>(executionThread, postExecutionThread) {
 
     override fun buildUseCaseObservable(): Observable<NumCompletedAndTotal> {
