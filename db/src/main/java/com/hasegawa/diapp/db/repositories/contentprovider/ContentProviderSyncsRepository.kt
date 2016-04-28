@@ -35,12 +35,12 @@ import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolve
 import com.pushtorefresh.storio.contentresolver.queries.Query
 import rx.Observable
 
-class ContentProviderSyncsRepository : SyncsRepository {
+class ContentProviderSyncsRepository(resolver: ContentResolver) : SyncsRepository {
     private val provider: DefaultStorIOContentResolver
 
-    constructor(contentResolver: ContentResolver) {
+    init {
         provider = DefaultStorIOContentResolver.builder()
-                .contentResolver(contentResolver)
+                .contentResolver(resolver)
                 .addTypeMapping(GCMMessageEntity::class.java, GCMMessageEntityMapping.typeMapping())
                 .addTypeMapping(GCMRegistrationEntity::class.java, GCMRegistrationEntityMapping.typeMapping())
                 .addTypeMapping(SyncEntity::class.java, SyncEntityMapping.typeMapping())

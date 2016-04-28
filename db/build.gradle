@@ -52,6 +52,7 @@ dependencies {
 
     testCompile testDependencies.junit
     testCompile testDependencies.robolectric
+
     compile dependencies.appcompat
     compile dependencies.kotlin_stdlib
     compile dependencies.kotlin_reflect

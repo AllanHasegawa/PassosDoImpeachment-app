@@ -18,22 +18,22 @@ package com.hasegawa.diapp.db.repositories.contentprovider
 
 import android.content.ContentResolver
 import android.net.Uri
-import com.hasegawa.diapp.domain.entities.NewsEntity
-import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.NewsContract
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.NewsEntityMapping
 import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.domain.entities.NewsEntity
+import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolver
 import com.pushtorefresh.storio.contentresolver.queries.DeleteQuery
 import com.pushtorefresh.storio.contentresolver.queries.Query
 import rx.Observable
 
-class ContentProviderNewsRepository : NewsRepository {
+class ContentProviderNewsRepository(resolver: ContentResolver) : NewsRepository {
     private val provider: DefaultStorIOContentResolver
 
-    constructor(contentResolver: ContentResolver) {
+    init {
         provider = DefaultStorIOContentResolver.builder()
-                .contentResolver(contentResolver)
+                .contentResolver(resolver)
                 .addTypeMapping(NewsEntity::class.java, NewsEntityMapping.typeMapping())
                 .build()
     }

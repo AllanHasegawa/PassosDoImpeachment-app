@@ -33,11 +33,11 @@ import com.pushtorefresh.storio.contentresolver.queries.DeleteQuery
 import com.pushtorefresh.storio.contentresolver.queries.Query
 import rx.Observable
 
-class ContentProviderStepsRepository : StepsRepository {
+class ContentProviderStepsRepository(resolver: ContentResolver) : StepsRepository {
     private val provider: StorIOContentResolver
 
-    constructor(contentResolver: ContentResolver) {
-        this.provider = DefaultStorIOContentResolver.builder().contentResolver(contentResolver)
+    init {
+        this.provider = DefaultStorIOContentResolver.builder().contentResolver(resolver)
                 .addTypeMapping(StepEntity::class.java, StepEntityMapping.typeMapping())
                 .addTypeMapping(StepLinkEntity::class.java, StepLinkEntityMapping.typeMapping())
                 .build()
