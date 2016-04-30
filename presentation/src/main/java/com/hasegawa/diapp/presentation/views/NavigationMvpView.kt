@@ -16,7 +16,7 @@
 
 package com.hasegawa.diapp.presentation.views
 
-interface NavigationMvpView : MvpView {
+abstract class NavigationMvpView : MvpView {
     enum class Item {
         StepsList,
         NewsList,
@@ -26,10 +26,16 @@ interface NavigationMvpView : MvpView {
         Update
     }
 
-    var viewItemTouchListener: (Item) -> Unit
+    enum class DrawerState {
+        Opened,
+        Closed
+    }
 
-    fun renderUpdateDateText(text: String)
-    fun renderItemSelected(item: Item)
-    fun renderOpenedNavView()
-    fun renderClosedNavView()
+    var itemTouchListener: (Item) -> Unit = {}
+    var drawerStateListener: (state: DrawerState) -> Unit = {}
+
+    abstract fun renderUpdateDateText(text: String)
+    abstract fun renderItemSelected(item: Item)
+    abstract fun renderOpenedNavView()
+    abstract fun renderClosedNavView()
 }

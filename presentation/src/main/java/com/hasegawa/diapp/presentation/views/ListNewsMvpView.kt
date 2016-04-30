@@ -18,13 +18,13 @@ package com.hasegawa.diapp.presentation.views
 
 import com.hasegawa.diapp.domain.entities.NewsEntity
 
-interface ListNewsMvpView : MvpView {
-    var viewShareBtTouchListener: (NewsEntity) -> Unit
-    var viewOpenBtTouchListener: (NewsEntity) -> Unit
+abstract class ListNewsMvpView : MvpView {
+    var shareBtTouchListener: (NewsEntity) -> Unit = {}
+    var openBtTouchListener: (NewsEntity) -> Unit = {}
 
     data class Item(val type: Int, val news: NewsEntity? = null, val date: String? = null)
 
-    fun renderNews(news: List<Item>)
+    abstract fun renderNews(news: List<Item>)
 
     companion object {
         const val ITEM_SPACE_TYPE = 2

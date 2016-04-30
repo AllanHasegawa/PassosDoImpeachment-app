@@ -18,28 +18,11 @@ package com.hasegawa.diapp.presentation.views
 
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 
-abstract class MainMvpView : MvpView {
-    enum class SizeState {
-        Shrunk,
-        Expanded
-    }
+abstract class ListStepDetailsMvpView : MvpView {
+    var currentStepListener: (position: Int) -> Unit = {}
 
-    enum class Selection {
-        Steps,
-        News
-    }
-
-    enum class Mode {
-        OnePane,
-        TwoPane
-    }
-
-    var selectionListener: (selection: Selection) -> Unit = {}
-    var listStepsScrollListener: (dy: Int) -> Unit = {}
-
-    abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
-    abstract fun renderSizeState(state: SizeState)
-    abstract fun renderSelection(selection: Selection)
-    abstract fun renderMode(mode: Mode)
+    abstract fun renderStepCompleted(completed: Boolean)
+    abstract fun renderStepsByPosition(positions: List<Int>)
+    abstract fun renderNumSteps(numbers: NumCompletedAndTotal)
+    abstract fun renderStepPosition(position: Int)
 }
-

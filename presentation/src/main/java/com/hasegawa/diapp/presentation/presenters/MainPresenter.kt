@@ -70,11 +70,15 @@ class MainPresenter @Inject constructor(
 
     override fun onViewBound() {
         if (!screenDevice.isTablet()) {
-            view.viewSelectionListener = {
+            view.selectionListener = {
                 selectionListener(it)
                 view.renderSelection(it)
+                when (it) {
+                    MainMvpView.Selection.Steps -> view.renderSizeState(MainMvpView.SizeState.Expanded)
+                    MainMvpView.Selection.News -> view.renderSizeState(MainMvpView.SizeState.Shrunk)
+                }
             }
-            view.viewListStepsScrollListener = { handleListStepsScroll(it) }
+            view.listStepsScrollListener = { handleListStepsScroll(it) }
         }
     }
 

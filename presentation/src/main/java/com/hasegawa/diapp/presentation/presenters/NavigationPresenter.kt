@@ -71,7 +71,7 @@ class NavigationPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        view.viewItemTouchListener = {
+        view.itemTouchListener = {
             setItemSelected(it)
             when (it) {
                 NavigationMvpView.Item.Feedback -> urlOpener.openUrl(constStrings.navFeedbackUrl)
@@ -79,6 +79,12 @@ class NavigationPresenter @Inject constructor(
                 else -> Unit
             }
             navItemTouchListener(it)
+        }
+        view.drawerStateListener = {
+            when (it) {
+                NavigationMvpView.DrawerState.Opened -> view.renderOpenedNavView()
+                NavigationMvpView.DrawerState.Closed -> view.renderClosedNavView()
+            }
         }
     }
 

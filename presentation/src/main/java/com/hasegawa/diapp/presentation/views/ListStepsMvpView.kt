@@ -18,14 +18,14 @@ package com.hasegawa.diapp.presentation.views
 
 import com.hasegawa.diapp.domain.entities.StepEntity
 
-interface ListStepsMvpView : MvpView {
-    var viewStepTouchListener: (step: StepEntity, position: Int) -> Unit
-    var viewScrollListener: (dy: Int) -> Unit
+abstract class ListStepsMvpView : MvpView {
+    var stepTouchListener: (step: StepEntity, position: Int) -> Unit = { i, j -> }
+    var scrollListener: (dy: Int) -> Unit = {}
 
     data class Item(val type: Int, val step: StepEntity? = null)
 
-    fun renderSteps(steps: List<Item>)
-    fun renderSelectedStep(listPosition: Int)
+    abstract fun renderSteps(steps: List<Item>)
+    abstract fun renderSelectedStep(listPosition: Int)
 
     companion object {
         const val ITEM_TYPE_SPACE = 2

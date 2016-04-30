@@ -16,7 +16,7 @@
 
 package com.hasegawa.diapp.presentation.views
 
-interface CreditsMvpView : MvpView {
-    var viewHaseEmailTouchListener: () -> Unit
-    var viewHaseGitHubTouchListener: () -> Unit
+abstract class CreditsMvpView : MvpView {
+    var haseEmailTouchListener: () -> Unit = {}
+    var haseGitHubTouchListener: () -> Unit = {}
 }

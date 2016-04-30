@@ -68,11 +68,11 @@ class ListStepsPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        view.viewStepTouchListener = { item, position ->
+        view.stepTouchListener = { item, position ->
             ListStepsPresenter@stepTouchListener(item, position)
             view.renderSelectedStep(position)
         }
-        view.viewScrollListener = { scrollListener(it) }
+        view.scrollListener = { scrollListener(it) }
     }
 
     private fun makeStepList(source: List<StepEntity>): List<ListStepsMvpView.Item> {

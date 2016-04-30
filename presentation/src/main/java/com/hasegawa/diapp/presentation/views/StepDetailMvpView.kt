@@ -19,9 +19,9 @@ package com.hasegawa.diapp.presentation.views
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 
-interface StepDetailMvpView : MvpView {
-    var viewLinkTouchListener: (url: String) -> Unit
+abstract class StepDetailMvpView : MvpView {
+    var linkTouchListener: (url: String) -> Unit = {}
 
-    fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity)
-    fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
+    abstract fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity)
+    abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
 }

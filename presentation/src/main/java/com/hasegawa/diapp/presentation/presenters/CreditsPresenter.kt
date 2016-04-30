@@ -28,13 +28,13 @@ class CreditsPresenter @Inject constructor(
         private val urlOpener: UrlOpener) :
         Presenter<CreditsMvpView>() {
     override fun onViewBound() {
-        view.viewHaseEmailTouchListener = {
+        view.haseEmailTouchListener = {
             textSharer.shareTextByEmail(
                     constStrings.creditsHaseEmail,
                     constStrings.creditsHaseEmailSubject,
                     constStrings.creditsEmailChooserTitle)
         }
-        view.viewHaseGitHubTouchListener = {
+        view.haseGitHubTouchListener = {
             urlOpener.openUrl(constStrings.creditsHaseGitHubUrl)
         }
     }

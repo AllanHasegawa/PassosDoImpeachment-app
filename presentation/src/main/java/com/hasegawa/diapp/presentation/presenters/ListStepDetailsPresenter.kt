@@ -19,76 +19,77 @@ package com.hasegawa.diapp.presentation.presenters
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.LogDevice
-import com.hasegawa.diapp.domain.devices.UrlOpener
-import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
+import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
-import com.hasegawa.diapp.domain.usecases.GetStepWithLinksByPositionUseCase
+import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.views.StepDetailMvpView
+import com.hasegawa.diapp.presentation.views.ListStepDetailsMvpView
 import rx.Subscriber
 import javax.inject.Inject
 
-class StepDetailPresenter @Inject constructor(
-        private val urlOpener: UrlOpener,
+class ListStepDetailsPresenter @Inject constructor(
         private val logDevice: LogDevice,
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        Presenter<StepDetailMvpView>() {
+        Presenter<ListStepDetailsMvpView>() {
 
-    private var getStepUc: GetStepWithLinksByPositionUseCase? = null
-    private var getTotalStepsUc: GetNumStepsTotalCompletedUseCase? = null
+    private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
+    private var getSteps: GetStepsUseCase? = null
+
+    private var stepsCache: List<StepEntity> = emptyList()
+
+    override fun onPause() {
+        getNumStepsUc?.unsubscribe()
+        getNumStepsUc = null
+        getSteps?.unsubscribe()
+        getSteps = null
+    }
 
     override fun onResume() {
-        getStepUc = GetStepWithLinksByPositionUseCase(
-                -1, stepsRepository,
+        getNumStepsUc = GetNumStepsTotalCompletedUseCase(stepsRepository,
                 executionThread, postExecutionThread)
-        getStepUc?.execute(object : Subscriber<StepWithLinksEntity>() {
+        getNumStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
             override fun onCompleted() {
             }
 
             override fun onError(e: Throwable?) {
-                logDevice.e(e, "Error getting step with links.")
-            }
-
-            override fun onNext(t: StepWithLinksEntity?) {
-                if (t != null && t.step != null) {
-                    view.renderStepAndLinks(t)
-                }
-            }
-        })
-
-        getTotalStepsUc = GetNumStepsTotalCompletedUseCase(stepsRepository,
-                executionThread, postExecutionThread)
-        getTotalStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
-            override fun onCompleted() {
-            }
-
-            override fun onError(e: Throwable?) {
-                logDevice.e(e, "Error getting num steps completed and total.")
+                logDevice.e(e, "Error getting num steps.")
             }
 
             override fun onNext(t: NumCompletedAndTotal?) {
                 if (t != null) {
-                    view.renderNumStepsCompletedAndTotal(t)
+                    view.renderNumSteps(t)
+                }
+            }
+        })
+
+        getSteps = GetStepsUseCase(stepsRepository, executionThread, postExecutionThread)
+        getSteps?.execute(object : Subscriber<List<StepEntity>>() {
+            override fun onCompleted() {
+            }
+
+            override fun onError(e: Throwable?) {
+                logDevice.e(e, "Error getting steps.")
+            }
+
+            override fun onNext(t: List<StepEntity>?) {
+                if (t != null) {
+                    view.renderStepsByPosition(t.map { it.position }.distinct())
+                    stepsCache = t
                 }
             }
         })
     }
 
-    override fun onPause() {
-        getStepUc?.unsubscribe()
-        getStepUc = null
-        getTotalStepsUc?.unsubscribe()
-        getTotalStepsUc = null
-    }
-
     override fun onViewBound() {
-        view.linkTouchListener = { urlOpener.openUrl(it) }
+        view.currentStepListener = { pos ->
+            view.renderStepPosition(pos)
+            view.renderStepCompleted(findStepByPosition(pos)?.completed ?: false)
+        }
     }
 
-    fun setStepPosition(pos: Int) {
-        getStepUc?.position = pos
-    }
+    private fun findStepByPosition(pos: Int): StepEntity? =
+            stepsCache.firstOrNull { it.position == pos }
 }

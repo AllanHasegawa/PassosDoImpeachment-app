@@ -66,8 +66,8 @@ class ListNewsPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        view.viewShareBtTouchListener = { newsSharer.shareNews(it) }
-        view.viewOpenBtTouchListener = { urlOpener.openUrl(it.url) }
+        view.shareBtTouchListener = { newsSharer.shareNews(it) }
+        view.openBtTouchListener = { urlOpener.openUrl(it.url) }
     }
 
     private fun makeNewsList(source: List<NewsEntity>): List<ListNewsMvpView.Item> {
