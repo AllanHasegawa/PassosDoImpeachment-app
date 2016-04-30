@@ -40,6 +40,7 @@ class ListStepsPresenter @Inject constructor(
 
     var stepTouchListener: (step: StepEntity, position: Int) -> Unit
             = { i, j -> }
+    var scrollListener: (dy: Int) -> Unit = {}
 
     override fun onResume() {
         getStepsUc = GetStepsUseCase(stepsRepository, executionThread, postExecutionThread)
@@ -71,6 +72,7 @@ class ListStepsPresenter @Inject constructor(
             ListStepsPresenter@stepTouchListener(item, position)
             view.renderSelectedStep(position)
         }
+        view.viewScrollListener = { scrollListener(it) }
     }
 
     private fun makeStepList(source: List<StepEntity>): List<ListStepsMvpView.Item> {

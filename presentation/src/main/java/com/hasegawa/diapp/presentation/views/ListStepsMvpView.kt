@@ -20,6 +20,7 @@ import com.hasegawa.diapp.domain.entities.StepEntity
 
 interface ListStepsMvpView : MvpView {
     var viewStepTouchListener: (step: StepEntity, position: Int) -> Unit
+    var viewScrollListener: (dy: Int) -> Unit
 
     data class Item(val type: Int, val step: StepEntity? = null)
 

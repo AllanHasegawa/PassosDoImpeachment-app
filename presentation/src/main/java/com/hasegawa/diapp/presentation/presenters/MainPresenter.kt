@@ -18,6 +18,7 @@ package com.hasegawa.diapp.presentation.presenters
 
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.DateDevice
 import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.domain.repositories.StepsRepository
@@ -25,11 +26,14 @@ import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import rx.Subscriber
+import rx.schedulers.Timestamped
+import java.util.*
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
         private val screenDevice: ScreenDevice,
         private val logDevice: LogDevice,
+        private val dateDevice: DateDevice,
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
@@ -69,6 +73,36 @@ class MainPresenter @Inject constructor(
             view.viewSelectionListener = {
                 selectionListener(it)
                 view.renderSelection(it)
+            }
+            view.viewListStepsScrollListener = { handleListStepsScroll(it) }
+        }
+    }
+
+    private var dyHistory: List<Timestamped<Int>> = ArrayList(100)
+    private fun handleListStepsScroll(dy: Int) {
+        if (screenDevice.isTablet()) return
+        if (dy != 0) {
+            val useMoreComplexChangeDetection = false
+            if (useMoreComplexChangeDetection) {
+                val now = dateDevice.nowInMillis()
+                (dyHistory as ArrayList).add(Timestamped(now, dy))
+                dyHistory = dyHistory.takeLast(20).filter { (now - it.timestampMillis) < 500 }
+                val dySum = dyHistory.sumBy { it.value }
+
+                val dyDp = screenDevice.pxToDp(dySum)
+                if (Math.abs(dyDp) > 32) {
+                    if (dyDp < 0) {
+                        view.renderSizeState(MainMvpView.SizeState.Expanded)
+                    } else {
+                        view.renderSizeState(MainMvpView.SizeState.Shrunk)
+                    }
+                }
+            } else {
+                if (dy < 0) {
+                    view.renderSizeState(MainMvpView.SizeState.Expanded)
+                } else {
+                    view.renderSizeState(MainMvpView.SizeState.Shrunk)
+                }
             }
         }
     }

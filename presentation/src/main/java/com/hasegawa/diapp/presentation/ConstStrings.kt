@@ -17,6 +17,9 @@
 package com.hasegawa.diapp.presentation
 
 abstract class ConstStrings {
+    abstract var stepsToolbarShrunkTitle: String
+    abstract var newsToolbarShrunkTitle: String
+
     abstract var navFeedbackUrl: String
     abstract var navOpenSourceUrl: String
     abstract var navSyncNeverUpdated: String

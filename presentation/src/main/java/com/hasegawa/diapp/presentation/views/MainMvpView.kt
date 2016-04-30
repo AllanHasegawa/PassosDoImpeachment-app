@@ -35,6 +35,7 @@ interface MainMvpView : MvpView {
     }
 
     var viewSelectionListener: (selection: Selection) -> Unit
+    var viewListStepsScrollListener: (dy: Int) -> Unit
 
     fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
     fun renderSizeState(state: SizeState)
