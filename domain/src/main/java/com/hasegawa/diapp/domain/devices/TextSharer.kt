@@ -18,4 +18,5 @@ package com.hasegawa.diapp.domain.devices
 
 interface TextSharer {
     fun shareText(body: String, chooserTitle: String? = null)
+    fun shareTextByEmail(email: String, subject: String, chooserTitle: String? = null)
 }
