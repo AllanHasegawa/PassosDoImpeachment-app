@@ -110,15 +110,4 @@ class MainPresenter @Inject constructor(
             }
         }
     }
-
-    fun setSelection(selection: MainMvpView.Selection) {
-        if (!screenDevice.isTablet()) {
-            view.renderSelection(selection)
-            selectionListener(selection)
-        }
-    }
-
-    fun setMode(mode: MainMvpView.Mode) {
-        view.renderMode(mode)
-    }
 }

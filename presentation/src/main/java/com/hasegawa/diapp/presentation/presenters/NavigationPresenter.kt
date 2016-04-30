@@ -72,7 +72,7 @@ class NavigationPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.itemTouchListener = {
-            setItemSelected(it)
+            view.renderItemSelected(it)
             when (it) {
                 NavigationMvpView.Item.Feedback -> urlOpener.openUrl(constStrings.navFeedbackUrl)
                 NavigationMvpView.Item.OpenSource -> urlOpener.openUrl(constStrings.navOpenSourceUrl)
@@ -86,10 +86,6 @@ class NavigationPresenter @Inject constructor(
                 NavigationMvpView.DrawerState.Closed -> view.renderClosedNavView()
             }
         }
-    }
-
-    fun setItemSelected(item: NavigationMvpView.Item) {
-        view.renderItemSelected(item)
     }
 
     private fun setUpdateDate(time: Long?) {

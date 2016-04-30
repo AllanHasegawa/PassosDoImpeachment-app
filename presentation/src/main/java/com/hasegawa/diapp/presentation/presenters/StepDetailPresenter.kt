@@ -28,8 +28,10 @@ import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.views.StepDetailMvpView
 import rx.Subscriber
 import javax.inject.Inject
+import javax.inject.Named
 
 class StepDetailPresenter @Inject constructor(
+        @Named("stepPosition") private val stepPosition: Int,
         private val urlOpener: UrlOpener,
         private val logDevice: LogDevice,
         private val stepsRepository: StepsRepository,
@@ -42,7 +44,7 @@ class StepDetailPresenter @Inject constructor(
 
     override fun onResume() {
         getStepUc = GetStepWithLinksByPositionUseCase(
-                -1, stepsRepository,
+                stepPosition, stepsRepository,
                 executionThread, postExecutionThread)
         getStepUc?.execute(object : Subscriber<StepWithLinksEntity>() {
             override fun onCompleted() {
@@ -86,9 +88,5 @@ class StepDetailPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.linkTouchListener = { urlOpener.openUrl(it) }
-    }
-
-    fun setStepPosition(pos: Int) {
-        getStepUc?.position = pos
     }
 }
