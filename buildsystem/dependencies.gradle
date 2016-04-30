@@ -15,6 +15,7 @@ ext {
     androidTestInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
     androidApplicationId = 'com.hasegawa.diapp'
     androidTestApplicationId = 'com.hasegawa.diapp.test'
+    androidMultiDexEnabled = false
 
     // AndroidLibraries
     rxAndroidVersion = '1.1.0'
@@ -24,11 +25,15 @@ ext {
     supportLibVersion = '23.2.1'
     recyclerviewAnimatorsVersion = '2.2.2'
     gcmVersion = '8.3.0'
+    conductorVersion = '1.1.4'
+    multidexVersion = '1.0.0'
+    butterknifeVersion = '8.0.0'
 
     // Libraries
     kotlinVersion = '1.0.1'
     rxKotlinVersion = '0.55.0'
     jodaVersion = '2.9.2'
+    dagger2Version = '2.4'
 
     // Testing
     junitVersion = '4.12'
@@ -56,6 +61,16 @@ ext {
             support_recyclerview  : "com.android.support:recyclerview-v7:$supportLibVersion",
             support               : "com.android.support:support-v4:$supportLibVersion",
             joda                  : "net.danlew:android.joda:$jodaVersion",
+            conductor             : "com.bluelinelabs:conductor:$conductorVersion",
+            conductor_support     : "com.bluelinelabs:conductor-support:$conductorVersion",
+            multidex              : "com.android.support:multidex:$multidexVersion",
+            butterknife           : "com.jakewharton:butterknife:$butterknifeVersion",
+            dagger2               : "com.google.dagger:dagger:$dagger2Version",
+    ]
+
+    appKaptDependencies = [
+            butterknife_compiler: "com.jakewharton:butterknife-compiler:$butterknifeVersion",
+            dagger2_compiler    : "com.google.dagger:dagger-compiler:$dagger2Version",
     ]
 
     appTestDependencies = [
@@ -73,6 +88,21 @@ ext {
 
     appDebugDependencies = [
             stheto: "com.facebook.stetho:stetho:$sthetoVersion"
+    ]
+
+    presentationDependencies = [
+            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion",
+            dagger2 : "com.google.dagger:dagger:$dagger2Version",
+    ]
+
+    presentationKaptDependencies = [
+            dagger2_compiler: "com.google.dagger:dagger-compiler:$dagger2Version",
+    ]
+
+    presentationTestDependencies = [
+            junit         : "junit:junit:$junitVersion",
+            mockito       : "org.mockito:mockito-core:$mockitoVersion",
+            hamcrest_junit: "org.hamcrest:hamcrest-junit:$hamcrestJUnitVersion"
     ]
 
     domainDependencies = [
@@ -108,11 +138,14 @@ ext {
             rxkotlin      : "io.reactivex:rxkotlin:$rxKotlinVersion",
             rxandroid     : "io.reactivex:rxandroid:$rxAndroidVersion",
             joda          : "net.danlew:android.joda:$jodaVersion",
-            storio        : "com.pushtorefresh.storio:content-resolver:$storIoVersion"
+            storio        : "com.pushtorefresh.storio:content-resolver:$storIoVersion",
     ]
 
     dbTestDependencies = [
             junit      : "junit:junit:$junitVersion",
             robolectric: "org.robolectric:robolectric:$robolectricVersion"
+    ]
+
+    dbKaptDependencies = [
     ]
 }
