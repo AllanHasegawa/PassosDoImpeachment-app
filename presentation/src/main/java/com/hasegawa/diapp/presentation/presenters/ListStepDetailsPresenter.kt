@@ -76,8 +76,8 @@ class ListStepDetailsPresenter @Inject constructor(
 
             override fun onNext(t: List<StepEntity>?) {
                 if (t != null) {
-                    view.renderStepsByPosition(t.map { it.position }.distinct())
                     stepsCache = t
+                    view.renderStepsByPosition(t.map { it.position }.distinct())
                 }
             }
         })
@@ -85,8 +85,8 @@ class ListStepDetailsPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.currentStepListener = { pos ->
-            view.renderStepPosition(pos)
             view.renderStepCompleted(findStepByPosition(pos)?.completed ?: false)
+            view.renderStepPosition(pos)
         }
     }
 
