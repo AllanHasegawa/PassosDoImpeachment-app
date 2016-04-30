@@ -18,6 +18,7 @@ package com.hasegawa.diapp.domain.devices
 
 interface DateDevice {
     fun nowInTimestamp(): Long
+    fun nowInMillis(): Long
     fun timestampToFormattedDate(time: Long): String
     fun timestampToFormattedDateTime(time: Long): String
 }

@@ -22,12 +22,17 @@ import com.hasegawa.diapp.domain.devices.DateDevice
 import com.hasegawa.diapp.utils.DateTimeExtensions
 import com.hasegawa.diapp.utils.toUnixTimestamp
 import org.joda.time.DateTime
+import org.joda.time.DateTimeZone
 import javax.inject.Inject
 
 class AppDateDevice @Inject constructor(val context: Context) : DateDevice {
 
     override fun nowInTimestamp(): Long {
         return DateTime.now().toUnixTimestamp()
+    }
+
+    override fun nowInMillis(): Long {
+        return DateTime.now(DateTimeZone.UTC).millis
     }
 
     override fun timestampToFormattedDate(time: Long): String {
