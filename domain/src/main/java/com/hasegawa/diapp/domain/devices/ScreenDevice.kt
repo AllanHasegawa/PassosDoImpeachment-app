@@ -18,4 +18,9 @@ package com.hasegawa.diapp.domain.devices
 
 interface ScreenDevice {
     fun isTablet(): Boolean
+
+    fun pxToDp(px: Int): Int
+    fun dpToPx(dp: Int): Int
+    fun fPxToDp(px: Float): Float
+    fun fDpToPx(dp: Float): Float
 }

@@ -19,6 +19,7 @@ package com.hasegawa.diapp.devices
 import android.app.Activity
 import android.util.DisplayMetrics
 import com.hasegawa.diapp.domain.devices.ScreenDevice
+import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
 class AppScreenDevice @Inject constructor(val activity: Activity) : ScreenDevice {
@@ -26,6 +27,10 @@ class AppScreenDevice @Inject constructor(val activity: Activity) : ScreenDevice
         return getScreenSwDp() >= TABLET_SW_DP
     }
 
+    override fun dpToPx(dp: Int): Int = ResourcesUtils.dpToPx(activity, dp)
+    override fun pxToDp(px: Int): Int = ResourcesUtils.pxToDp(activity, px)
+    override fun fDpToPx(dp: Float): Float = ResourcesUtils.fDpToPx(activity, dp)
+    override fun fPxToDp(px: Float): Float = ResourcesUtils.fPxToDp(activity, px)
 
     private fun getScreenSwDp(): Float {
         val displayMetrics = DisplayMetrics()
