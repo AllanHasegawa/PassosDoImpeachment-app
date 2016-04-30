@@ -39,7 +39,7 @@ class MainPresenter @Inject constructor(
         private val postExecutionThread: PostExecutionThread) :
         Presenter<MainMvpView>() {
 
-    var selectionListener: (selection: MainMvpView.Selection) -> Unit = {}
+    var routeListener: (route: MainMvpView.Route) -> Unit = {}
 
     private var getNumTotalsCompletedUc: GetNumStepsTotalCompletedUseCase? = null
 
@@ -69,17 +69,25 @@ class MainPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        if (!screenDevice.isTablet()) {
-            view.selectionListener = {
-                selectionListener(it)
-                view.renderSelection(it)
-                when (it) {
-                    MainMvpView.Selection.Steps -> view.renderSizeState(MainMvpView.SizeState.Expanded)
-                    MainMvpView.Selection.News -> view.renderSizeState(MainMvpView.SizeState.Shrunk)
+        view.routeListener = {
+            routeListener(it)
+            view.renderRouteChange(it)
+            when (it) {
+                MainMvpView.Route.Steps -> {
+                    view.renderSizeState(MainMvpView.SizeState.Expanded)
+                    view.renderMode(MainMvpView.Mode.TwoPane)
+                }
+                MainMvpView.Route.News -> {
+                    view.renderSizeState(MainMvpView.SizeState.Shrunk)
+                    view.renderMode(MainMvpView.Mode.OnePane)
+                }
+                MainMvpView.Route.Credits -> {
+                    view.renderMode(MainMvpView.Mode.OnePane)
                 }
             }
-            view.listStepsScrollListener = { handleListStepsScroll(it) }
         }
+        view.listStepsScrollListener = { handleListStepsScroll(it) }
+        view.stepSelectedByPosListener = { view.renderStepSelectedByPosition(it) }
     }
 
     private var dyHistory: List<Timestamped<Int>> = ArrayList(100)

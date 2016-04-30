@@ -24,9 +24,11 @@ abstract class MainMvpView : MvpView {
         Expanded
     }
 
-    enum class Selection {
+    enum class Route {
         Steps,
-        News
+        News,
+        StepDetail,
+        Credits
     }
 
     enum class Mode {
@@ -34,12 +36,14 @@ abstract class MainMvpView : MvpView {
         TwoPane
     }
 
-    var selectionListener: (selection: Selection) -> Unit = {}
+    var routeListener: (route: Route) -> Unit = {}
     var listStepsScrollListener: (dy: Int) -> Unit = {}
+    var stepSelectedByPosListener: (position: Int) -> Unit = {}
 
     abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
     abstract fun renderSizeState(state: SizeState)
-    abstract fun renderSelection(selection: Selection)
+    abstract fun renderRouteChange(route: Route)
     abstract fun renderMode(mode: Mode)
+    abstract fun renderStepSelectedByPosition(position: Int)
 }
 

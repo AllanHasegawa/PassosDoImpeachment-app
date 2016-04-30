@@ -38,8 +38,7 @@ class ListStepsPresenter @Inject constructor(
 
     private var getStepsUc: GetStepsUseCase? = null
 
-    var stepTouchListener: (step: StepEntity, position: Int) -> Unit
-            = { i, j -> }
+    var stepTouchListener: (step: StepEntity) -> Unit = {}
     var scrollListener: (dy: Int) -> Unit = {}
 
     override fun onResume() {
@@ -57,6 +56,9 @@ class ListStepsPresenter @Inject constructor(
                     view.renderSteps(emptyList())
                 } else {
                     view.renderSteps(makeStepList(t))
+                    if (screenDevice.isTablet()) {
+                        view.renderSelectedStepByPosition(t.first().position)
+                    }
                 }
             }
         })
@@ -68,9 +70,9 @@ class ListStepsPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        view.stepTouchListener = { item, position ->
-            ListStepsPresenter@stepTouchListener(item, position)
-            view.renderSelectedStep(position)
+        view.stepTouchListener = {
+            stepTouchListener(it)
+            view.renderSelectedStepByPosition(it.position)
         }
         view.scrollListener = { scrollListener(it) }
     }
