@@ -19,6 +19,7 @@ package com.hasegawa.diapp.devices
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.widget.Toast
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.devices.TextSharer
@@ -31,7 +32,26 @@ class AppTextSharer @Inject constructor(val context: Context) : TextSharer {
         intent.putExtra(Intent.EXTRA_TEXT, body)
         intent.type = "text/plain"
         try {
-            context.startActivity(Intent.createChooser(intent, chooserTitle))
+            if (chooserTitle != null) {
+                context.startActivity(Intent.createChooser(intent, chooserTitle))
+            } else {
+                context.startActivity(intent)
+            }
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(context, context.getString(R.string.error_no_app_to_share),
+                    Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun shareTextByEmail(email: String, subject: String, chooserTitle: String?) {
+        val i = Intent(Intent.ACTION_SENDTO, Uri.fromParts("mailto", email, null))
+        i.putExtra(Intent.EXTRA_SUBJECT, subject)
+        try {
+            if (chooserTitle != null) {
+                context.startActivity(Intent.createChooser(i, chooserTitle))
+            } else {
+                context.startActivity(i)
+            }
         } catch (e: ActivityNotFoundException) {
             Toast.makeText(context, context.getString(R.string.error_no_app_to_share),
                     Toast.LENGTH_SHORT).show()
