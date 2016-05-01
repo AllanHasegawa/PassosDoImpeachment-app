@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_conductor)
+        setContentView(R.layout.activity_main)
 
         DiApp.activityComponent = DaggerActivityComponent.builder()
                 .appComponent(DiApp.appComponent)

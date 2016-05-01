@@ -29,7 +29,6 @@
                 style="@style/DetailLinkTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla quis metus lectus."
                 android:textColor="#DFFF"
                 />
 
@@ -38,7 +37,6 @@
                 style="@style/DetailLinkUrl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Sed tincidunt ipsum quis est sagittis, eu posuere ante finibus. Nunc in tincidunt est. Cras tempus tortor at congue convallis. Nunc ac malesuada neque."
                 android:textColor="#AFFF"
                 />
 
@@ -49,7 +47,6 @@
             style="@style/DetailLinkUrl"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Vestibulum finibus nisi vulputate nibh aliquam, eu pharetra elit tristique. Proin imperdiet orci elit, in hendrerit neque vehicula sed. In at magna a nisl luctus dictum. Suspendisse convallis dapibus mi, et malesuada lacus gravida sit amet. Nam mi ante, accumsan et finibus at, tincidunt at est. Phasellus vehicula bibendum sollicitudin. Etiam sed quam velit. Vestibulum dictum fringilla quam, quis mollis massa tristique ac. In nec sodales ex, imperdiet commodo ante."
             />
 
         <LinearLayout

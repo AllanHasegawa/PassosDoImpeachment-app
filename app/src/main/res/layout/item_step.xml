@@ -29,7 +29,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="."
                 android:textColor="#c5ffffff"
                 android:textSize="22sp"/>
         </FrameLayout>
@@ -47,7 +46,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="sans-serif-medium"
-                android:text="Lorem ipsum dolor sit amet"
                 android:textColor="@color/colorPrimaryText"
                 android:textSize="14sp"
                 />
@@ -58,7 +56,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:fontFamily="sans-serif-regular"
-                android:text="Maecenas vel est volutpat, semper lectus sed, sagittis elit. Nunc mollis nisi sit amet ornare laoreet. Nam sollicitudin arcu non elit ultricies placerat. Morbi volutpat feugiat placerat."
                 android:textColor="@color/colorSecondaryText"
                 android:textSize="14sp"
                 />
