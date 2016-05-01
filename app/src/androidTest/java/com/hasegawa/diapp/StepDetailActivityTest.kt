@@ -25,7 +25,6 @@ import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.hasegawa.diapp.activities.StepDetailActivity
 import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test

@@ -32,7 +32,6 @@ import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
-import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.adapters.StepsRvAdapter
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf

@@ -35,9 +35,6 @@ import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
-import com.hasegawa.diapp.activities.CreditsActivity
-import com.hasegawa.diapp.activities.MainActivity
-import com.hasegawa.diapp.activities.StepDetailActivity
 import com.hasegawa.diapp.adapters.NewsRvAdapter
 import com.hasegawa.diapp.adapters.StepsRvAdapter
 import org.hamcrest.Matchers.`is`

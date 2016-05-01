@@ -25,7 +25,6 @@ import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.hasegawa.diapp.activities.CreditsActivity
 import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test

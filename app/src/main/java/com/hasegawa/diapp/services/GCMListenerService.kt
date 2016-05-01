@@ -25,7 +25,7 @@ import android.support.v7.app.NotificationCompat
 import com.google.android.gms.gcm.GcmListenerService
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.activities.ConductorActivity
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.SyncEntity
@@ -66,27 +66,27 @@ class GCMListenerService : GcmListenerService() {
     }
 
     private fun appMessageNotification(title: String, message: String) {
-        val resultIntent = Intent(applicationContext, MainActivity::class.java)
-        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY, 1)
-
-        val stackBuilder = TaskStackBuilder.create(applicationContext)
-        stackBuilder.addParentStack(MainActivity::class.java)
-        stackBuilder.addNextIntent(resultIntent)
-
-        val pendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT)
-
-        val notification = NotificationCompat.Builder(applicationContext)
-                .setSmallIcon(R.drawable.app_icon_plain)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .build()
-
-        val notificationMgr = applicationContext
-                .getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-        notificationMgr.notify(Random().nextInt(), notification)
+//        val resultIntent = Intent(applicationContext, ConductorActivity::class.java)
+//        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY, 1)
+//
+//        val stackBuilder = TaskStackBuilder.create(applicationContext)
+//        stackBuilder.addParentStack(MainActivity::class.java)
+//        stackBuilder.addNextIntent(resultIntent)
+//
+//        val pendingIntent = stackBuilder.getPendingIntent(
+//                0,
+//                PendingIntent.FLAG_UPDATE_CURRENT)
+//
+//        val notification = NotificationCompat.Builder(applicationContext)
+//                .setSmallIcon(R.drawable.app_icon_plain)
+//                .setContentTitle(title)
+//                .setContentText(message)
+//                .setAutoCancel(true)
+//                .setContentIntent(pendingIntent)
+//                .build()
+//
+//        val notificationMgr = applicationContext
+//                .getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+//        notificationMgr.notify(Random().nextInt(), notification)
     }
 }
