@@ -31,6 +31,9 @@ abstract class NavigationMvpView : MvpView {
         Closed
     }
 
+    // listener to specify the item selected (without triggering a touch)
+    var itemSelectionListener: (Item) -> Unit = {}
+    // listener when a touch happens
     var itemTouchListener: (Item) -> Unit = {}
     var drawerStateListener: (state: DrawerState) -> Unit = {}
 

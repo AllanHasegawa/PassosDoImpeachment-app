@@ -84,6 +84,7 @@ class MainPresenter @Inject constructor(
                 MainMvpView.Route.Credits -> {
                     view.renderMode(MainMvpView.Mode.OnePane)
                 }
+                else -> Unit
             }
         }
         view.listStepsScrollListener = { handleListStepsScroll(it) }

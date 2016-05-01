@@ -86,6 +86,10 @@ class NavigationPresenter @Inject constructor(
                 NavigationMvpView.DrawerState.Closed -> view.renderClosedNavView()
             }
         }
+
+        view.itemSelectionListener = { item ->
+            view.renderItemSelected(item)
+        }
     }
 
     private fun setUpdateDate(time: Long?) {

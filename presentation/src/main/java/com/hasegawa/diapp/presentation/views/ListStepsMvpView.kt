@@ -19,6 +19,9 @@ package com.hasegawa.diapp.presentation.views
 import com.hasegawa.diapp.domain.entities.StepEntity
 
 abstract class ListStepsMvpView : MvpView {
+    // listener for step selection (without triggering touch)
+    var stepSelectionListener: (position: Int) -> Unit = {}
+    // listener for step selection
     var stepTouchListener: (step: StepEntity) -> Unit = {}
     var scrollListener: (dy: Int) -> Unit = {}
 
