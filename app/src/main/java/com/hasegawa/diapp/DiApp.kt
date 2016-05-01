@@ -21,13 +21,10 @@ import android.support.multidex.MultiDex
 import com.hasegawa.diapp.cloud.RestInfo
 import com.hasegawa.diapp.di.*
 import net.danlew.android.joda.JodaTimeAndroid
-import timber.log.Timber
 
 open class DiApp : Application() {
     override fun onCreate() {
         super.onCreate()
-
-        Timber.plant(Timber.DebugTree())
 
         JodaTimeAndroid.init(this)
 
@@ -35,8 +32,6 @@ open class DiApp : Application() {
                 .appModule(AppModule(this))
                 .restServiceModule(RestServiceModule(RestInfo.API_URL))
                 .build()
-
-        Timber.d("App initiated")
     }
 
     override fun onTerminate() {

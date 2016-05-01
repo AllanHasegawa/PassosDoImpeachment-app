@@ -18,14 +18,12 @@ package com.hasegawa.diapp.syncadapters
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import timber.log.Timber
 
 class SyncService : Service() {
     override fun onCreate() {
         synchronized(syncAdapterLock) {
             if (syncAdapter == null) {
                 syncAdapter = SyncAdapter(applicationContext, true)
-                Timber.d("Sync adapter created.")
             }
         }
     }

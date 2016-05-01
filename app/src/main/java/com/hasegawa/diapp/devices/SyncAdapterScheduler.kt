@@ -20,17 +20,18 @@ import android.content.ContentResolver
 import android.content.Context
 import android.os.Bundle
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract
+import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.SyncScheduler
 import com.hasegawa.diapp.syncadapters.authenticators.StubAuthenticator
 import rx.Observable
 import rx.Subscriber
 import rx.Subscription
-import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class SyncAdapterScheduler @Inject constructor(val context: Context) : SyncScheduler {
+class SyncAdapterScheduler @Inject constructor(val context: Context, val logDevice: LogDevice) :
+        SyncScheduler {
     var subscription: Subscription? = null
 
     override fun enqueueSync(delayed: Boolean) {
@@ -44,7 +45,7 @@ class SyncAdapterScheduler @Inject constructor(val context: Context) : SyncSched
                         }
 
                         override fun onError(e: Throwable?) {
-                            Timber.d(e, "Error enqueuing sync")
+                            logDevice.d(e, "Error enqueuing sync")
                         }
 
                         override fun onNext(t: Long?) {

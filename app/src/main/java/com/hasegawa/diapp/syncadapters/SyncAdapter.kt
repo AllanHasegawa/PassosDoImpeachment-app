@@ -33,7 +33,6 @@ import com.hasegawa.diapp.domain.restservices.responses.NewsResponse
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
 import com.hasegawa.diapp.domain.usecases.*
 import rx.Subscriber
-import timber.log.Timber
 import javax.inject.Inject
 
 class SyncAdapter : AbstractThreadedSyncAdapter {
@@ -59,10 +58,9 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
     override fun onPerformSync(account: Account?, extras: Bundle?, authority: String?,
                                provider: ContentProviderClient?, syncResult: SyncResult?) {
-
-        Timber.d("Initiating sync!")
-
         DiApp.appComponent.inject(this)
+
+        logDevice.d("Initiating sync!")
 
         syncSteps(syncResult)
         syncNews(syncResult)
@@ -74,7 +72,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                         }
 
                         override fun onError(e: Throwable?) {
-                            Timber.d(e, "Error updating pending syncs.")
+                            logDevice.d(e, "Error updating pending syncs.")
                         }
 
                         override fun onNext(t: List<SyncEntity>?) {

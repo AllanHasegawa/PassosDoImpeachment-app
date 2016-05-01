@@ -27,7 +27,6 @@ import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.AddPendingSyncUseCase
 import rx.Subscriber
-import timber.log.Timber
 import javax.inject.Inject
 
 class GCMListenerService : GcmListenerService() {
@@ -39,18 +38,18 @@ class GCMListenerService : GcmListenerService() {
     @Inject lateinit var logDevice: LogDevice
 
     override fun onMessageReceived(from: String?, data: Bundle?) {
+        DiApp.appComponent.inject(this)
+
         if (from!!.startsWith("/topics/sync")) {
-            Timber.d("GCM full sync request received.")
+            logDevice.d("GCM full sync request received.")
         } else if (from.startsWith("/topics/news")) {
-            Timber.d("GCM news notification request received.")
+            logDevice.d("GCM news notification request received.")
             val title = applicationContext.getString(R.string.notification_default_title)
             val message =
                     data!!.getString("notificationMessage",
                             applicationContext.getString(R.string.notification_default_message))
             appMessageNotification(title, message)
         }
-
-        DiApp.appComponent.inject(this)
 
         AddPendingSyncUseCase(syncScheduler, syncsRepository, executionThread, postExecutionThread)
                 .executeBlocking(

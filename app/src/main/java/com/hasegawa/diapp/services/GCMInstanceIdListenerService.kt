@@ -17,13 +17,11 @@ package com.hasegawa.diapp.services
 
 import android.content.Intent
 import com.google.android.gms.iid.InstanceIDListenerService
-import timber.log.Timber
 
 class GCMInstanceIdListenerService : InstanceIDListenerService() {
     override fun onTokenRefresh() {
         val intent = Intent(this, GCMRegistrationService::class.java)
         intent.putExtra(GCMRegistrationService.INTENT_KEY_FORCE_REGISTER, true)
         startService(intent)
-        Timber.d("Forcing a gcm token refresh.")
     }
 }

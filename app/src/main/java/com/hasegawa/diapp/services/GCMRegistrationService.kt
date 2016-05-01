@@ -29,7 +29,6 @@ import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.usecases.PostGCMRegistrationUseCase
 import rx.Subscriber
-import timber.log.Timber
 import javax.inject.Inject
 
 class GCMRegistrationService : IntentService(TAG) {
@@ -50,7 +49,7 @@ class GCMRegistrationService : IntentService(TAG) {
                     GoogleCloudMessaging.INSTANCE_ID_SCOPE, null)
 
 
-            Timber.d("GCM Registration token: $token")
+            logDevice.d("GCM Registration token: $token")
             val postGcmUc = PostGCMRegistrationUseCase(token, syncsRepository,
                     restService, executionThread, postExecutionThread)
             postGcmUc.executeBlocking(object : Subscriber<Boolean>() {

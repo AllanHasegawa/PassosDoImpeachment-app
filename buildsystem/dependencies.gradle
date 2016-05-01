@@ -19,7 +19,6 @@ ext {
 
     // AndroidLibraries
     rxAndroidVersion = '1.1.0'
-    timberVersion = '4.1.1'
     retrofitVersion = '2.0.0'
     storIoVersion = '1.8.0'
     supportLibVersion = '23.2.1'
@@ -54,7 +53,6 @@ ext {
             rxkotlin              : "io.reactivex:rxkotlin:$rxKotlinVersion",
             rxandroid             : "io.reactivex:rxandroid:$rxAndroidVersion",
             recyclerview_animators: "jp.wasabeef:recyclerview-animators:$recyclerviewAnimatorsVersion",
-            timber                : "com.jakewharton.timber:timber:$timberVersion",
             gcm                   : "com.google.android.gms:play-services-gcm:$gcmVersion",
             support_design        : "com.android.support:design:$supportLibVersion",
             support_cardview      : "com.android.support:cardview-v7:$supportLibVersion",

@@ -19,17 +19,14 @@ import android.os.Build
 import android.os.Handler
 import android.os.StrictMode
 import com.facebook.stetho.Stetho
-import timber.log.Timber
 
 class DebugDiApp : DiApp() {
     override fun onCreate() {
         super.onCreate()
 
-//        tryToEnableStrictMode()
+        //        tryToEnableStrictMode()
 
         Stetho.initializeWithDefaults(this)
-
-        Timber.d("App initiated in DEBUG mode.")
     }
 
     companion object {
