@@ -64,9 +64,13 @@ class MainActivity : AppCompatActivity() {
 
         val container = findViewById(R.id.container) as FrameLayout
 
+        val viewNumber = if (intent != null) {
+            intent.getIntExtra(INTENT_VIEW_NUMBER_KEY, 0)
+        } else 0
+
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(ScreenMainController())
+            router.setRoot(ScreenMainController(viewNumber))
         }
 
         val gcmRegistrationIntent = Intent(this, GCMRegistrationService::class.java)
@@ -103,5 +107,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    companion object {
+        const val INTENT_VIEW_NUMBER_KEY = "intent_view_number"
     }
 }

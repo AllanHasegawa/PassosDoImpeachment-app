@@ -47,7 +47,7 @@ import com.hasegawa.diapp.presentation.views.NavigationMvpView
 import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
-class ScreenMainController : BaseNavigationController(NavigationMvpView.Item.StepsList) {
+class ScreenMainController : BaseNavigationController {
 
     @Inject lateinit var mainPresenter: MainPresenter
     @Inject lateinit var constStrings: ConstStrings
@@ -77,7 +77,20 @@ class ScreenMainController : BaseNavigationController(NavigationMvpView.Item.Ste
 
     private var unbinder: Unbinder? = null
 
-    init {
+    constructor(viewNumber: Int) : super(
+            when (viewNumber) {
+                0 -> NavigationMvpView.Item.StepsList
+                1 -> NavigationMvpView.Item.NewsList
+                else -> NavigationMvpView.Item.StepsList
+            }) {
+        when (viewNumber) {
+            0 -> currentRoute = MainMvpView.Route.Steps
+            1 -> currentRoute = MainMvpView.Route.News
+        }
+        DiApp.activityComponent.inject(this)
+    }
+
+    constructor(bundle: Bundle) : super(bundle) {
         DiApp.activityComponent.inject(this)
     }
 
