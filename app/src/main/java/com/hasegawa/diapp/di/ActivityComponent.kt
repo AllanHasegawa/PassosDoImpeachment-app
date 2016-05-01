@@ -16,7 +16,7 @@
 
 package com.hasegawa.diapp.di
 
-import com.hasegawa.diapp.activities.ConductorActivity
+import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.controllers.*
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
@@ -29,7 +29,7 @@ import dagger.Component
 @Component(dependencies = arrayOf(AppComponent::class),
         modules = arrayOf(ActivityModule::class))
 interface ActivityComponent {
-    fun inject(a: ConductorActivity)
+    fun inject(a: MainActivity)
     fun inject(c: ScreenMainController)
     fun inject(c: BaseNavigationController)
     fun inject(c: ListNewsController)

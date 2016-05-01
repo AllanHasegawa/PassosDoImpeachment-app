@@ -39,7 +39,7 @@ import com.hasegawa.diapp.services.GCMRegistrationService
 import rx.Subscriber
 import javax.inject.Inject
 
-class ConductorActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     private lateinit var router: Router
 
@@ -98,7 +98,7 @@ class ConductorActivity : AppCompatActivity() {
 
             override fun onNext(t: Boolean?) {
                 if (t != null && t) {
-                    Toast.makeText(this@ConductorActivity, constStrings.syncDone,
+                    Toast.makeText(this@MainActivity, constStrings.syncDone,
                             Toast.LENGTH_LONG).show()
                 }
             }

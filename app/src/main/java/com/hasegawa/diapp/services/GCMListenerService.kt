@@ -25,7 +25,7 @@ import android.support.v7.app.NotificationCompat
 import com.google.android.gms.gcm.GcmListenerService
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.activities.ConductorActivity
+import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.SyncEntity
