@@ -58,7 +58,6 @@ class NavigationPresenter @Inject constructor(
             }
 
             override fun onNext(t: SyncEntity?) {
-                logDevice.d("Hey :3 $t")
                 if (t != null) {
                     setUpdateDate(t.timeSynced)
                 } else {
