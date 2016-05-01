@@ -39,8 +39,8 @@ interface ActivityComponent {
     fun inject(c: CreditsController)
     fun inject(c: ListStepDetailsController)
 
-    fun getUrlOpener(): UrlOpener
     fun getLogDevice(): LogDevice
+    fun getUrlOpener(): UrlOpener
     fun getStepsRepository(): StepsRepository
     fun getExecutionThread(): ExecutionThread
     fun getPostExecutionThread(): PostExecutionThread

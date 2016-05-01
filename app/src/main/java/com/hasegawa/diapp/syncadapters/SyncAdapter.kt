@@ -21,18 +21,32 @@ import android.os.Bundle
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.SyncEntity
+import com.hasegawa.diapp.domain.repositories.NewsRepository
+import com.hasegawa.diapp.domain.repositories.StepsRepository
+import com.hasegawa.diapp.domain.repositories.SyncsRepository
+import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.restservices.responses.NewsResponse
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
 import com.hasegawa.diapp.domain.usecases.*
 import rx.Subscriber
-import rx.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Inject
 
 class SyncAdapter : AbstractThreadedSyncAdapter {
     private lateinit var contentResolver: ContentResolver
+
+
+    @Inject lateinit var restService: RestService
+    @Inject lateinit var stepsRepository: StepsRepository
+    @Inject lateinit var newsRepository: NewsRepository
+    @Inject lateinit var syncsRepository: SyncsRepository
+    @Inject lateinit var executionThread: ExecutionThread
+    @Inject lateinit var postExecutionThread: PostExecutionThread
+    @Inject lateinit var logDevice: LogDevice
 
     constructor(ctx: Context, autoInitialize: Boolean) : super(ctx, autoInitialize) {
         contentResolver = context.contentResolver
@@ -48,12 +62,13 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
         Timber.d("Initiating sync!")
 
+        DiApp.appComponent.inject(this)
+
         syncSteps(syncResult)
         syncNews(syncResult)
 
         if (!syncResult!!.hasError()) {
-            UpdatePendingSyncsAsSuccessUseCase(DiApp.syncsRepository,
-                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+            UpdatePendingSyncsAsSuccessUseCase(syncsRepository, executionThread, postExecutionThread)
                     .execute(object : Subscriber<List<SyncEntity>>() {
                         override fun onCompleted() {
                         }
@@ -70,21 +85,20 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
 
     private fun syncNews(syncResult: SyncResult?) {
-        val getNewsUc = GetCloudNewsUseCase(DiApp.restServices,
-                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+        val getNewsUc = GetCloudNewsUseCase(restService, executionThread, postExecutionThread)
         getNewsUc.executeBlocking(object : Subscriber<List<NewsResponse>>() {
             override fun onCompleted() {
             }
 
             override fun onError(e: Throwable?) {
-                Timber.d(e, "Network Response error: ${e!!.message}")
+                logDevice.d(e, "Network Response error: ${e!!.message}")
                 syncResult!!.delayUntil = DELAY_RETRY
                 syncResult.stats.numIoExceptions++
             }
 
             override fun onNext(t: List<NewsResponse>?) {
                 if (t == null) {
-                    Timber.d("Response error")
+                    logDevice.d("Response error")
                     syncResult!!.stats.numIoExceptions++
                     syncResult.delayUntil = DELAY_RETRY
                 }
@@ -92,28 +106,27 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                     saveNewsResponseList(t!!)
                 } catch (e: Exception) {
                     syncResult!!.databaseError = true
-                    Timber.d(e, "Database error: ${e.message}")
+                    logDevice.d(e, "Database error: ${e.message}")
                 }
             }
         })
     }
 
     private fun syncSteps(syncResult: SyncResult?) {
-        val getStepsUc = GetCloudStepsUseCase(DiApp.restServices,
-                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+        val getStepsUc = GetCloudStepsUseCase(restService, executionThread, postExecutionThread)
         getStepsUc.executeBlocking(object : Subscriber<List<StepResponse>>() {
             override fun onCompleted() {
             }
 
             override fun onError(e: Throwable?) {
-                Timber.d(e, "Network Response error: ${e!!.message}")
+                logDevice.d(e, "Network Response error: ${e!!.message}")
                 syncResult!!.delayUntil = DELAY_RETRY
                 syncResult.stats.numIoExceptions++
             }
 
             override fun onNext(t: List<StepResponse>?) {
                 if (t == null) {
-                    Timber.d("Response error")
+                    logDevice.d("Response error")
                     syncResult!!.stats.numIoExceptions++
                     syncResult.delayUntil = DELAY_RETRY
                 }
@@ -121,7 +134,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                     saveStepsResponsesList(t!!)
                 } catch (e: Exception) {
                     syncResult!!.databaseError = true
-                    Timber.d(e, "Database error: ${e.message}")
+                    logDevice.d(e, "Database error: ${e.message}")
                 }
             }
         })
@@ -129,22 +142,23 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
     private fun saveNewsResponseList(newsResponses: List<NewsResponse>) {
         try {
-            val useCase = AddNewsResponsesToRepoUseCase(newsResponses, DiApp.newsRepository,
-                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+            val useCase = AddNewsResponsesToRepoUseCase(newsResponses,
+                    newsRepository, executionThread, postExecutionThread)
             useCase.executeBlocking(object : Subscriber<List<NewsEntity>>() {
                 override fun onCompleted() {
                 }
 
                 override fun onError(e: Throwable?) {
+                    logDevice.d(e, "Error trying to add news responses.")
                     throw e!!
                 }
 
                 override fun onNext(t: List<NewsEntity>?) {
                 }
             })
-            Timber.d("Saved list of news successfully.")
+            logDevice.d("Saved list of news successfully.")
         } catch (e: Exception) {
-            Timber.d(e, "Error while saving list of important news.")
+            logDevice.d(e, "Error while saving list of important news.")
             throw e
         }
     }
@@ -152,7 +166,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
     private fun saveStepsResponsesList(stepResponsesList: List<StepResponse>) {
         try {
             val stepsToRepoUc = AddStepResponsesToRepoUseCase(stepResponsesList,
-                    DiApp.stepsRepository, ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+                    stepsRepository, executionThread, postExecutionThread)
             stepsToRepoUc.executeBlocking(object : Subscriber<List<StepEntity>>() {
                 override fun onCompleted() {
                 }
@@ -163,9 +177,9 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                 override fun onNext(t: List<StepEntity>?) {
                 }
             })
-            Timber.d("List of steps saved successfully.")
+            logDevice.d("List of steps saved successfully.")
         } catch (e: Exception) {
-            Timber.d(e, "Error while saving list of steps.")
+            logDevice.d(e, "Error while saving list of steps.")
             throw e
         }
     }

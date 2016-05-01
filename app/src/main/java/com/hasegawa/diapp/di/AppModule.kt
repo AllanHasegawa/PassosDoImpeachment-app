@@ -18,9 +18,11 @@ package com.hasegawa.diapp.di
 
 import android.app.Application
 import android.content.Context
+import com.hasegawa.diapp.devices.AppLogDevice
 import com.hasegawa.diapp.devices.SyncAdapterScheduler
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.SyncScheduler
 import dagger.Module
 import dagger.Provides
@@ -32,6 +34,7 @@ import javax.inject.Singleton
 class AppModule(val context: Application) {
     @Provides @Singleton fun getApplicationContext(): Context = context
 
+    @Provides @Singleton fun providesLogDevice(d: AppLogDevice): LogDevice = d
     @Provides @Singleton fun provideSyncScheduler(d: SyncAdapterScheduler): SyncScheduler = d
 
     @Provides @Singleton

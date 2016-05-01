@@ -57,8 +57,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_conductor)
 
         DiApp.activityComponent = DaggerActivityComponent.builder()
-                .activityModule(ActivityModule(this))
                 .appComponent(DiApp.appComponent)
+                .activityModule(ActivityModule(this))
                 .build()
         DiApp.activityComponent.inject(this)
 

@@ -32,8 +32,6 @@ class ActivityModule(val context: AppCompatActivity) {
 
     @Provides @PerActivity fun activity(): Activity = context
 
-    @Provides @PerActivity fun logDevice(d: AppLogDevice): LogDevice = d
-
     @Provides @PerActivity fun urlOpener(d: AppUrlOpener): UrlOpener = d
 
     @Provides @PerActivity fun dateDevice(d: AppDateDevice): DateDevice = d

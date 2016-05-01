@@ -15,27 +15,28 @@
  ******************************************************************************/
 package com.hasegawa.diapp.services
 
-import android.app.Activity
-import android.app.NotificationManager
-import android.app.PendingIntent
-import android.app.TaskStackBuilder
-import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.NotificationCompat
 import com.google.android.gms.gcm.GcmListenerService
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.LogDevice
+import com.hasegawa.diapp.domain.devices.SyncScheduler
 import com.hasegawa.diapp.domain.entities.SyncEntity
+import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.AddPendingSyncUseCase
 import rx.Subscriber
-import rx.schedulers.Schedulers
 import timber.log.Timber
-import java.util.*
+import javax.inject.Inject
 
 class GCMListenerService : GcmListenerService() {
+
+    @Inject lateinit var syncScheduler: SyncScheduler
+    @Inject lateinit var syncsRepository: SyncsRepository
+    @Inject lateinit var executionThread: ExecutionThread
+    @Inject lateinit var postExecutionThread: PostExecutionThread
+    @Inject lateinit var logDevice: LogDevice
 
     override fun onMessageReceived(from: String?, data: Bundle?) {
         if (from!!.startsWith("/topics/sync")) {
@@ -49,44 +50,46 @@ class GCMListenerService : GcmListenerService() {
             appMessageNotification(title, message)
         }
 
-        AddPendingSyncUseCase(DiApp.syncScheduler, DiApp.syncsRepository,
-                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io())).executeBlocking(
-                object : Subscriber<SyncEntity?>() {
-                    override fun onCompleted() {
-                    }
+        DiApp.appComponent.inject(this)
 
-                    override fun onError(e: Throwable?) {
-                        Timber.d("Error adding pending sync from GCM.")
-                    }
+        AddPendingSyncUseCase(syncScheduler, syncsRepository, executionThread, postExecutionThread)
+                .executeBlocking(
+                        object : Subscriber<SyncEntity?>() {
+                            override fun onCompleted() {
+                            }
 
-                    override fun onNext(t: SyncEntity?) {
-                    }
-                }
-        )
+                            override fun onError(e: Throwable?) {
+                                logDevice.d(e, "Error trying to add pending sync.")
+                            }
+
+                            override fun onNext(t: SyncEntity?) {
+                            }
+                        }
+                )
     }
 
     private fun appMessageNotification(title: String, message: String) {
-//        val resultIntent = Intent(applicationContext, ConductorActivity::class.java)
-//        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY, 1)
-//
-//        val stackBuilder = TaskStackBuilder.create(applicationContext)
-//        stackBuilder.addParentStack(MainActivity::class.java)
-//        stackBuilder.addNextIntent(resultIntent)
-//
-//        val pendingIntent = stackBuilder.getPendingIntent(
-//                0,
-//                PendingIntent.FLAG_UPDATE_CURRENT)
-//
-//        val notification = NotificationCompat.Builder(applicationContext)
-//                .setSmallIcon(R.drawable.app_icon_plain)
-//                .setContentTitle(title)
-//                .setContentText(message)
-//                .setAutoCancel(true)
-//                .setContentIntent(pendingIntent)
-//                .build()
-//
-//        val notificationMgr = applicationContext
-//                .getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
-//        notificationMgr.notify(Random().nextInt(), notification)
+        //        val resultIntent = Intent(applicationContext, ConductorActivity::class.java)
+        //        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY, 1)
+        //
+        //        val stackBuilder = TaskStackBuilder.create(applicationContext)
+        //        stackBuilder.addParentStack(MainActivity::class.java)
+        //        stackBuilder.addNextIntent(resultIntent)
+        //
+        //        val pendingIntent = stackBuilder.getPendingIntent(
+        //                0,
+        //                PendingIntent.FLAG_UPDATE_CURRENT)
+        //
+        //        val notification = NotificationCompat.Builder(applicationContext)
+        //                .setSmallIcon(R.drawable.app_icon_plain)
+        //                .setContentTitle(title)
+        //                .setContentText(message)
+        //                .setAutoCancel(true)
+        //                .setContentIntent(pendingIntent)
+        //                .build()
+        //
+        //        val notificationMgr = applicationContext
+        //                .getSystemService(Activity.NOTIFICATION_SERVICE) as NotificationManager
+        //        notificationMgr.notify(Random().nextInt(), notification)
     }
 }

@@ -19,20 +19,7 @@ import android.app.Application
 import android.content.Context
 import android.support.multidex.MultiDex
 import com.hasegawa.diapp.cloud.RestInfo
-import com.hasegawa.diapp.cloud.restservices.retrofit.RetrofitRestService
-import com.hasegawa.diapp.di.ActivityComponent
-import com.hasegawa.diapp.di.AppComponent
-import com.hasegawa.diapp.di.AppModule
-import com.hasegawa.diapp.di.DaggerAppComponent
-import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderNewsRepository
-import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderStepsRepository
-import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderSyncsRepository
-import com.hasegawa.diapp.domain.devices.SyncScheduler
-import com.hasegawa.diapp.domain.repositories.NewsRepository
-import com.hasegawa.diapp.domain.repositories.StepsRepository
-import com.hasegawa.diapp.domain.repositories.SyncsRepository
-import com.hasegawa.diapp.domain.restservices.RestService
-import com.hasegawa.diapp.devices.SyncAdapterScheduler
+import com.hasegawa.diapp.di.*
 import net.danlew.android.joda.JodaTimeAndroid
 import timber.log.Timber
 
@@ -44,13 +31,10 @@ open class DiApp : Application() {
 
         JodaTimeAndroid.init(this)
 
-        stepsRepository = ContentProviderStepsRepository(applicationContext.contentResolver)
-        newsRepository = ContentProviderNewsRepository(applicationContext.contentResolver)
-        syncsRepository = ContentProviderSyncsRepository(applicationContext.contentResolver)
-        restServices = RetrofitRestService(RestInfo.API_URL)
-        syncScheduler = SyncAdapterScheduler(applicationContext)
-
-        appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+        appComponent = DaggerAppComponent.builder()
+                .appModule(AppModule(this))
+                .restServiceModule(RestServiceModule(RestInfo.API_URL))
+                .build()
 
         Timber.d("App initiated")
     }
@@ -67,15 +51,5 @@ open class DiApp : Application() {
     companion object {
         @JvmStatic lateinit var appComponent: AppComponent
         @JvmStatic lateinit var activityComponent: ActivityComponent
-
-        lateinit var stepsRepository: StepsRepository
-        lateinit var newsRepository: NewsRepository
-        lateinit var syncsRepository: SyncsRepository
-        lateinit var restServices: RestService
-        lateinit var syncScheduler: SyncScheduler
-
-        const val PREFS_KEY_SENT_TOKEN_TO_SERVER = "sent_token_to_server"
-        const val PREFS_KEY_LAST_UPDATE = "last_update"
-        const val PREFS_KEY_SYNC_PENDING = "sync_pending"
     }
 }

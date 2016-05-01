@@ -24,14 +24,26 @@ import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.LogDevice
+import com.hasegawa.diapp.domain.repositories.SyncsRepository
+import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.usecases.PostGCMRegistrationUseCase
 import rx.Subscriber
-import rx.schedulers.Schedulers
 import timber.log.Timber
+import javax.inject.Inject
 
 class GCMRegistrationService : IntentService(TAG) {
 
+    @Inject lateinit var restService: RestService
+    @Inject lateinit var syncsRepository: SyncsRepository
+    @Inject lateinit var executionThread: ExecutionThread
+    @Inject lateinit var postExecutionThread: PostExecutionThread
+    @Inject lateinit var logDevice: LogDevice
+
     override fun onHandleIntent(intent: Intent?) {
+
+        DiApp.appComponent.inject(this)
+
         try {
             val instanceId = InstanceID.getInstance(this)
             val token = instanceId.getToken(getString(R.string.gcm_defaultSenderId),
@@ -39,27 +51,26 @@ class GCMRegistrationService : IntentService(TAG) {
 
 
             Timber.d("GCM Registration token: $token")
-            val postGcmUc = PostGCMRegistrationUseCase(token, DiApp.syncsRepository,
-                    DiApp.restServices,
-                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
+            val postGcmUc = PostGCMRegistrationUseCase(token, syncsRepository,
+                    restService, executionThread, postExecutionThread)
             postGcmUc.executeBlocking(object : Subscriber<Boolean>() {
                 override fun onCompleted() {
                 }
 
                 override fun onError(e: Throwable?) {
-                    Timber.d(e, "Error posting GCM Token.")
+                    logDevice.d(e, "Error posting GCM Token.")
                     throw e!!
                 }
 
                 override fun onNext(t: Boolean?) {
-                    Timber.d("Posted token? $t")
+                    logDevice.d("Posted token? $t")
                     if (t != null && t) {
                         subscribeTopics(token)
                     }
                 }
             })
         } catch (e: Exception) {
-            Timber.d(e, "Failed to complete token refresh")
+            logDevice.d(e, "Failed to complete token refresh")
         }
     }
 

@@ -18,16 +18,26 @@ package com.hasegawa.diapp.di
 
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
+import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.SyncScheduler
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
+import com.hasegawa.diapp.domain.restservices.RestService
+import com.hasegawa.diapp.services.GCMListenerService
+import com.hasegawa.diapp.services.GCMRegistrationService
+import com.hasegawa.diapp.syncadapters.SyncAdapter
 import dagger.Component
 import javax.inject.Singleton
 
 @Singleton
-@Component(modules = arrayOf(AppModule::class, RepositoriesModule::class))
+@Component(modules = arrayOf(AppModule::class, RepositoriesModule::class, RestServiceModule::class))
 interface AppComponent {
+    fun inject(g: GCMListenerService)
+    fun inject(g: GCMRegistrationService)
+    fun inject(g: SyncAdapter)
+
+    fun logDevice(): LogDevice
     fun syncScheduler(): SyncScheduler
 
     fun executionThread(): ExecutionThread
@@ -36,4 +46,5 @@ interface AppComponent {
     fun syncsRepository(): SyncsRepository
     fun stepsRepository(): StepsRepository
     fun newsRepository(): NewsRepository
+    fun restService(): RestService
 }
