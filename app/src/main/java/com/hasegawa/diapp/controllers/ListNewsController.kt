@@ -45,7 +45,7 @@ class ListNewsController : Controller() {
     private var adapter: Adapter? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val root = inflater.inflate(R.layout.fragment_news, container, false)
+        val root = inflater.inflate(R.layout.view_list_news, container, false)
 
         unbinder = ButterKnife.bind(this, root)
         adapter = Adapter(mvpView)

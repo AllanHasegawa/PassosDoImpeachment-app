@@ -64,7 +64,7 @@ class ListStepsController : Controller {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-        val root = inflater.inflate(R.layout.fragment_main, container, false)
+        val root = inflater.inflate(R.layout.view_list_steps, container, false)
 
         unbinder = ButterKnife.bind(this, root)
 
