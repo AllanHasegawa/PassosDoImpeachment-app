@@ -40,6 +40,8 @@ abstract class MainMvpView : MvpView {
     var listStepsScrollListener: (dy: Int) -> Unit = {}
     var stepSelectedByPosListener: (position: Int) -> Unit = {}
 
+    abstract fun actRouteChange(route: Route)
+
     abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
     abstract fun renderSizeState(state: SizeState)
     abstract fun renderRouteChange(route: Route)

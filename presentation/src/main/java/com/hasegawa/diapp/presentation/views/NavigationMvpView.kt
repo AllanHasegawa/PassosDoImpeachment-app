@@ -37,6 +37,8 @@ abstract class NavigationMvpView : MvpView {
     var itemTouchListener: (Item) -> Unit = {}
     var drawerStateListener: (state: DrawerState) -> Unit = {}
 
+    abstract fun actItemTouched(item: Item)
+
     abstract fun renderUpdateDateText(text: String)
     abstract fun renderItemSelected(item: Item)
     abstract fun renderOpenedNavView()

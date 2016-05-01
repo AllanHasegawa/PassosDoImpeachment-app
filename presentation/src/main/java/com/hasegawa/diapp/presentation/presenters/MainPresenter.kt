@@ -39,8 +39,6 @@ class MainPresenter @Inject constructor(
         private val postExecutionThread: PostExecutionThread) :
         Presenter<MainMvpView>() {
 
-    var routeListener: (route: MainMvpView.Route) -> Unit = {}
-
     private var getNumTotalsCompletedUc: GetNumStepsTotalCompletedUseCase? = null
 
     override fun onPause() {
@@ -70,7 +68,6 @@ class MainPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.routeListener = {
-            routeListener(it)
             view.renderRouteChange(it)
             when (it) {
                 MainMvpView.Route.Steps -> {
@@ -86,6 +83,7 @@ class MainPresenter @Inject constructor(
                 }
                 else -> Unit
             }
+            view.actRouteChange(it)
         }
         view.listStepsScrollListener = { handleListStepsScroll(it) }
         view.stepSelectedByPosListener = { view.renderStepSelectedByPosition(it) }

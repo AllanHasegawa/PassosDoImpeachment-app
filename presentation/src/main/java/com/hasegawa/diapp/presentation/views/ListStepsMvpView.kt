@@ -28,7 +28,10 @@ abstract class ListStepsMvpView : MvpView {
     data class Item(val type: Int, val step: StepEntity? = null)
 
     abstract fun renderSteps(steps: List<Item>)
-    abstract fun renderSelectedStepByPosition(position: Int)
+    abstract fun renderStepByPosSelected(position: Int)
+
+    abstract fun actListScrolled(dy: Int)
+    abstract fun actStepByPosTouched(position: Int)
 
     companion object {
         const val ITEM_TYPE_SPACE = 2

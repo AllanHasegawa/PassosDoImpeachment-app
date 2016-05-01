@@ -39,8 +39,6 @@ class NavigationPresenter @Inject constructor(
         private val postExecutionThread: PostExecutionThread) :
         Presenter<NavigationMvpView>() {
 
-    var navItemTouchListener: (item: NavigationMvpView.Item) -> Unit = {}
-
     private var getLastUpdateUc: GetLastSuccessfulSyncUseCase? = null
 
     override fun onPause() {
@@ -78,8 +76,9 @@ class NavigationPresenter @Inject constructor(
                 NavigationMvpView.Item.OpenSource -> urlOpener.openUrl(constStrings.navOpenSourceUrl)
                 else -> Unit
             }
-            navItemTouchListener(it)
+            view.actItemTouched(it)
         }
+
         view.drawerStateListener = {
             when (it) {
                 NavigationMvpView.DrawerState.Opened -> view.renderOpenedNavView()
