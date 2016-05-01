@@ -17,6 +17,8 @@
 package com.hasegawa.diapp.presentation
 
 abstract class ConstStrings {
+    abstract var syncDone: String
+
     abstract var stepsToolbarShrunkTitle: String
     abstract var newsToolbarShrunkTitle: String
 
