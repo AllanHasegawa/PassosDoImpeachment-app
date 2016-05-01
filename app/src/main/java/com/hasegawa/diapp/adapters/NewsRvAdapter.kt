@@ -25,6 +25,8 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.NewsRvAdapter.NewsViewHolder
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.usecases.GetNewsUseCase
 import com.hasegawa.diapp.utils.DateTimeExtensions
@@ -33,7 +35,7 @@ import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
 
 class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
         RecyclerView.Adapter<NewsViewHolder>() {
@@ -46,7 +48,7 @@ class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
         }
 
         fun setNews(news: NewsEntity) {
-            (itemView!! as ItemImportantNewsView).importantNews = news
+            (itemView!! as ItemImportantNewsView).news = news
         }
 
         fun setDate(date: String) {
@@ -60,8 +62,8 @@ class NewsRvAdapter(val ctx: Context, val isTablet: Boolean) :
     private lateinit var getNewsUc: GetNewsUseCase
 
     init {
-        getNewsUc = GetNewsUseCase(DiApp.newsRepository, Schedulers.io(),
-                AndroidSchedulers.mainThread())
+        getNewsUc = GetNewsUseCase(DiApp.newsRepository, ExecutionThread(Schedulers.io()),
+                PostExecutionThread(AndroidSchedulers.mainThread()))
 
         getNewsUc.execute(object : Subscriber<List<NewsEntity>>() {
             override fun onCompleted() {

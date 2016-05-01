@@ -19,6 +19,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import com.hasegawa.diapp.DiApp
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.fragments.StepDetailSubFragment
@@ -26,7 +28,7 @@ import rx.Subscriber
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
 
 class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
         FragmentStatePagerAdapter(fragmentManager) {
@@ -35,7 +37,7 @@ class StepDetailFragmentAdapter(fragmentManager: FragmentManager) :
 
     init {
         getStepsUseCase = GetStepsUseCase(DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
         getStepsUseCase.execute(object : Subscriber<List<StepEntity>>() {
             override fun onCompleted() {
             }

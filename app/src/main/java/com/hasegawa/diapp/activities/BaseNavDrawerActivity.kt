@@ -28,6 +28,8 @@ import android.view.View
 import android.widget.Toast
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.usecases.GetLastSuccessfulSyncUseCase
 import com.hasegawa.diapp.domain.usecases.SyncIfNecessaryUseCase
@@ -98,7 +100,7 @@ abstract class BaseNavDrawerActivity : AppCompatActivity(),
         getLastSuccessfulSyncUc?.unsubscribe()
 
         getLastSuccessfulSyncUc = GetLastSuccessfulSyncUseCase(DiApp.syncsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
 
         getLastSuccessfulSyncUc?.execute(object : Subscriber<SyncEntity?>() {
             override fun onCompleted() {
@@ -134,7 +136,7 @@ abstract class BaseNavDrawerActivity : AppCompatActivity(),
         syncIfNeededUc?.unsubscribe()
 
         syncIfNeededUc = SyncIfNecessaryUseCase(DiApp.syncScheduler, DiApp.syncsRepository,
-                Schedulers.io(), Schedulers.io())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
 
         syncIfNeededUc?.execute(object : Subscriber<Boolean>() {
             override fun onCompleted() {

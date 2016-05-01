@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:text="@string/credits_hase_position"
+            android:textSize="32sp"/>
+
+        <ImageView
+            android:layout_width="141dp"
+            android:layout_height="142dp"
+            android:layout_gravity="center_horizontal"
+            app:srcCompat="@drawable/ic_emoticon_tongue"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/credits_hase_name"/>
+
+        <Button
+            android:id="@+id/credits_hase_github_bt"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/proxy_ic_github"
+            android:text="@string/credits_hase_github"
+            />
+
+        <Button
+            android:id="@+id/credits_hase_email_bt"
+            style="@style/Widget.AppCompat.Button.Borderless"
+            android:layout_width="280dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:drawableLeft="@drawable/proxy_ic_email"
+            android:text="@string/credits_hase_email"
+            android:textSize="12sp"/>
+    </LinearLayout>
+</ScrollView>

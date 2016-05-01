@@ -15,17 +15,13 @@
  ******************************************************************************/
 package com.hasegawa.diapp.views
 
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
-import android.widget.Toast
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.entities.NewsEntity
 
@@ -52,13 +48,9 @@ class ItemImportantNewsView(ctx: Context, attrSet: AttributeSet?) : FrameLayout(
         tldrTv = this.findViewById(R.id.important_news_tldr_tv) as TextView
         shareBt = this.findViewById(R.id.important_news_share_bt) as Button
         linkBt = this.findViewById(R.id.important_news_open_bt) as Button
-
-        shareBt.setOnClickListener({ launchShareIntent() })
-
-        linkBt.setOnClickListener({ launchLinkIntent() })
     }
 
-    var importantNews: NewsEntity? = null
+    var news: NewsEntity? = null
         set(i) {
             field = i
             if (i != null) {
@@ -73,32 +65,4 @@ class ItemImportantNewsView(ctx: Context, attrSet: AttributeSet?) : FrameLayout(
                 }
             }
         }
-
-    private fun launchLinkIntent() {
-        val i = Intent(Intent.ACTION_VIEW)
-        i.data = Uri.parse(importantNews!!.url)
-        try {
-            context.startActivity(i)
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, context.getString(R.string.error_invalid_link),
-                    Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun launchShareIntent() {
-        val shareText = context.getString(R.string.share_news_item_text,
-                importantNews!!.title, importantNews!!.url)
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(Intent.EXTRA_TEXT, shareText)
-        intent.type = "text/plain"
-        try {
-            context.startActivity(
-                    Intent.createChooser(intent,
-                            context.getString(R.string.share_news_item_chooser_header))
-            )
-        } catch (e: ActivityNotFoundException) {
-            Toast.makeText(context, context.getString(R.string.error_no_app_to_share),
-                    Toast.LENGTH_SHORT).show()
-        }
-    }
 }

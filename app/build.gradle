@@ -29,6 +29,8 @@ android {
         vectorDrawables.useSupportLibrary = true
 
         testInstrumentationRunner globalConfig.getAt("androidTestInstrumentationRunner")
+
+        multiDexEnabled = globalConfig.getAt("androidMultiDexEnabled")
     }
 
     signingConfigs {
@@ -68,19 +70,21 @@ kapt {
 
 configurations.all {
     resolutionStrategy {
-        force "com.android.support:recyclerview-v7:23.2.1", "com.android.support:design:23.2.1"
+        force "com.android.support:recyclerview-v7:23.2.1", "com.android.support:design:23.2.1",
+                "com.android.support:support-annotations:23.2.1"
     }
 }
 
 dependencies {
-
     compile project(":domain")
     compile project(":db")
     compile project(":cloud")
+    compile project(":presentation")
 
     def androidTestDependencies = rootProject.ext.appAndroidTestDependencies
     def debugDependencies = rootProject.ext.appDebugDependencies
     def dependencies = rootProject.ext.appDependencies
+    def kaptDependencies = rootProject.ext.appKaptDependencies
 
     androidTestCompile androidTestDependencies.support_annotations
     androidTestCompile androidTestDependencies.test_runner
@@ -91,6 +95,7 @@ dependencies {
 
     debugCompile debugDependencies.stheto
 
+    compile dependencies.multidex
     compile dependencies.kotlin_stdlib
     compile dependencies.kotlin_reflect
     compile dependencies.support_design
@@ -103,5 +108,12 @@ dependencies {
     compile dependencies.recyclerview_animators
     compile dependencies.timber
     compile dependencies.gcm
+    compile dependencies.conductor
+    compile dependencies.conductor_support
+    compile dependencies.butterknife
+    compile dependencies.dagger2
+
+    kapt kaptDependencies.butterknife_compiler
+    kapt kaptDependencies.dagger2_compiler
 }
 

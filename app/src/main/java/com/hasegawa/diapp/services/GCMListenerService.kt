@@ -26,12 +26,14 @@ import com.google.android.gms.gcm.GcmListenerService
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.usecases.AddPendingSyncUseCase
 import rx.Subscriber
 import rx.schedulers.Schedulers
 import timber.log.Timber
-import java.util.Random
+import java.util.*
 
 class GCMListenerService : GcmListenerService() {
 
@@ -48,7 +50,7 @@ class GCMListenerService : GcmListenerService() {
         }
 
         AddPendingSyncUseCase(DiApp.syncScheduler, DiApp.syncsRepository,
-                Schedulers.io(), Schedulers.io()).executeBlocking(
+                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io())).executeBlocking(
                 object : Subscriber<SyncEntity?>() {
                     override fun onCompleted() {
                     }

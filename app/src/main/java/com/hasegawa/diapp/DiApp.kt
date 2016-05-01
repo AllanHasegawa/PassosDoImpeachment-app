@@ -16,8 +16,14 @@
 package com.hasegawa.diapp
 
 import android.app.Application
+import android.content.Context
+import android.support.multidex.MultiDex
 import com.hasegawa.diapp.cloud.RestInfo
 import com.hasegawa.diapp.cloud.restservices.retrofit.RetrofitRestService
+import com.hasegawa.diapp.di.ActivityComponent
+import com.hasegawa.diapp.di.AppComponent
+import com.hasegawa.diapp.di.AppModule
+import com.hasegawa.diapp.di.DaggerAppComponent
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderNewsRepository
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderStepsRepository
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderSyncsRepository
@@ -26,7 +32,7 @@ import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.restservices.RestService
-import com.hasegawa.diapp.syncadapters.SyncAdapterScheduler
+import com.hasegawa.diapp.devices.SyncAdapterScheduler
 import net.danlew.android.joda.JodaTimeAndroid
 import timber.log.Timber
 
@@ -44,6 +50,8 @@ open class DiApp : Application() {
         restServices = RetrofitRestService(RestInfo.API_URL)
         syncScheduler = SyncAdapterScheduler(applicationContext)
 
+        appComponent = DaggerAppComponent.builder().appModule(AppModule(this)).build()
+
         Timber.d("App initiated")
     }
 
@@ -51,7 +59,14 @@ open class DiApp : Application() {
         super.onTerminate()
     }
 
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        MultiDex.install(this)
+    }
+
     companion object {
+        @JvmStatic lateinit var appComponent: AppComponent
+        @JvmStatic lateinit var activityComponent: ActivityComponent
 
         lateinit var stepsRepository: StepsRepository
         lateinit var newsRepository: NewsRepository

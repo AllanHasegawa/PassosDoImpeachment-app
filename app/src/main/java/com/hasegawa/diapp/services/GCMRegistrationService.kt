@@ -22,6 +22,8 @@ import com.google.android.gms.gcm.GoogleCloudMessaging
 import com.google.android.gms.iid.InstanceID
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.usecases.PostGCMRegistrationUseCase
 import rx.Subscriber
 import rx.schedulers.Schedulers
@@ -38,7 +40,8 @@ class GCMRegistrationService : IntentService(TAG) {
 
             Timber.d("GCM Registration token: $token")
             val postGcmUc = PostGCMRegistrationUseCase(token, DiApp.syncsRepository,
-                    DiApp.restServices, Schedulers.io(), Schedulers.io())
+                    DiApp.restServices,
+                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
             postGcmUc.executeBlocking(object : Subscriber<Boolean>() {
                 override fun onCompleted() {
                 }

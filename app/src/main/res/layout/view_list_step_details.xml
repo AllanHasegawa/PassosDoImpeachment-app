@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <FrameLayout
+        android:id="@+id/detail_is_completed_fl"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-150dp"
+        android:background="@drawable/border_item_step_number_completed">
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/detail_pb"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="6dp"
+        android:indeterminate="false"
+        android:max="10"
+        android:progress="5"
+        android:scaleY="2"/>
+
+    <com.hasegawa.diapp.views.MaybeSwipeViewPager
+        android:id="@+id/detail_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.hasegawa.diapp.views.MaybeSwipeViewPager>
+
+
+</FrameLayout>

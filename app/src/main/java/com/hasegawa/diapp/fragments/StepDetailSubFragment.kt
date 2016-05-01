@@ -26,6 +26,8 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.string
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
@@ -83,9 +85,9 @@ class StepDetailSubFragment : Fragment() {
         linksLl = root.findViewById(R.id.detail_links_ll) as LinearLayout
 
         getStepByPositionUc = GetStepWithLinksByPositionUseCase(stepPosition, DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
         getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
 
         loadGetStepUc()
         loadTotalStepsUc()

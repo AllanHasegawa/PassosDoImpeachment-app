@@ -99,7 +99,7 @@
         >
 
         <android.support.design.widget.NavigationView
-            android:id="@+id/main_nav_view"
+            android:id="@+id/nav_view"
             android:layout_width="250dp"
             android:layout_height="match_parent"
             android:layout_gravity="start"
@@ -109,13 +109,13 @@
             />
 
         <FrameLayout
-            android:id="@+id/main_fragment_container"
+            android:id="@+id/base_container"
             android:layout_width="250dp"
             android:layout_height="match_parent"
             />
 
         <FrameLayout
-            android:id="@+id/detail_fragment_container"
+            android:id="@+id/detail_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 

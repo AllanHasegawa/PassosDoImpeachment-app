@@ -16,23 +16,17 @@
 package com.hasegawa.diapp.syncadapters
 
 import android.accounts.Account
-import android.content.AbstractThreadedSyncAdapter
-import android.content.ContentProviderClient
-import android.content.ContentResolver
-import android.content.Context
-import android.content.SyncResult
+import android.content.*
 import android.os.Bundle
 import com.hasegawa.diapp.DiApp
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.restservices.responses.NewsResponse
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
-import com.hasegawa.diapp.domain.usecases.AddNewsResponsesToRepoUseCase
-import com.hasegawa.diapp.domain.usecases.AddStepResponsesToRepoUseCase
-import com.hasegawa.diapp.domain.usecases.GetCloudNewsUseCase
-import com.hasegawa.diapp.domain.usecases.GetCloudStepsUseCase
-import com.hasegawa.diapp.domain.usecases.UpdatePendingSyncsAsSuccessUseCase
+import com.hasegawa.diapp.domain.usecases.*
 import rx.Subscriber
 import rx.schedulers.Schedulers
 import timber.log.Timber
@@ -59,7 +53,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
         if (!syncResult!!.hasError()) {
             UpdatePendingSyncsAsSuccessUseCase(DiApp.syncsRepository,
-                    Schedulers.io(), Schedulers.io())
+                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
                     .execute(object : Subscriber<List<SyncEntity>>() {
                         override fun onCompleted() {
                         }
@@ -76,7 +70,8 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
 
     private fun syncNews(syncResult: SyncResult?) {
-        val getNewsUc = GetCloudNewsUseCase(DiApp.restServices, Schedulers.io(), Schedulers.io())
+        val getNewsUc = GetCloudNewsUseCase(DiApp.restServices,
+                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
         getNewsUc.executeBlocking(object : Subscriber<List<NewsResponse>>() {
             override fun onCompleted() {
             }
@@ -104,7 +99,8 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
     }
 
     private fun syncSteps(syncResult: SyncResult?) {
-        val getStepsUc = GetCloudStepsUseCase(DiApp.restServices, Schedulers.io(), Schedulers.io())
+        val getStepsUc = GetCloudStepsUseCase(DiApp.restServices,
+                ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
         getStepsUc.executeBlocking(object : Subscriber<List<StepResponse>>() {
             override fun onCompleted() {
             }
@@ -134,7 +130,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
     private fun saveNewsResponseList(newsResponses: List<NewsResponse>) {
         try {
             val useCase = AddNewsResponsesToRepoUseCase(newsResponses, DiApp.newsRepository,
-                    Schedulers.io(), Schedulers.io())
+                    ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
             useCase.executeBlocking(object : Subscriber<List<NewsEntity>>() {
                 override fun onCompleted() {
                 }
@@ -156,7 +152,7 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
     private fun saveStepsResponsesList(stepResponsesList: List<StepResponse>) {
         try {
             val stepsToRepoUc = AddStepResponsesToRepoUseCase(stepResponsesList,
-                    DiApp.stepsRepository, Schedulers.io(), Schedulers.io())
+                    DiApp.stepsRepository, ExecutionThread(Schedulers.io()), PostExecutionThread(Schedulers.io()))
             stepsToRepoUc.executeBlocking(object : Subscriber<List<StepEntity>>() {
                 override fun onCompleted() {
                 }

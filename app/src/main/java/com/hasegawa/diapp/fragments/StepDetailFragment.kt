@@ -30,14 +30,14 @@ import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.drawable
 import com.hasegawa.diapp.adapters.StepDetailFragmentAdapter
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.GetStepByPositionUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.MaybeSwipeViewPager
 import rx.Subscriber
-import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import timber.log.Timber
@@ -86,9 +86,9 @@ class StepDetailFragment : Fragment(), ViewPager.OnPageChangeListener {
         }
         Timber.d("Started with position $stepPosition")
         getStepByPositionUc = GetStepByPositionUseCase(stepPosition, DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
         getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
 
         adapter = StepDetailFragmentAdapter(activity.supportFragmentManager)
         viewPager.adapter = adapter

@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    tools:context=".activities.MainActivity">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/main_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/main_ll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <FrameLayout
+                android:id="@+id/main_toolbar_fl"
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:layout_margin="0dp"
+                android:background="@color/colorPrimary"
+                android:padding="0dp">
+
+                <RelativeLayout
+                    android:id="@+id/main_toolbar_expanded_content_fl"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="32dp"
+                    android:padding="0dp"
+                    >
+
+                    <TextView
+                        android:id="@+id/main_toolbar_expanded_tv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="12dp"
+                        android:layout_marginTop="36dp"
+                        android:text="@string/main_toolbar_expanded_title"
+                        android:textSize="22sp"
+                        />
+
+                    <ProgressBar
+                        android:id="@+id/main_toolbar_expanded_pb"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="170dp"
+                        android:layout_height="18dp"
+                        android:layout_below="@+id/main_toolbar_expanded_tv"
+                        android:indeterminate="false"
+                        android:max="100"
+                        android:progress="10"
+                        />
+
+                    <ImageView
+                        android:layout_width="104dp"
+                        android:layout_height="104dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="48dp"
+                        app:srcCompat="@drawable/app_icon_plain"
+                        />
+
+                </RelativeLayout>
+            </FrameLayout>
+
+            <android.support.design.widget.TabLayout
+                android:id="@+id/main_tablayout"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@color/colorPrimary"
+                />
+        </LinearLayout>
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/main_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@android:color/transparent"
+            android:theme="@style/AppTheme"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <TextView
+                android:id="@+id/main_toolbar_shrunk_tv"
+                style="@style/ToolbarShrunkText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:alpha="0"
+                android:text="@string/main_toolbar_shrunk_title"
+                />
+        </android.support.v7.widget.Toolbar>
+
+    </FrameLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/main_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        app:layout_anchor="@id/main_tablayout"
+        app:layout_anchorGravity="bottom|end"
+        app:srcCompat="@drawable/ic_share"/>
+
+</android.support.design.widget.CoordinatorLayout>
+

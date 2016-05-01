@@ -22,17 +22,17 @@ import android.view.ViewGroup
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.adapters.StepsRvAdapter.StepViewHolder
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.fragments.MainFragment.OnMainFragmentListener
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import com.hasegawa.diapp.views.ItemStepView
 import rx.Subscriber
-import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
 
 class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
                      val isTablet: Boolean,
@@ -118,7 +118,7 @@ class StepsRvAdapter(val mainFragmentListener: OnMainFragmentListener,
         }
 
         getStepsUseCase = GetStepsUseCase(DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
         getStepsUseCase.execute(subscriber)
     }
 

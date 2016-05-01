@@ -23,9 +23,7 @@ import android.os.Handler
 import android.support.design.widget.FloatingActionButton
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
-import android.support.design.widget.TabLayout.OnTabSelectedListener
-import android.support.design.widget.TabLayout.Tab
-import android.support.design.widget.TabLayout.TabLayoutOnPageChangeListener
+import android.support.design.widget.TabLayout.*
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.GravityCompat
@@ -43,10 +41,11 @@ import android.widget.TextView
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.R.drawable
+import com.hasegawa.diapp.domain.ExecutionThread
+import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.domain.usecases.SyncIfNecessaryUseCase
 import com.hasegawa.diapp.fragments.CreditsFragment
 import com.hasegawa.diapp.fragments.MainFragment
 import com.hasegawa.diapp.fragments.MainFragment.OnMainFragmentListener
@@ -54,15 +53,13 @@ import com.hasegawa.diapp.fragments.NewsFragment
 import com.hasegawa.diapp.fragments.StepDetailFragment
 import com.hasegawa.diapp.services.GCMRegistrationService
 import com.hasegawa.diapp.utils.ResourcesUtils
-import com.hasegawa.diapp.utils.unsubscribeIfSubscribed
 import org.joda.time.DateTime
 import rx.Subscriber
-import rx.Subscription
 import rx.android.schedulers.AndroidSchedulers
 import rx.schedulers.Schedulers
 import rx.schedulers.Timestamped
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
 
 class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
@@ -110,7 +107,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
         setSupportActionBar(toolbar)
         supportActionBar!!.setDisplayShowTitleEnabled(false)
 
-        if (findViewById(R.id.main_fragment_container) != null) {
+        if (findViewById(R.id.base_container) != null) {
             Timber.d("Tablet mode on!")
             isTablet = true
             detailFl = findViewById(R.id.detail_fragment_container) as FrameLayout
@@ -236,7 +233,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                     detailFragment = StepDetailFragment.newInstance(true, 1)
                     supportFragmentManager.beginTransaction()
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, mainFragment)
+                            .replace(R.id.base_container, mainFragment)
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
                             .replace(R.id.detail_fragment_container, detailFragment)
                             .commit()
@@ -250,7 +247,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                 } else {
                     supportFragmentManager.beginTransaction()
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, NewsFragment.newInstance(true))
+                            .replace(R.id.base_container, NewsFragment.newInstance(true))
                             .commit()
                     tmAdjustPanes(false)
                     detailFragment = null
@@ -263,7 +260,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
                 } else {
                     supportFragmentManager.beginTransaction()
                             .setCustomAnimations(android.R.anim.fade_in, android.R.anim.fade_out)
-                            .replace(R.id.main_fragment_container, CreditsFragment.newInstance())
+                            .replace(R.id.base_container, CreditsFragment.newInstance())
                             .commit()
                     tmAdjustPanes(false)
                     detailFragment = null
@@ -296,13 +293,13 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
             mainFragment = MainFragment.newInstance(isTablet)
             detailFragment = StepDetailFragment.newInstance(isTablet, -1)
             supportFragmentManager.beginTransaction()
-                    .add(R.id.main_fragment_container, mainFragment, TM_MAIN_FRAG_TAG)
+                    .add(R.id.base_container, mainFragment, TM_MAIN_FRAG_TAG)
                     .add(R.id.detail_fragment_container, detailFragment, TM_DETAIL_FRAG_TAG)
                     .commit()
             tmAdjustPanes(true)
         } else {
             mainFragment = supportFragmentManager.findFragmentById(
-                    R.id.main_fragment_container) as MainFragment
+                    R.id.base_container) as MainFragment
             detailFragment = supportFragmentManager.findFragmentById(
                     R.id.detail_fragment_container) as StepDetailFragment
 
@@ -315,7 +312,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
     private fun setupNumberOfStepsUc() {
         getNumStepsUc = GetNumStepsTotalCompletedUseCase(DiApp.stepsRepository,
-                Schedulers.io(), AndroidSchedulers.mainThread())
+                ExecutionThread(Schedulers.io()), PostExecutionThread(AndroidSchedulers.mainThread()))
 
         getNumStepsUc?.execute(object : Subscriber<NumCompletedAndTotal>() {
             override fun onCompleted() {
@@ -425,7 +422,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
 
     fun tmAdjustPanes(twoPanes: Boolean) {
         val ll = findViewById(R.id.main_containers_ll) as LinearLayout
-        val mainContainer = findViewById(R.id.main_fragment_container) as FrameLayout
+        val mainContainer = findViewById(R.id.base_container) as FrameLayout
         val maxContainerSize = ll.measuredWidth - navView.measuredWidth
         if (maxContainerSize == 0) {
             // if the view is not ready yet, queue it for later :)
@@ -445,7 +442,7 @@ class MainActivity : BaseNavDrawerActivity(), OnMainFragmentListener {
     }
 
     fun tmShouldBeTwoPanes(): Boolean {
-        val fragment = supportFragmentManager.findFragmentById(R.id.main_fragment_container)
+        val fragment = supportFragmentManager.findFragmentById(R.id.base_container)
         if (fragment != null) {
             return fragment is MainFragment
         }

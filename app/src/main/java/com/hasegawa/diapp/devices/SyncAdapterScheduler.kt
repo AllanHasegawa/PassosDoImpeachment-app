@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.syncadapters
+package com.hasegawa.diapp.devices
 
 import android.content.ContentResolver
 import android.content.Context
@@ -26,16 +26,12 @@ import rx.Observable
 import rx.Subscriber
 import rx.Subscription
 import timber.log.Timber
-import java.util.Random
+import java.util.*
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class SyncAdapterScheduler : SyncScheduler {
+class SyncAdapterScheduler @Inject constructor(val context: Context) : SyncScheduler {
     var subscription: Subscription? = null
-    val context: Context
-
-    constructor(ctx: Context) {
-        context = ctx
-    }
 
     override fun enqueueSync(delayed: Boolean) {
         if (delayed && subscription != null && !subscription!!.isUnsubscribed) {
