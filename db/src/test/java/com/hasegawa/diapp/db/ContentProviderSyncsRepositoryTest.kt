@@ -18,14 +18,11 @@ package com.hasegawa.diapp.db
 
 
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderSyncsRepository
-import com.hasegawa.diapp.domain.entities.GCMMessageEntity
-import com.hasegawa.diapp.domain.entities.GCMMessageType
-import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
-import com.hasegawa.diapp.domain.entities.SyncEntity
-import com.hasegawa.diapp.domain.entities.equalsNoId
+import com.hasegawa.diapp.domain.entities.*
+import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.pushtorefresh.storio.StorIOException
 import org.hamcrest.Matchers.*
-import org.junit.Assert.*
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -33,18 +30,16 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import rx.Observable
 import rx.schedulers.Schedulers
-import java.util.ArrayList
-import java.util.Random
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
-class ContentProviderSyncsRepositoryTest {
+open class ContentProviderSyncsRepositoryTest {
     val contentResolver = RuntimeEnvironment.application.contentResolver
 
-    fun db() = ContentProviderSyncsRepository(contentResolver)
+    open fun db(): SyncsRepository = ContentProviderSyncsRepository(contentResolver)
 
     fun gcmRegistrationsList() = listOf(
             GCMRegistrationEntity("tokenA", 0),
@@ -72,7 +67,7 @@ class ContentProviderSyncsRepositoryTest {
                                       changes: (() -> Unit)): List<List<T>> {
         var barrier = CyclicBarrier(2)
         var results = ArrayList<List<T>>()
-        obs
+        obs.subscribeOn(Schedulers.io())
                 .take(3)
                 .subscribe({
                     results.add(it)
