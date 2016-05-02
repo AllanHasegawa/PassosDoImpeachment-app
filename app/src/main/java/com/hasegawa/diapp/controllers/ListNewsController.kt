@@ -73,7 +73,7 @@ class ListNewsController : Controller() {
         }
     }
 
-    private class Adapter(val newsMvpView: ListNewsMvpView) :
+    class Adapter(val newsMvpView: ListNewsMvpView) :
             RecyclerView.Adapter<Adapter.ViewHolder>() {
         class ViewHolder(item: View, val newsMvpView: ListNewsMvpView) :
                 RecyclerView.ViewHolder(item) {

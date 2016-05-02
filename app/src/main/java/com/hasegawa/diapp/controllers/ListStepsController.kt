@@ -126,7 +126,7 @@ class ListStepsController : Controller {
         }
     }
 
-    private class Adapter(val stepsMvpView: ListStepsMvpView) :
+    class Adapter(val stepsMvpView: ListStepsMvpView) :
             RecyclerView.Adapter<Adapter.ViewHolder>() {
         class ViewHolder(item: View, val stepsMvpView: ListStepsMvpView) :
                 RecyclerView.ViewHolder(item) {

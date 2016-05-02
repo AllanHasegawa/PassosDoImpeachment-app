@@ -447,8 +447,8 @@ class ScreenMainController : BaseNavigationController,
     }
 
     companion object {
-        private const val VIEW_PAGER_STEPS_LIST = 0
-        private const val VIEW_PAGER_NEWS_LIST = 1
+        const val VIEW_PAGER_STEPS_LIST = 0
+        const val VIEW_PAGER_NEWS_LIST = 1
 
         private const val BKEY_STEP_SELECTED = "step_selected"
         private const val BKEY_CURRENT_ROUTE = "main_current_route"
