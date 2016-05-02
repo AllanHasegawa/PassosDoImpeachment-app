@@ -214,12 +214,18 @@ class ScreenMainController : BaseNavigationController,
                 }
                 viewPager?.setCurrentItem(viewPage, true)
             } else {
+                when (route) {
+                    Route.Steps -> if (childControllers.contains(listStepsController)) return
+                    Route.News -> if (childControllers.contains(listNewsController)) return
+                    Route.Credits -> if (childControllers.contains(creditsController)) return
+                    else -> return
+                }
                 currentRoute = route
-                childControllers.map { removeChildController(it) }
+                childControllers.forEach { this@ScreenMainController.removeChildController(it) }
                 when (route) {
                     MainMvpView.Route.Steps -> {
-                        addChildController(ChildControllerTransaction.builder(listStepsController!!,
-                                R.id.base_container)
+                        addChildController(ChildControllerTransaction.builder(
+                                listStepsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
                                 .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
@@ -230,15 +236,15 @@ class ScreenMainController : BaseNavigationController,
                                 .build())
                     }
                     MainMvpView.Route.News -> {
-                        addChildController(ChildControllerTransaction.builder(listNewsController!!,
-                                R.id.base_container)
+                        addChildController(ChildControllerTransaction.builder(
+                                listNewsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
                                 .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                     }
                     MainMvpView.Route.Credits -> {
-                        addChildController(ChildControllerTransaction.builder(creditsController!!,
-                                R.id.base_container)
+                        addChildController(ChildControllerTransaction.builder(
+                                creditsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
                                 .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
