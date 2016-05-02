@@ -32,6 +32,7 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import butterknife.BindView
 import butterknife.ButterKnife
+import butterknife.OnClick
 import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
@@ -41,6 +42,7 @@ import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.bluelinelabs.conductor.support.ControllerPagerAdapter
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.ConstStrings
 import com.hasegawa.diapp.presentation.presenters.MainPresenter
@@ -55,6 +57,7 @@ class ScreenMainController : BaseNavigationController,
 
     @Inject lateinit var mainPresenter: MainPresenter
     @Inject lateinit var constStrings: ConstStrings
+    @Inject lateinit var textSharer: TextSharer
 
     @BindView(R.id.main_toolbar_expanded_pb) lateinit var toolbarPb: ProgressBar
     @BindView(R.id.main_toolbar_expanded_tv) lateinit var toolbarExpandedTv: TextView
@@ -75,6 +78,8 @@ class ScreenMainController : BaseNavigationController,
     private var listNewsController: ListNewsController? = null
     private var creditsController: CreditsController? = null
     private var listStepDetailsController: ListStepDetailsController? = null
+
+    private var numSteps: NumCompletedAndTotal? = null
 
     private var stepSelectedByPosition: Int = 1
     private var currentRoute = MainMvpView.Route.Steps
@@ -184,6 +189,15 @@ class ScreenMainController : BaseNavigationController,
         routeFromOthersScreens = route
     }
 
+    @OnClick(R.id.main_fab)
+    fun fabClicked() {
+        val body = activity.getString(R.string.share_main_text,
+                numSteps?.completed ?: 0, numSteps?.total ?: 0,
+                activity.getString(R.string.app_play_store_short_url))
+        val chooserTitle = activity.getString(R.string.share_main_chooser_header)
+        textSharer.shareText(body, chooserTitle)
+    }
+
     private val mvpView = object : MainMvpView() {
         override fun actRouteChange(route: Route) {
             logDevice.d("Act Route Change $route")
@@ -280,6 +294,7 @@ class ScreenMainController : BaseNavigationController,
         override fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal) {
             toolbarPb.max = numbers.total
             toolbarPb.progress = numbers.completed
+            numSteps = numbers
         }
 
         override fun renderRouteChange(route: Route) {

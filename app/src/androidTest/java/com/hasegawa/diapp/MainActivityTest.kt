@@ -22,21 +22,18 @@ import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.RecyclerViewActions
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withClassName
-import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withParent
-import android.support.test.espresso.matcher.ViewMatchers.withText
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
-import com.hasegawa.diapp.adapters.StepsRvAdapter
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.containsString
+import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.controllers.ListStepsController
+import com.hasegawa.diapp.di.AppModule
+import com.hasegawa.diapp.di.DaggerAppMemComponent
+import org.hamcrest.Matchers.*
 import org.junit.Assume
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +44,19 @@ class MainActivityTest {
 
     @get:Rule
     val activityRule = ActivityTestRule(MainActivity::class.java)
+
+    @Before
+    fun setUp() {
+        DiApp.appComponent = DaggerAppMemComponent.builder()
+                .appModule(AppModule(activityRule.activity.application))
+                .build()
+        MemMockGen.resetStepsRepo()
+        MemMockGen.resetSyncsRepo()
+        MemMockGen.genRegistered()
+        MemMockGen.genSynced()
+        MemMockGen.genSteps()
+        MemMockGen.genStepLinks()
+    }
 
 
     fun tabletMode() {
@@ -104,7 +114,7 @@ class MainActivityTest {
     @Test
     fun navBarNewsBt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
         onView(withId(R.id.main_news_rv)).check(matches(isDisplayed()))
     }
@@ -120,7 +130,7 @@ class MainActivityTest {
     @Test
     fun navBarStepsBt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_step_list)).perform(ViewActions.click())
         onView(withId(R.id.main_steps_rv)).check(matches(isDisplayed()))
     }
@@ -176,7 +186,7 @@ class MainActivityTest {
     @Test
     fun goToCreditsAndComeBackWithUpButton() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
 
         onView(withContentDescription(R.string.abc_action_bar_up_description)).perform(
@@ -188,7 +198,7 @@ class MainActivityTest {
     @Test
     fun goToCreditsAndComeBackWithBackButton() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
 
         pressBack()
@@ -202,7 +212,7 @@ class MainActivityTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_steps_rv)).perform(
-                RecyclerViewActions.scrollToPosition<StepsRvAdapter.StepViewHolder>(2))
+                RecyclerViewActions.scrollToPosition<ListStepsController.Adapter.ViewHolder>(2))
         onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
                 .perform(ViewActions.click())
 
@@ -218,7 +228,7 @@ class MainActivityTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_steps_rv)).perform(
-                RecyclerViewActions.scrollToPosition<StepsRvAdapter.StepViewHolder>(2))
+                RecyclerViewActions.scrollToPosition<ListStepsController.Adapter.ViewHolder>(2))
         onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
                 .perform(ViewActions.click())
 
@@ -230,7 +240,7 @@ class MainActivityTest {
     @Test
     fun openDrawerAndPressBackButtonToCloseIt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         Espresso.pressBack()
         onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
     }
