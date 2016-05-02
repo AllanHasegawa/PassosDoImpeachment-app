@@ -74,6 +74,8 @@ class ScreenMainController : BaseNavigationController {
 
     private var stepSelectedByPosition: Int = 1
     private var currentRoute = MainMvpView.Route.Steps
+    var routeFromOthersScreens: MainMvpView.Route? = null
+
 
     private var unbinder: Unbinder? = null
 
@@ -133,9 +135,8 @@ class ScreenMainController : BaseNavigationController {
         listStepsController?.stepTouchListener = { mvpView.stepSelectedByPosListener(it) }
         listStepsController?.listStepsScrollListener = { mvpView.listStepsScrollListener(it) }
 
-        mvpView.routeListener(currentRoute)
         if (screenDevice.isTablet()) {
-            mvpView.stepSelectedByPosListener(stepSelectedByPosition)
+            mvpView.routeListener(currentRoute)
         }
 
         return baseView
@@ -160,7 +161,12 @@ class ScreenMainController : BaseNavigationController {
     override fun onRestoreViewState(view: View, savedViewState: Bundle) {
         super.onRestoreViewState(view, savedViewState)
         stepSelectedByPosition = savedViewState.getInt(BKEY_STEP_SELECTED)
+        mvpView.stepSelectedByPosListener(stepSelectedByPosition)
+
+
         currentRoute = MainMvpView.Route.valueOf(savedViewState.getString(BKEY_CURRENT_ROUTE))
+        currentRoute = routeFromOthersScreens ?: currentRoute
+        routeFromOthersScreens = null
         mvpView.routeListener(currentRoute)
     }
 
@@ -168,16 +174,13 @@ class ScreenMainController : BaseNavigationController {
         override fun actRouteChange(route: Route) {
             if (!screenDevice.isTablet()) {
                 val viewPage: Int
-                val toolbarShrunkTitle: String
                 when (route) {
                     MainMvpView.Route.Steps -> {
                         viewPage = VIEW_PAGER_STEPS_LIST
-                        toolbarShrunkTitle = constStrings.stepsToolbarShrunkTitle
                         currentRoute = route
                     }
                     MainMvpView.Route.News -> {
                         viewPage = VIEW_PAGER_NEWS_LIST
-                        toolbarShrunkTitle = constStrings.newsToolbarShrunkTitle
                         currentRoute = route
                     }
                     MainMvpView.Route.Credits -> {
@@ -192,7 +195,6 @@ class ScreenMainController : BaseNavigationController {
                     else -> return
                 }
                 viewPager?.setCurrentItem(viewPage, true)
-                toolbarShrunkTv?.text = toolbarShrunkTitle
             } else {
                 currentRoute = route
                 childControllers.map { removeChildController(it) }
@@ -253,6 +255,15 @@ class ScreenMainController : BaseNavigationController {
                 Route.Credits -> baseMvpView.itemSelectionListener(NavigationMvpView.Item.Credits)
                 else -> Unit
             }
+
+            if (!screenDevice.isTablet()) {
+                val toolbarShrunkTitle = when (route) {
+                    MainMvpView.Route.Steps -> constStrings.stepsToolbarShrunkTitle
+                    MainMvpView.Route.News -> constStrings.newsToolbarShrunkTitle
+                    else -> return
+                }
+                toolbarShrunkTv?.text = toolbarShrunkTitle
+            }
         }
 
         override fun renderSizeState(state: MainMvpView.SizeState) {
@@ -264,29 +275,30 @@ class ScreenMainController : BaseNavigationController {
             }
         }
 
-        private fun tmAdjustPanes(twoPanes: Boolean) {
-            val maxContainerSize = containersLl!!.measuredWidth - navView.measuredWidth
-            if (maxContainerSize == 0) {
-                // if the view is not ready yet, queue it for later :)
-                Handler().post { tmAdjustPanes(twoPanes) }
-                return
-            }
-            val mainContainerTarget = if (twoPanes) maxContainerSize / 2 else maxContainerSize
-            val initialWidth = mainContainer!!.layoutParams.width
-            val anim = ValueAnimator.ofInt(initialWidth, mainContainerTarget)
-            anim.addUpdateListener {
-                val oldLayoutParams = mainContainer!!.layoutParams as LinearLayout.LayoutParams
-                oldLayoutParams.width = it.animatedValue as Int
-                mainContainer!!.layoutParams = oldLayoutParams
-            }
-            anim.startDelay = 200
-            anim.duration = 150
-            anim.start()
-        }
     }
 
     override fun onNavigationRouteRequested(route: MainMvpView.Route) {
         mvpView.routeListener(route)
+    }
+
+    private fun tmAdjustPanes(twoPanes: Boolean) {
+        val maxContainerSize = containersLl!!.measuredWidth - navView.measuredWidth
+        if (maxContainerSize == 0) {
+            // if the view is not ready yet, queue it for later :)
+            Handler().post { tmAdjustPanes(twoPanes) }
+            return
+        }
+        val mainContainerTarget = if (twoPanes) maxContainerSize / 2 else maxContainerSize
+        val initialWidth = mainContainer!!.layoutParams.width
+        val anim = ValueAnimator.ofInt(initialWidth, mainContainerTarget)
+        anim.addUpdateListener {
+            val oldLayoutParams = mainContainer!!.layoutParams as LinearLayout.LayoutParams
+            oldLayoutParams.width = it.animatedValue as Int
+            mainContainer!!.layoutParams = oldLayoutParams
+        }
+        anim.startDelay = 200
+        anim.duration = 150
+        anim.start()
     }
 
     private fun setupTabLayout() {
@@ -304,9 +316,9 @@ class ScreenMainController : BaseNavigationController {
 
                 override fun onPageSelected(position: Int) {
                     if (position == VIEW_PAGER_STEPS_LIST) {
-                        mvpView.routeListener(MainMvpView.Route.Steps)
+                        mvpView.viewPagerListener(MainMvpView.Route.Steps)
                     } else {
-                        mvpView.routeListener(MainMvpView.Route.News)
+                        mvpView.viewPagerListener(MainMvpView.Route.News)
                     }
                 }
             })
@@ -316,14 +328,13 @@ class ScreenMainController : BaseNavigationController {
 
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     if (tab!!.position == VIEW_PAGER_STEPS_LIST) {
-                        mvpView.routeListener(MainMvpView.Route.Steps)
+                        mvpView.tabSelectedListener(MainMvpView.Route.Steps)
                     } else {
-                        mvpView.routeListener(MainMvpView.Route.News)
+                        mvpView.tabSelectedListener(MainMvpView.Route.News)
                     }
                 }
 
                 override fun onTabReselected(tab: TabLayout.Tab?) {
-                    mvpView.routeListener(MainMvpView.Route.Steps)
                 }
             })
         }

@@ -26,6 +26,7 @@ import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import com.hasegawa.diapp.presentation.views.NavigationMvpView
 
@@ -59,10 +60,14 @@ class ScreenCreditsController : BaseNavigationController(NavigationMvpView.Item.
         when (route) {
             MainMvpView.Route.Steps -> {
                 removeChildController(childController)
+                val c = router.getControllerWithTag(MainActivity.TAG_MAIN_CONTROLLER)
+                (c as ScreenMainController).routeFromOthersScreens = MainMvpView.Route.Steps
                 router.popCurrentController()
             }
             MainMvpView.Route.News -> {
                 removeChildController(childController)
+                val c = router.getControllerWithTag(MainActivity.TAG_MAIN_CONTROLLER)
+                (c as ScreenMainController).routeFromOthersScreens = MainMvpView.Route.News
                 router.popCurrentController()
             }
             else -> Unit

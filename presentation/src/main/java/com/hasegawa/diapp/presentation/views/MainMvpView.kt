@@ -37,6 +37,8 @@ abstract class MainMvpView : MvpView {
     }
 
     var routeListener: (route: Route) -> Unit = {}
+    var tabSelectedListener: (route: Route) -> Unit = {}
+    var viewPagerListener: (route: Route) -> Unit = {}
     var listStepsScrollListener: (dy: Int) -> Unit = {}
     var stepSelectedByPosListener: (position: Int) -> Unit = {}
 

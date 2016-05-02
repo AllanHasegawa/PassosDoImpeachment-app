@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity() {
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(ScreenMainController(viewNumber))
+            router.setRoot(ScreenMainController(viewNumber), TAG_MAIN_CONTROLLER)
         }
 
         val gcmRegistrationIntent = Intent(this, GCMRegistrationService::class.java)
@@ -111,5 +111,6 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         const val INTENT_VIEW_NUMBER_KEY = "intent_view_number"
+        const val TAG_MAIN_CONTROLLER = "main_controller_tag"
     }
 }

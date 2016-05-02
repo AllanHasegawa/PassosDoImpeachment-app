@@ -67,26 +67,48 @@ class MainPresenter @Inject constructor(
     }
 
     override fun onViewBound() {
-        view.routeListener = {
+        view.routeListener = { it: MainMvpView.Route ->
             view.renderRouteChange(it)
             when (it) {
-                MainMvpView.Route.Steps -> {
-                    view.renderSizeState(MainMvpView.SizeState.Expanded)
-                    view.renderMode(MainMvpView.Mode.TwoPane)
-                }
+                MainMvpView.Route.Steps,
                 MainMvpView.Route.News -> {
-                    view.renderSizeState(MainMvpView.SizeState.Shrunk)
-                    view.renderMode(MainMvpView.Mode.OnePane)
+                    view.renderSizeState(routeToSize(it))
+                    view.renderMode(routeToMode(it))
                 }
                 MainMvpView.Route.Credits -> {
-                    view.renderMode(MainMvpView.Mode.OnePane)
+                    view.renderMode(routeToMode(it))
                 }
                 else -> Unit
             }
             view.actRouteChange(it)
         }
+
+        view.tabSelectedListener = { it: MainMvpView.Route ->
+            view.renderRouteChange(it)
+            view.renderSizeState(routeToSize(it))
+            view.actRouteChange(it)
+        }
+
+        view.viewPagerListener = { it: MainMvpView.Route ->
+            view.renderRouteChange(it)
+            view.renderSizeState(routeToSize(it))
+        }
+
         view.listStepsScrollListener = { handleListStepsScroll(it) }
         view.stepSelectedByPosListener = { view.renderStepSelectedByPosition(it) }
+    }
+
+    private fun routeToSize(route: MainMvpView.Route): MainMvpView.SizeState = when (route) {
+        MainMvpView.Route.Steps -> MainMvpView.SizeState.Expanded
+        MainMvpView.Route.News -> MainMvpView.SizeState.Shrunk
+        else -> throw RuntimeException("Can't convert route $route to SizeState.")
+    }
+
+    private fun routeToMode(route: MainMvpView.Route): MainMvpView.Mode = when (route) {
+        MainMvpView.Route.Steps -> MainMvpView.Mode.TwoPane
+        MainMvpView.Route.News -> MainMvpView.Mode.OnePane
+        MainMvpView.Route.Credits -> MainMvpView.Mode.OnePane
+        else -> throw RuntimeException("Can't convert route $route to Mode.")
     }
 
     private var dyHistory: List<Timestamped<Int>> = ArrayList(100)
