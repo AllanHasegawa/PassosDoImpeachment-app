@@ -23,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
+import com.bluelinelabs.conductor.changehandler.FadeChangeHandler
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.controllers.ScreenMainController
@@ -70,7 +71,8 @@ class MainActivity : AppCompatActivity() {
 
         router = Conductor.attachRouter(this, container, savedInstanceState)
         if (!router.hasRootController()) {
-            router.setRoot(ScreenMainController(viewNumber), TAG_MAIN_CONTROLLER)
+            router.setRoot(ScreenMainController(viewNumber),
+                    TAG_MAIN_CONTROLLER, FadeChangeHandler())
         }
 
         val gcmRegistrationIntent = Intent(this, GCMRegistrationService::class.java)

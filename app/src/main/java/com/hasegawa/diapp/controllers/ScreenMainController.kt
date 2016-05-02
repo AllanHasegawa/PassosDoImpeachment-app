@@ -36,6 +36,8 @@ import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
+import com.bluelinelabs.conductor.changehandler.HorizontalChangeHandler
+import com.bluelinelabs.conductor.changehandler.VerticalChangeHandler
 import com.bluelinelabs.conductor.support.ControllerPagerAdapter
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
@@ -201,6 +203,8 @@ class ScreenMainController : BaseNavigationController,
                             router.pushController(
                                     RouterTransaction.builder(ScreenCreditsController(
                                             this@ScreenMainController))
+                                            .popChangeHandler(VerticalChangeHandler())
+                                            .pushChangeHandler(VerticalChangeHandler())
                                             .tag(TAG_CREDITS)
                                             .build())
                         }
@@ -216,21 +220,28 @@ class ScreenMainController : BaseNavigationController,
                     MainMvpView.Route.Steps -> {
                         addChildController(ChildControllerTransaction.builder(listStepsController!!,
                                 R.id.base_container)
+                                .popChangeHandler(HorizontalChangeHandler())
+                                .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                         addChildController(ChildControllerTransaction.builder(
                                 listStepDetailsController!!, R.id.detail_container)
+                                .popChangeHandler(HorizontalChangeHandler())
+                                .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                     }
                     MainMvpView.Route.News -> {
                         addChildController(ChildControllerTransaction.builder(listNewsController!!,
                                 R.id.base_container)
+                                .popChangeHandler(HorizontalChangeHandler())
+                                .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                     }
                     MainMvpView.Route.Credits -> {
-                        addChildController(
-                                ChildControllerTransaction.builder(creditsController!!,
-                                        R.id.base_container)
-                                        .build())
+                        addChildController(ChildControllerTransaction.builder(creditsController!!,
+                                R.id.base_container)
+                                .popChangeHandler(HorizontalChangeHandler())
+                                .pushChangeHandler(HorizontalChangeHandler())
+                                .build())
                     }
                     else -> Unit
                 }
@@ -251,6 +262,8 @@ class ScreenMainController : BaseNavigationController,
             if (!screenDevice.isTablet()) {
                 router.pushController(RouterTransaction.builder(
                         ScreenStepDetailController(position, this@ScreenMainController))
+                        .popChangeHandler(VerticalChangeHandler())
+                        .pushChangeHandler(VerticalChangeHandler())
                         .build())
             } else {
                 listStepDetailsController?.renderStepByPosition(position)
