@@ -19,9 +19,9 @@ package com.hasegawa.diapp.db
 import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderNewsRepository
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.entities.equalsNoId
+import com.hasegawa.diapp.domain.repositories.NewsRepository
 import org.hamcrest.Matchers.*
-import org.junit.Assert
-import org.junit.Assert.*
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -29,17 +29,17 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import rx.Observable
 import rx.schedulers.Schedulers
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
-class ContentProviderNewsRepositoryTest {
+open class ContentProviderNewsRepositoryTest {
 
     val contentResolver = RuntimeEnvironment.application.contentResolver
 
-    fun db() = ContentProviderNewsRepository(contentResolver)
+    open fun db(): NewsRepository = ContentProviderNewsRepository(contentResolver)
 
     fun newsList() = listOf(
             NewsEntity("A", "NewsA", "UrlA", 0, null),
@@ -97,6 +97,7 @@ class ContentProviderNewsRepositoryTest {
         var barrier = CyclicBarrier(2)
         var results = ArrayList<Int>()
         val subscription = db().getNews()
+                .subscribeOn(Schedulers.io())
                 .take(3)
                 .subscribe({
                     results.add(it.size)
