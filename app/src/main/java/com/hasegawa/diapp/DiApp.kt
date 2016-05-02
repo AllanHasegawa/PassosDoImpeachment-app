@@ -20,6 +20,7 @@ import android.content.Context
 import android.support.multidex.MultiDex
 import com.hasegawa.diapp.cloud.RestInfo
 import com.hasegawa.diapp.di.*
+import com.hasegawa.diapp.utils.L
 import net.danlew.android.joda.JodaTimeAndroid
 
 open class DiApp : Application() {
@@ -32,6 +33,7 @@ open class DiApp : Application() {
                 .appModule(AppModule(this))
                 .restServiceModule(RestServiceModule(RestInfo.API_URL))
                 .build()
+        L.log = appComponent.logDevice()
     }
 
     override fun onTerminate() {
@@ -45,6 +47,7 @@ open class DiApp : Application() {
 
     companion object {
         @JvmStatic lateinit var appComponent: AppComponent
+        // The app uses a single activity, so I guess it is fine to put it here?
         @JvmStatic lateinit var activityComponent: ActivityComponent
     }
 }
