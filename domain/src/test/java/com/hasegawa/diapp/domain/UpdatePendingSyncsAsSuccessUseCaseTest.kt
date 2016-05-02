@@ -19,8 +19,8 @@ package com.hasegawa.diapp.domain
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.UpdatePendingSyncsAsSuccessUseCase
-import org.hamcrest.Matchers.*
-import org.junit.Assert.*
+import org.hamcrest.Matchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
@@ -33,6 +33,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class UpdatePendingSyncsAsSuccessUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var syncsRepository: SyncsRepository? = null
 
@@ -59,8 +62,7 @@ class UpdatePendingSyncsAsSuccessUseCaseTest {
         `when`(syncsRepository!!.upsertSyncs(pendingSyncs.map { it.pending = false; it.timeSynced = null; it }))
                 .thenReturn(Observable.just(successSyncs))
 
-        val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!, et, pet)
 
         var result: List<SyncEntity>? = null
         val lock = CountDownLatch(1)
@@ -95,8 +97,7 @@ class UpdatePendingSyncsAsSuccessUseCaseTest {
         `when`(syncsRepository!!.upsertSyncs(listOf(successSyncs[0])))
                 .thenReturn(Observable.just(listOf(successSyncs[0])))
 
-        val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!, et, pet)
 
         var result: List<SyncEntity>? = null
         val lock = CountDownLatch(1)

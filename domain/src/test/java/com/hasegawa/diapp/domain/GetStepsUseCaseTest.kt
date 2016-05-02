@@ -33,6 +33,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetStepsUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -53,8 +56,7 @@ class GetStepsUseCaseTest {
 
     @Test
     fun execute() {
-        val useCase = GetStepsUseCase(stepsRepository!!, Schedulers.io(),
-                Schedulers.newThread())
+        val useCase = GetStepsUseCase(stepsRepository!!, et, pet)
 
         var completed = false
         var result: List<StepEntity>? = null

@@ -20,8 +20,8 @@ import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetStepLinksByStepPositionUseCase
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.*
+import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -34,6 +34,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetStepLinksByStepPositionUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -58,8 +61,7 @@ class GetStepLinksByStepPositionUseCaseTest {
 
     @Test
     fun execute() {
-        val useCase = GetStepLinksByStepPositionUseCase(step.position,
-                stepsRepository!!, Schedulers.computation(), Schedulers.io())
+        val useCase = GetStepLinksByStepPositionUseCase(step.position, stepsRepository!!, et, pet)
 
         var completed = false
         var result: List<StepLinkEntity>? = null

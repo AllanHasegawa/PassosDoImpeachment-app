@@ -18,22 +18,23 @@ package com.hasegawa.diapp.domain
 
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetNumStepsCompletedUseCase
-import org.hamcrest.CoreMatchers.*
-import org.junit.Assert.*
+import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations
-import rx.Observable
 import rx.Subscriber
 import rx.lang.kotlin.BehaviorSubject
 import rx.schedulers.Schedulers
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetNumStepsCompletedUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -47,8 +48,7 @@ class GetNumStepsCompletedUseCaseTest {
 
     @Test
     fun execute() {
-        val useCase = GetNumStepsCompletedUseCase(stepsRepository!!, Schedulers.io(),
-                Schedulers.newThread())
+        val useCase = GetNumStepsCompletedUseCase(stepsRepository!!, et, pet)
 
         var completed = false
         var numCompleted = -1

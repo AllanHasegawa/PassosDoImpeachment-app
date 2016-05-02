@@ -32,6 +32,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetNumStepsTotalCompletedUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -49,8 +52,7 @@ class GetNumStepsTotalCompletedUseCaseTest {
                 .thenReturn(Observable.just(expected.completed))
 
 
-        val useCase = GetNumStepsTotalCompletedUseCase(stepsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = GetNumStepsTotalCompletedUseCase(stepsRepository!!, et, pet)
 
         var result: NumCompletedAndTotal? = null
         val barrier = CyclicBarrier(2)

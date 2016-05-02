@@ -35,6 +35,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class GetCloudUseCasesTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var restService: RestService? = null
 
@@ -60,7 +63,7 @@ class GetCloudUseCasesTest {
     fun getSteps() {
         `when`(restService!!.getSteps()).thenReturn(Observable.just(stepResponses))
 
-        val useCase = GetCloudStepsUseCase(restService!!, Schedulers.io(), Schedulers.newThread())
+        val useCase = GetCloudStepsUseCase(restService!!, et, pet)
         var result: List<StepResponse>? = null
         val lock = CountDownLatch(1)
         useCase.execute(object : Subscriber<List<StepResponse>>() {
@@ -87,7 +90,7 @@ class GetCloudUseCasesTest {
     fun getNews() {
         `when`(restService!!.getNews()).thenReturn(Observable.just(newsResponses))
 
-        val useCase = GetCloudNewsUseCase(restService!!, Schedulers.io(), Schedulers.newThread())
+        val useCase = GetCloudNewsUseCase(restService!!, et, pet)
         var result: List<NewsResponse>? = null
         val lock = CountDownLatch(1)
         useCase.execute(object : Subscriber<List<NewsResponse>>() {

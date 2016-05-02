@@ -20,8 +20,8 @@ import com.hasegawa.diapp.domain.devices.SyncScheduler
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.SyncIfNecessaryUseCase
-import org.hamcrest.Matchers.*
-import org.junit.Assert.*
+import org.hamcrest.Matchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -33,6 +33,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class SyncIfNecessaryUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var syncsRepository: SyncsRepository? = null
 
@@ -59,8 +62,7 @@ class SyncIfNecessaryUseCaseTest {
                 Observable.just(pendingSyncs)
         )
 
-        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!, et, pet)
 
         var result: Boolean? = null
         val lock = CountDownLatch(1)
@@ -91,8 +93,7 @@ class SyncIfNecessaryUseCaseTest {
         `when`(syncsRepository!!.getPendingSyncs()).thenReturn(Observable.just(emptyList()))
         `when`(syncsRepository!!.getSuccessfulSyncs()).thenReturn(Observable.just(successSyncs))
 
-        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!, et, pet)
 
         var result: Boolean? = null
         val lock = CountDownLatch(1)
@@ -123,8 +124,7 @@ class SyncIfNecessaryUseCaseTest {
         `when`(syncsRepository!!.getPendingSyncs()).thenReturn(Observable.just(emptyList()))
         `when`(syncsRepository!!.getSuccessfulSyncs()).thenReturn(Observable.just(emptyList()))
 
-        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = SyncIfNecessaryUseCase(syncScheduler!!, syncsRepository!!, et, pet)
 
         var result: Boolean? = null
         val lock = CountDownLatch(1)

@@ -37,6 +37,9 @@ import java.util.concurrent.TimeUnit
 
 class AddNewsResponsesToRepoUseCaseTest {
 
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var newsRepository: NewsRepository? = null
 
@@ -62,8 +65,7 @@ class AddNewsResponsesToRepoUseCaseTest {
         `when`(newsRepository!!.addAllNews(responses.map { it.toEntity(null) }))
                 .thenReturn(Observable.just(responses.mapIndexed { i, it -> it.toEntity("id$i") }))
 
-        val useCase = AddNewsResponsesToRepoUseCase(responses, newsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = AddNewsResponsesToRepoUseCase(responses, newsRepository!!, et, pet)
 
         var completed = false
         var results: List<NewsEntity>? = null

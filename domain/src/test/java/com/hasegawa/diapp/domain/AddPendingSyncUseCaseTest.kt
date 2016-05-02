@@ -33,6 +33,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class AddPendingSyncUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var syncsRepository: SyncsRepository? = null
 
@@ -51,8 +54,7 @@ class AddPendingSyncUseCaseTest {
         `when`(syncsRepository!!.upsertSync(pendingSync))
                 .thenReturn(Observable.just(pendingSyncRet))
 
-        val useCase = AddPendingSyncUseCase(syncScheduler!!, syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = AddPendingSyncUseCase(syncScheduler!!, syncsRepository!!, et, pet)
 
         var result: SyncEntity? = null
         val lock = CountDownLatch(1)

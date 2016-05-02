@@ -32,6 +32,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetStepByPositionUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -53,8 +56,7 @@ class GetStepByPositionUseCaseTest {
         `when`(stepsRepository!!.getStepByPosition(3))
                 .thenReturn(Observable.just(null))
 
-        val useCase = GetStepByPositionUseCase(1, stepsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = GetStepByPositionUseCase(1, stepsRepository!!, et, pet)
 
         var result: StepEntity? = null
         var completed = false

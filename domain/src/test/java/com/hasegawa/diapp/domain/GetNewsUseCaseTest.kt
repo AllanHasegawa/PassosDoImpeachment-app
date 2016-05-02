@@ -33,6 +33,8 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetNewsUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
 
     @Mock
     var newsRepository: NewsRepository? = null
@@ -54,7 +56,7 @@ class GetNewsUseCaseTest {
 
     @Test
     fun execute() {
-        val useCase = GetNewsUseCase(newsRepository!!, Schedulers.io(), Schedulers.newThread())
+        val useCase = GetNewsUseCase(newsRepository!!, et, pet)
 
         val barrier = CyclicBarrier(2)
         var completed = false

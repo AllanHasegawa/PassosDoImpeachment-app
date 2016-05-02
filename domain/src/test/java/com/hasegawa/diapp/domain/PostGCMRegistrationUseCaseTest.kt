@@ -22,7 +22,7 @@ import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.usecases.PostGCMRegistrationUseCase
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.*
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
@@ -36,6 +36,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class PostGCMRegistrationUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var syncsRepository: SyncsRepository? = null
     @Mock
@@ -62,8 +65,7 @@ class PostGCMRegistrationUseCaseTest {
                 .thenReturn(Observable.just(gcmRegistration))
         `when`(restService!!.postGCMToken(token)).thenReturn(Observable.just(true))
 
-        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!, et, pet)
 
         var completed = false
         var calls = 0
@@ -104,8 +106,7 @@ class PostGCMRegistrationUseCaseTest {
         `when`(syncsRepository!!.getGCMRegistrationByToken(token))
                 .thenReturn(Observable.just(gcmRegistration))
 
-        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!, et, pet)
 
         var completed = false
         var calls = 0
@@ -152,8 +153,7 @@ class PostGCMRegistrationUseCaseTest {
         ))
 
 
-        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = PostGCMRegistrationUseCase(token, syncsRepository!!, restService!!, et, pet)
 
         var completed = false
         var foundError = false

@@ -37,6 +37,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class AddStepResponsesToRepoUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
 
     @Mock
     var stepsRepository: StepsRepository? = null
@@ -75,8 +78,7 @@ class AddStepResponsesToRepoUseCaseTest {
         `when`(stepsRepository!!.addStepLinks(emptyList()))
                 .thenReturn(Observable.just(emptyList()))
 
-        val useCase = AddStepResponsesToRepoUseCase(responses, stepsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = AddStepResponsesToRepoUseCase(responses, stepsRepository!!, et, pet)
 
         var completed = false
         var results: List<StepEntity>? = null

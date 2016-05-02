@@ -32,6 +32,9 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 class GetLastSuccessfulSyncUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var syncsRepository: SyncsRepository? = null
 
@@ -55,8 +58,7 @@ class GetLastSuccessfulSyncUseCaseTest {
                 Observable.just(successSyncs)
         )
 
-        val useCase = GetLastSuccessfulSyncUseCase(syncsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = GetLastSuccessfulSyncUseCase(syncsRepository!!, et, pet)
 
         var result: SyncEntity? = null
         val lock = CountDownLatch(1)

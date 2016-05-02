@@ -21,8 +21,8 @@ import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetStepWithLinksByPositionUseCase
-import org.hamcrest.Matchers.*
-import org.junit.Assert.*
+import org.hamcrest.Matchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.*
@@ -34,6 +34,9 @@ import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 class GetStepWithLinksByPositionUseCaseTest {
+    val et = ExecutionThread(Schedulers.io())
+    val pet = PostExecutionThread(Schedulers.newThread())
+
     @Mock
     var stepsRepository: StepsRepository? = null
 
@@ -68,8 +71,7 @@ class GetStepWithLinksByPositionUseCaseTest {
         `when`(stepsRepository!!.getStepLinksByStepPosition(1))
                 .thenReturn(Observable.just(listOf(links[1]!!)))
 
-        val useCase = GetStepWithLinksByPositionUseCase(1, stepsRepository!!,
-                Schedulers.io(), Schedulers.newThread())
+        val useCase = GetStepWithLinksByPositionUseCase(1, stepsRepository!!, et, pet)
 
         var result: StepWithLinksEntity? = null
         val barrier = CyclicBarrier(2)
