@@ -105,7 +105,6 @@ dependencies {
     compile dependencies.rxkotlin
     compile dependencies.rxandroid
     compile dependencies.joda
-    compile dependencies.recyclerview_animators
     compile dependencies.gcm
     compile dependencies.conductor
     compile dependencies.conductor_support
