@@ -47,7 +47,9 @@ import com.hasegawa.diapp.presentation.views.NavigationMvpView
 import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
-class ScreenMainController : BaseNavigationController {
+class ScreenMainController : BaseNavigationController,
+        ScreenCreditsController.CreditsTargetListener,
+        ScreenStepDetailController.StepDetailTargetListener {
 
     @Inject lateinit var mainPresenter: MainPresenter
     @Inject lateinit var constStrings: ConstStrings
@@ -161,7 +163,9 @@ class ScreenMainController : BaseNavigationController {
     override fun onRestoreViewState(view: View, savedViewState: Bundle) {
         super.onRestoreViewState(view, savedViewState)
         stepSelectedByPosition = savedViewState.getInt(BKEY_STEP_SELECTED)
-        mvpView.stepSelectedByPosListener(stepSelectedByPosition)
+        if (screenDevice.isTablet()) {
+            mvpView.stepSelectedByPosListener(stepSelectedByPosition)
+        }
 
 
         currentRoute = MainMvpView.Route.valueOf(savedViewState.getString(BKEY_CURRENT_ROUTE))
@@ -170,8 +174,17 @@ class ScreenMainController : BaseNavigationController {
         mvpView.routeListener(currentRoute)
     }
 
+    override fun onRouteFromCredits(route: MainMvpView.Route) {
+        routeFromOthersScreens = route
+    }
+
+    override fun onRouteFromStepDetail(route: MainMvpView.Route) {
+        routeFromOthersScreens = route
+    }
+
     private val mvpView = object : MainMvpView() {
         override fun actRouteChange(route: Route) {
+            logDevice.d("Act Route Change $route")
             if (!screenDevice.isTablet()) {
                 val viewPage: Int
                 when (route) {
@@ -186,7 +199,8 @@ class ScreenMainController : BaseNavigationController {
                     MainMvpView.Route.Credits -> {
                         if (router.getControllerWithTag(TAG_CREDITS) == null) {
                             router.pushController(
-                                    RouterTransaction.builder(ScreenCreditsController())
+                                    RouterTransaction.builder(ScreenCreditsController(
+                                            this@ScreenMainController))
                                             .tag(TAG_CREDITS)
                                             .build())
                         }
@@ -236,7 +250,8 @@ class ScreenMainController : BaseNavigationController {
             stepSelectedByPosition = position
             if (!screenDevice.isTablet()) {
                 router.pushController(RouterTransaction.builder(
-                        ScreenStepDetailController(position)).build())
+                        ScreenStepDetailController(position, this@ScreenMainController))
+                        .build())
             } else {
                 listStepDetailsController?.renderStepByPosition(position)
                 listStepsController?.renderSelectedStepByPosition(position)

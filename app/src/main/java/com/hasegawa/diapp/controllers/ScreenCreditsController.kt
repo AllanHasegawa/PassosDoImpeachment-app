@@ -26,11 +26,27 @@ import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import com.hasegawa.diapp.presentation.views.NavigationMvpView
 
-class ScreenCreditsController : BaseNavigationController(NavigationMvpView.Item.Credits) {
+class ScreenCreditsController : BaseNavigationController {
+
+    interface CreditsTargetListener {
+        fun onRouteFromCredits(route: MainMvpView.Route)
+    }
+
+    constructor() : this(null)
+
+    constructor(target: Controller?) : super(NavigationMvpView.Item.Credits) {
+        if (target != null) {
+            if (target is CreditsTargetListener) {
+                this.targetController = target
+            } else {
+                // Kotlin does not support non-generic classes with generic constructor :(
+                throw RuntimeException("Target must be of type CreditsTargetListener")
+            }
+        }
+    }
 
     private lateinit var unbinder: Unbinder
 
@@ -57,20 +73,19 @@ class ScreenCreditsController : BaseNavigationController(NavigationMvpView.Item.
     }
 
     override fun onNavigationRouteRequested(route: MainMvpView.Route) {
+        val target = targetController
         when (route) {
             MainMvpView.Route.Steps -> {
                 removeChildController(childController)
-                val c = router.getControllerWithTag(MainActivity.TAG_MAIN_CONTROLLER)
-                (c as ScreenMainController).routeFromOthersScreens = MainMvpView.Route.Steps
+                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvpView.Route.Steps)
                 router.popCurrentController()
             }
             MainMvpView.Route.News -> {
                 removeChildController(childController)
-                val c = router.getControllerWithTag(MainActivity.TAG_MAIN_CONTROLLER)
-                (c as ScreenMainController).routeFromOthersScreens = MainMvpView.Route.News
+                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvpView.Route.News)
                 router.popCurrentController()
             }
-            else -> Unit
+            else -> return
         }
     }
 
@@ -78,6 +93,4 @@ class ScreenCreditsController : BaseNavigationController(NavigationMvpView.Item.
     fun fabClick() {
         Toast.makeText(activity, "Fab Not Working Yet! [TODO]", Toast.LENGTH_SHORT).show()
     }
-
-
 }

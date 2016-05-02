@@ -21,22 +21,38 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.bluelinelabs.conductor.ChildControllerTransaction
+import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import com.hasegawa.diapp.utils.BundleBuilder
 
 class ScreenStepDetailController : BaseNavigationController {
+    interface StepDetailTargetListener {
+        fun onRouteFromStepDetail(route: MainMvpView.Route)
+    }
 
     private var stepPosition: Int
 
-    constructor(initialStepPosition: Int) : this(BundleBuilder(Bundle())
-            .putInt(BKEY_INITIAL_STEP_POSITION, initialStepPosition).build())
+    constructor(initialStepPosition: Int, target: Controller? = null) :
+    this(BundleBuilder(Bundle()).putInt(BKEY_INITIAL_STEP_POSITION, initialStepPosition)
+            .build(), target)
+
+    constructor(bundle: Bundle, target: Controller? = null) : super(bundle) {
+        stepPosition = bundle.getInt(BKEY_INITIAL_STEP_POSITION)
+        if (target != null) {
+            if (target is StepDetailTargetListener) {
+                this.targetController = target
+            } else {
+                // Kotlin does not support non-generic classes with generic constructor :(
+                throw RuntimeException("Target must be StepDetailTargetListener")
+            }
+        }
+    }
 
     constructor(bundle: Bundle) : super(bundle) {
         stepPosition = bundle.getInt(BKEY_INITIAL_STEP_POSITION)
     }
-
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val baseView = super.onCreateView(inflater, container)
@@ -51,14 +67,24 @@ class ScreenStepDetailController : BaseNavigationController {
     }
 
     override fun onNavigationRouteRequested(route: MainMvpView.Route) {
+        val setTargetRoute = {
+            if (targetController != null) {
+                (targetController as StepDetailTargetListener?)?.onRouteFromStepDetail(route)
+            }
+        }
         when (route) {
             MainMvpView.Route.Steps -> {
+                childControllers.map { router.popController(it) }
+                setTargetRoute()
                 router.popCurrentController()
             }
             MainMvpView.Route.News -> {
+                childControllers.map { router.popController(it) }
+                setTargetRoute()
                 router.popCurrentController()
             }
             MainMvpView.Route.Credits -> {
+                childControllers.map { router.popController(it) }
                 router.popCurrentController()
                 router.pushController(RouterTransaction.builder(ScreenCreditsController()).build())
             }
