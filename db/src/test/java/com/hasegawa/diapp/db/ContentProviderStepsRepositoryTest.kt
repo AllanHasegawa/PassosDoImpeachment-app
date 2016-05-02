@@ -20,9 +20,10 @@ import com.hasegawa.diapp.db.repositories.contentprovider.ContentProviderStepsRe
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.entities.equalsNotId
+import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.pushtorefresh.storio.StorIOException
 import org.hamcrest.Matchers.*
-import org.junit.Assert.*
+import org.junit.Assert.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -30,17 +31,17 @@ import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import rx.Observable
 import rx.schedulers.Schedulers
-import java.util.ArrayList
+import java.util.*
 import java.util.concurrent.CyclicBarrier
 import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricGradleTestRunner::class)
 @Config(constants = BuildConfig::class)
-class ContentProviderStepsRepositoryTest {
+open class ContentProviderStepsRepositoryTest {
 
     val contentResolver = RuntimeEnvironment.application.contentResolver
 
-    fun db() = ContentProviderStepsRepository(contentResolver)
+    open fun db(): StepsRepository = ContentProviderStepsRepository(contentResolver)
 
     fun stepsList() = listOf(
             StepEntity("A", 1, "A", "asdA", true, "1"),
@@ -74,7 +75,7 @@ class ContentProviderStepsRepositoryTest {
                                       changes: (() -> Unit)): List<Int> {
         var barrier = CyclicBarrier(2)
         var results = ArrayList<Int>()
-        obs
+        obs.subscribeOn(Schedulers.io())
                 .take(3)
                 .subscribe({
                     results.add(it.size)
