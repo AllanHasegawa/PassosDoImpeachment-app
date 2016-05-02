@@ -81,10 +81,13 @@ dependencies {
     compile project(":cloud")
     compile project(":presentation")
 
+    def testDependencies = rootProject.ext.appTestDependencies
     def androidTestDependencies = rootProject.ext.appAndroidTestDependencies
     def debugDependencies = rootProject.ext.appDebugDependencies
     def dependencies = rootProject.ext.appDependencies
     def kaptDependencies = rootProject.ext.appKaptDependencies
+
+    testCompile testDependencies.junit
 
     androidTestCompile androidTestDependencies.support_annotations
     androidTestCompile androidTestDependencies.test_runner

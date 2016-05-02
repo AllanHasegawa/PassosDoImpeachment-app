@@ -70,7 +70,7 @@ ext {
     ]
 
     appTestDependencies = [
-
+            junit: "junit:junit:$junitVersion"
     ]
 
     appAndroidTestDependencies = [
