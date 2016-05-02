@@ -1,5 +1,7 @@
 # Passos do Impeachment (Android app)
 
+> This README was written before refactoring the app to use the "Clean-way Android Architecture". I'm working on a new one to document the architecture and details of this new improved version :)
+
 [![Play Link](http://steverichey.github.io/google-play-badge-svg/img/en_get.svg)](https://play.google.com/store/apps/details?id=com.hasegawa.diapp)
 
 A *full* **demo** Android app showcasing data syncing with a RESTful server. Android [SyncAdapter](http://developer.android.com/training/sync-adapters/creating-sync-adapter.html) is used to schedule the appropriate time to sync the data, a process done with Retrofit. StorIO caches the data for offline usage. To keep devices up-to-date, the server issues GCM messages to the client when things changes. Kotlin and RxJava makes everything beautiful.
