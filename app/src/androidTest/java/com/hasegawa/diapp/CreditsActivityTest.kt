@@ -25,6 +25,7 @@ import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import com.hasegawa.diapp.activities.MainActivity
 import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
@@ -35,7 +36,7 @@ import org.junit.runner.RunWith
 class CreditsActivityTest {
 
     @get:Rule
-    val activityRule = ActivityTestRule(CreditsActivity::class.java)
+    val activityRule = ActivityTestRule(MainActivity::class.java)
 
 
     fun tabletMode() {
@@ -56,7 +57,7 @@ class CreditsActivityTest {
     @Test
     fun openDrawerAndPressBackButtonToCloseIt() {
         phoneMode()
-        onView(withId(R.id.credits_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         Espresso.pressBack()
         onView(withId(R.id.credits_toolbar)).check(matches(isDisplayed()))
     }

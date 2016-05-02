@@ -29,17 +29,14 @@ import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.matcher.IntentMatchers
 import android.support.test.espresso.intent.rule.IntentsTestRule
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
-import com.hasegawa.diapp.adapters.NewsRvAdapter
-import com.hasegawa.diapp.adapters.StepsRvAdapter
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.not
+import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.controllers.ListNewsController
+import com.hasegawa.diapp.controllers.ScreenMainController
+import org.hamcrest.Matchers.*
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
@@ -73,10 +70,10 @@ class MainActivityIntentsTest {
         phoneMode()
         val resultIntent = Intent()
         resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                MainActivity.VIEW_PAGER_STEPS_LIST)
+                ScreenMainController.VIEW_PAGER_STEPS_LIST)
         Intents.intending(IntentMatchers.toPackage("com.hasegawa.diapp"))
                 .respondWith(ActivityResult(Activity.RESULT_OK, resultIntent))
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
         onView(withId(R.id.main_steps_rv)).check(ViewAssertions.matches(isDisplayed()))
     }
@@ -86,10 +83,10 @@ class MainActivityIntentsTest {
         phoneMode()
         val resultIntent = Intent()
         resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                MainActivity.VIEW_PAGER_NEWS_LIST)
+                ScreenMainController.VIEW_PAGER_NEWS_LIST)
         Intents.intending(IntentMatchers.toPackage("com.hasegawa.diapp"))
                 .respondWith(ActivityResult(Activity.RESULT_OK, resultIntent))
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
         onView(withId(R.id.main_news_rv)).check(ViewAssertions.matches(isDisplayed()))
     }
@@ -107,7 +104,7 @@ class MainActivityIntentsTest {
     @Test
     fun navBarFeedbackBt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_feedback)).perform(ViewActions.click())
 
         val feedbackUrl = activityRule.activity.getString(R.string.app_feedback_url)
@@ -136,7 +133,7 @@ class MainActivityIntentsTest {
     @Test
     fun navBarOpensourceBt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_opensource)).perform(ViewActions.click())
 
         val opensourceUrl = activityRule.activity.getString(R.string.app_opensource_url)
@@ -165,12 +162,12 @@ class MainActivityIntentsTest {
     @Test
     fun navBarCreditsBt() {
         phoneMode()
-        onView(withId(R.id.main_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
 
         Intents.intended(
                 IntentMatchers.hasComponent(ComponentName(activityRule.activity,
-                        CreditsActivity::class.java))
+                        MainActivity::class.java))
         )
     }
 
@@ -180,7 +177,7 @@ class MainActivityIntentsTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeLeft())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(2))
+                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(2))
         onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(2,
                 R.id.important_news_share_bt)).perform(ViewActions.click())
 
@@ -197,7 +194,7 @@ class MainActivityIntentsTest {
         onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(1))
+                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(1))
         onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(1,
                 R.id.important_news_share_bt)).perform(ViewActions.click())
 
@@ -214,7 +211,7 @@ class MainActivityIntentsTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeLeft())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(2))
+                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(2))
         var url: String = ""
         onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(2,
                 R.id.important_news_url_tv)).perform(TestUtils.customAction {
@@ -237,7 +234,7 @@ class MainActivityIntentsTest {
         onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_news_rv)).perform(
-                RecyclerViewActions.scrollToPosition<NewsRvAdapter.NewsViewHolder>(1))
+                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(1))
         var url: String = ""
         onView(RecyclerViewMatcher(R.id.main_news_rv).atPositionOnView(1,
                 R.id.important_news_url_tv)).perform(TestUtils.customAction {
@@ -260,14 +257,14 @@ class MainActivityIntentsTest {
         onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
         Thread.sleep(300) // add animation time
         onView(withId(R.id.main_steps_rv)).perform(
-                RecyclerViewActions.scrollToPosition<StepsRvAdapter.StepViewHolder>(2))
+                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(2))
         onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
                 .perform(ViewActions.click())
 
         Intents.intended(
                 IntentMatchers.hasComponent(
                         ComponentName(activityRule.activity,
-                                StepDetailActivity::class.java)
+                                MainActivity::class.java)
                 )
         )
     }

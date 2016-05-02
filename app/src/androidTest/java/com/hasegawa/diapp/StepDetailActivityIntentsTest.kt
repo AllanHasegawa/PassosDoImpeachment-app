@@ -17,29 +17,17 @@ package com.hasegawa.diapp
 
 import android.app.Activity
 import android.app.Instrumentation
-import android.app.Instrumentation.ActivityResult
-import android.content.ComponentName
 import android.content.Intent
-import android.net.Uri
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.assertion.ViewAssertions
-import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.matcher.IntentMatchers
 import android.support.test.espresso.intent.rule.IntentsTestRule
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
 import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import android.widget.TextView
-import com.hasegawa.diapp.adapters.NewsRvAdapter
-import com.hasegawa.diapp.adapters.StepsRvAdapter
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.not
+import com.hasegawa.diapp.activities.MainActivity
+import org.hamcrest.Matchers.*
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
@@ -50,7 +38,7 @@ import org.junit.runner.RunWith
 @LargeTest
 class StepDetailActivityIntentsTest {
     @get:Rule
-    val activityRule = IntentsTestRule(StepDetailActivity::class.java)
+    val activityRule = IntentsTestRule(MainActivity::class.java)
 
     fun tabletMode() {
         Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))

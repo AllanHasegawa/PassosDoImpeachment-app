@@ -30,6 +30,8 @@ import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
+import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.controllers.ScreenMainController
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.not
@@ -43,7 +45,7 @@ import org.junit.runner.RunWith
 @LargeTest
 class CreditsActivityIntentsTest {
     @get:Rule
-    val activityRule = IntentsTestRule(CreditsActivity::class.java)
+    val activityRule = IntentsTestRule(MainActivity::class.java)
 
     fun tabletMode() {
         Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))
@@ -64,7 +66,7 @@ class CreditsActivityIntentsTest {
     @Test
     fun goToMainActivityStepLists() {
         phoneMode()
-        onView(withId(R.id.credits_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_step_list)).perform(ViewActions.click())
 
         Intents.intended(
@@ -73,14 +75,14 @@ class CreditsActivityIntentsTest {
                                 activityRule.activity, MainActivity::class.java)
                         ),
                         IntentMatchers.hasExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                                MainActivity.VIEW_PAGER_STEPS_LIST))
+                                ScreenMainController.VIEW_PAGER_STEPS_LIST))
         )
     }
 
     @Test
     fun goToMainActivityNewsLists() {
         phoneMode()
-        onView(withId(R.id.credits_drawer_layout)).perform(DrawerActions.open())
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
 
         Intents.intended(
@@ -89,7 +91,7 @@ class CreditsActivityIntentsTest {
                                 activityRule.activity, MainActivity::class.java)
                         ),
                         IntentMatchers.hasExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                                MainActivity.VIEW_PAGER_NEWS_LIST))
+                                ScreenMainController.VIEW_PAGER_NEWS_LIST))
         )
     }
 
