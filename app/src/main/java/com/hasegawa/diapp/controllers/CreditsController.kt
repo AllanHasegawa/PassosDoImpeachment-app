@@ -16,7 +16,6 @@
 
 package com.hasegawa.diapp.controllers
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -46,8 +45,6 @@ class CreditsController : Controller() {
         creditsPresenter.bindView(mvpView)
         creditsPresenter.onResume()
 
-        Log.d("HH", "Starting credits onCreateView")
-
         return root
     }
 
@@ -55,7 +52,6 @@ class CreditsController : Controller() {
         super.onDestroyView(view)
         creditsPresenter.onPause()
         unbinder.unbind()
-        Log.d("HH", "Stopping Credits :)")
     }
 
     private val mvpView = object : CreditsMvpView() {}
