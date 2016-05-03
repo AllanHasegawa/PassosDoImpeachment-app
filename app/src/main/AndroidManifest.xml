@@ -52,25 +52,6 @@
                 android:resource="@xml/syncadapter"/>
         </service>
 
-        <activity
-            android:name=".activities.StepDetailActivity"
-            android:label="@string/title_activity_step_detail"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.hasegawa.diapp.activities.MainActivity"/>
-        </activity>
-        <activity
-            android:name=".activities.CreditsActivity"
-            android:label="@string/title_activity_credits"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.hasegawa.diapp.activities.MainActivity"/>
-        </activity>
-
         <!-- GCM stuff -->
         <receiver
             android:name="com.google.android.gms.gcm.GcmReceiver"
