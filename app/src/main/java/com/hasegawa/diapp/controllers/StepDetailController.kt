@@ -41,19 +41,6 @@ import javax.inject.Inject
 
 class StepDetailController : Controller {
 
-    constructor(stepPosition: Int) : this(BundleBuilder(Bundle())
-            .putInt(BKEY_STEP_POSITION, stepPosition).build())
-
-    constructor(bundle: Bundle) : super(bundle) {
-        stepPosition = bundle.getInt(BKEY_STEP_POSITION)
-
-        val component = DaggerStepDetailComponent.builder()
-                .activityComponent(DiApp.activityComponent)
-                .stepDetailModule(StepDetailModule(stepPosition))
-                .build()
-        component.inject(this)
-    }
-
     @Inject lateinit var stepDetailPresenter: StepDetailPresenter
 
     @BindView(R.id.detail_step_number_tv) lateinit var numberTv: TextView
@@ -66,6 +53,19 @@ class StepDetailController : Controller {
     private lateinit var unbinder: Unbinder
 
     private var stepPosition: Int
+
+    constructor(stepPosition: Int) : this(BundleBuilder(Bundle())
+            .putInt(BKEY_STEP_POSITION, stepPosition).build())
+
+    constructor(bundle: Bundle) : super(bundle) {
+        stepPosition = bundle.getInt(BKEY_STEP_POSITION)
+
+        val component = DaggerStepDetailComponent.builder()
+                .activityComponent(DiApp.activityComponent)
+                .stepDetailModule(StepDetailModule(stepPosition))
+                .build()
+        component.inject(this)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
         val root = inflater.inflate(R.layout.view_step_detail, container, false)
@@ -82,6 +82,10 @@ class StepDetailController : Controller {
         super.onDestroyView(view)
         stepDetailPresenter.onPause()
         unbinder.unbind()
+    }
+
+    fun share() {
+        mvpView.shareFabTouchListener()
     }
 
     private val mvpView = object : StepDetailMvpView() {

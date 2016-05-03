@@ -20,22 +20,26 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
+import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import com.hasegawa.diapp.presentation.views.NavigationMvpView
+import javax.inject.Inject
 
 class ScreenCreditsController : BaseNavigationController {
 
     interface CreditsTargetListener {
         fun onRouteFromCredits(route: MainMvpView.Route)
     }
+
+    @Inject lateinit var textSharer: TextSharer
 
     @BindView(R.id.credits_toolbar) lateinit var creditsToolbar: Toolbar
 
@@ -50,6 +54,8 @@ class ScreenCreditsController : BaseNavigationController {
                 throw RuntimeException("Target must be of type CreditsTargetListener")
             }
         }
+
+        DiApp.activityComponent.inject(this)
     }
 
     private lateinit var unbinder: Unbinder
@@ -97,6 +103,10 @@ class ScreenCreditsController : BaseNavigationController {
 
     @OnClick(R.id.credits_fab)
     fun fabClick() {
-        Toast.makeText(activity, "Fab Not Working Yet! [TODO]", Toast.LENGTH_SHORT).show()
+        textSharer.shareTextByEmail(
+                activity.getString(R.string.credits_hase_email),
+                activity.getString(R.string.credits_hase_email_subject),
+                activity.getString(R.string.credits_email_chooser_header)
+        )
     }
 }

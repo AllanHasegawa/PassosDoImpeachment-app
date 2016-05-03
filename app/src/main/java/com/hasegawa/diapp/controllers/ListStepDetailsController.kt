@@ -39,6 +39,7 @@ import com.hasegawa.diapp.presentation.presenters.ListStepDetailsPresenter
 import com.hasegawa.diapp.presentation.views.ListStepDetailsMvpView
 import com.hasegawa.diapp.utils.BundleBuilder
 import com.hasegawa.diapp.views.MaybeSwipeViewPager
+import java.util.*
 import javax.inject.Inject
 
 class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
@@ -95,6 +96,10 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
         mvpView.currentStepListener(position)
     }
 
+    fun share() {
+        mvpView.shareListener()
+    }
+
     private val mvpView = object : ListStepDetailsMvpView() {
         override fun renderNumSteps(numbers: NumCompletedAndTotal) {
             numTotalSteps = numbers.total
@@ -136,8 +141,13 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
 
         override fun renderStepsByPosition(positions: List<Int>) {
             adapter.stepPositions = positions
+            adapter.savedInstances.clear()
             adapter.notifyDataSetChanged()
             this.currentStepListener(stepPosition)
+        }
+
+        override fun actShare(position: Int) {
+            adapter.savedInstances[position]?.share()
         }
     }
 
@@ -153,7 +163,16 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
 
     class StepDetailsAdapter(host: Controller) : ControllerPagerAdapter(host) {
         var stepPositions: List<Int> = emptyList()
-        override fun getItem(position: Int) = StepDetailController(stepPositions[position])
+        var savedInstances = HashMap<Int, StepDetailController>()
+        override fun getItem(position: Int): Controller {
+            var ret = savedInstances[position]
+            if (ret == null) {
+                ret = StepDetailController(stepPositions[position])
+                savedInstances.put(position, ret)
+            }
+            return ret
+        }
+
         override fun getCount() = stepPositions.size
     }
 

@@ -19,6 +19,8 @@ package com.hasegawa.diapp.presentation
 abstract class ConstStrings {
     abstract var syncDone: String
 
+    abstract var appPlayUrl: String
+
     abstract var stepsToolbarShrunkTitle: String
     abstract var newsToolbarShrunkTitle: String
 
@@ -30,4 +32,10 @@ abstract class ConstStrings {
     abstract var creditsHaseEmail: String
     abstract var creditsHaseEmailSubject: String
     abstract var creditsHaseGitHubUrl: String
+
+    abstract fun stepDetailShareBody(position: Int, total: Int, completed: Boolean,
+                                     date: String, stepTitle: String): String
+    abstract var stepDetailShareHeader: String
+    abstract var stepDetailShareStateCompleted: String
+    abstract var stepDetailShareStateIncomplete: String
 }

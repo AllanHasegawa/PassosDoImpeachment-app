@@ -39,6 +39,7 @@ class ListStepDetailsPresenter @Inject constructor(
     private var getSteps: GetStepsUseCase? = null
 
     private var stepsCache: List<StepEntity> = emptyList()
+    private var currentStepPosition = 1
 
     override fun onPause() {
         getNumStepsUc?.unsubscribe()
@@ -85,8 +86,12 @@ class ListStepDetailsPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.currentStepListener = { pos ->
+            currentStepPosition = pos
             view.renderStepCompleted(findStepByPosition(pos)?.completed ?: false)
             view.renderStepPosition(pos)
+        }
+        view.shareListener = {
+            view.actShare(currentStepPosition)
         }
     }
 

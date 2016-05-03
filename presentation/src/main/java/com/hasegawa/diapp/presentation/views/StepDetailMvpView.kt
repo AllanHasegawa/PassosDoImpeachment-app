@@ -21,6 +21,7 @@ import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 
 abstract class StepDetailMvpView : MvpView {
     var linkTouchListener: (url: String) -> Unit = {}
+    var shareFabTouchListener: () -> Unit = {}
 
     abstract fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity)
     abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)

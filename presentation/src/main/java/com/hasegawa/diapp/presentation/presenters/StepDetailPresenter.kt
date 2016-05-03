@@ -19,12 +19,14 @@ package com.hasegawa.diapp.presentation.presenters
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.LogDevice
+import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.devices.UrlOpener
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.GetStepWithLinksByPositionUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
+import com.hasegawa.diapp.presentation.ConstStrings
 import com.hasegawa.diapp.presentation.views.StepDetailMvpView
 import rx.Subscriber
 import javax.inject.Inject
@@ -34,6 +36,8 @@ class StepDetailPresenter @Inject constructor(
         @Named("stepPosition") private val stepPosition: Int,
         private val urlOpener: UrlOpener,
         private val logDevice: LogDevice,
+        private val textSharer: TextSharer,
+        private val constStrings: ConstStrings,
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
@@ -41,6 +45,8 @@ class StepDetailPresenter @Inject constructor(
 
     private var getStepUc: GetStepWithLinksByPositionUseCase? = null
     private var getTotalStepsUc: GetNumStepsTotalCompletedUseCase? = null
+    private var stepCache: StepWithLinksEntity? = null
+    private var totalCache: Int = 0
 
     override fun onResume() {
         getStepUc = GetStepWithLinksByPositionUseCase(
@@ -56,6 +62,7 @@ class StepDetailPresenter @Inject constructor(
 
             override fun onNext(t: StepWithLinksEntity?) {
                 if (t != null && t.step != null) {
+                    stepCache = t
                     view.renderStepAndLinks(t)
                 }
             }
@@ -74,6 +81,7 @@ class StepDetailPresenter @Inject constructor(
             override fun onNext(t: NumCompletedAndTotal?) {
                 if (t != null) {
                     view.renderNumStepsCompletedAndTotal(t)
+                    totalCache = t.total
                 }
             }
         })
@@ -88,5 +96,16 @@ class StepDetailPresenter @Inject constructor(
 
     override fun onViewBound() {
         view.linkTouchListener = { urlOpener.openUrl(it) }
+
+        view.shareFabTouchListener = { share() }
+    }
+
+    private fun share() {
+        if (stepCache?.step != null) {
+            val s = stepCache!!.step!!
+            val body = constStrings.stepDetailShareBody(s.position, totalCache, s.completed,
+                    s.possibleDate, s.title)
+            textSharer.shareText(body, constStrings.stepDetailShareHeader)
+        }
     }
 }

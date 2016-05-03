@@ -21,8 +21,10 @@ import com.hasegawa.diapp.controllers.*
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.LogDevice
+import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.devices.UrlOpener
 import com.hasegawa.diapp.domain.repositories.StepsRepository
+import com.hasegawa.diapp.presentation.ConstStrings
 import dagger.Component
 
 @PerActivity
@@ -39,6 +41,8 @@ interface ActivityComponent {
     fun inject(c: CreditsController)
     fun inject(c: ListStepDetailsController)
 
+    fun getConstStrings(): ConstStrings
+    fun getTextSharer(): TextSharer
     fun getLogDevice(): LogDevice
     fun getUrlOpener(): UrlOpener
     fun getStepsRepository(): StepsRepository

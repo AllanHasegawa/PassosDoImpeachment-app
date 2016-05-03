@@ -20,6 +20,9 @@ import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 
 abstract class ListStepDetailsMvpView : MvpView {
     var currentStepListener: (position: Int) -> Unit = {}
+    var shareListener: () -> Unit = {}
+
+    abstract fun actShare(position: Int)
 
     abstract fun renderStepCompleted(completed: Boolean)
     abstract fun renderStepsByPosition(positions: List<Int>)

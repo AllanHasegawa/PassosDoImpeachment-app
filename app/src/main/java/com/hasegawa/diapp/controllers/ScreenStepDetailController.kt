@@ -112,8 +112,8 @@ class ScreenStepDetailController : BaseNavigationController {
     }
 
     @OnClick(R.id.detail_fab)
-    fun fabClick() {
-        Toast.makeText(activity, "[TODO] detail fab :)", Toast.LENGTH_SHORT).show()
+    fun detailFabClick() {
+        (childControllers[0] as ListStepDetailsController?)?.share()
     }
 
     companion object {

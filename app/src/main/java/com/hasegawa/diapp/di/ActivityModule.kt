@@ -49,6 +49,8 @@ class ActivityModule(val context: AppCompatActivity) {
 
             override var syncDone: String = s(R.string.sync_done)
 
+            override var appPlayUrl: String = s(R.string.app_play_store_short_url)
+
             override var newsToolbarShrunkTitle: String = s(R.string.news_toolbar_shrunk_title)
             override var stepsToolbarShrunkTitle: String = s(R.string.main_toolbar_shrunk_title)
 
@@ -60,6 +62,18 @@ class ActivityModule(val context: AppCompatActivity) {
             override var creditsHaseEmail: String = s(R.string.credits_hase_email)
             override var creditsHaseEmailSubject: String = s(R.string.credits_hase_email_subject)
             override var creditsHaseGitHubUrl: String = s(R.string.credits_hase_github_url)
+
+            override var stepDetailShareHeader: String = s(R.string.share_step_detail_chooser_header)
+            override var stepDetailShareStateCompleted: String = s(R.string.share_step_detail_state_completed)
+            override var stepDetailShareStateIncomplete: String = s(R.string.share_step_detail_state_incomplete)
+
+            override fun stepDetailShareBody(position: Int, total: Int, completed: Boolean,
+                                             date: String, stepTitle: String): String {
+                val state = if (completed) stepDetailShareStateCompleted else stepDetailShareStateIncomplete
+                val body = context.getString(R.string.share_step_detail_text, position,
+                        total, state, date, stepTitle, appPlayUrl)
+                return body
+            }
         }
         return cs
     }
