@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp
+package com.hasegawa.diapp.not_tests
 
 import com.hasegawa.diapp.db.repositories.mocks.mem.MemNewsRepository
 import com.hasegawa.diapp.db.repositories.mocks.mem.MemStepsRepository

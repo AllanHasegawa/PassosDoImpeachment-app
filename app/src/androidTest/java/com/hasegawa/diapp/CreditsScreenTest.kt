@@ -23,6 +23,7 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
+import com.hasegawa.diapp.not_tests.BaseTest
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.allOf
 import org.junit.Test

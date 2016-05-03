@@ -26,6 +26,9 @@ import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
 import com.hasegawa.diapp.controllers.ListStepsController
+import com.hasegawa.diapp.not_tests.BaseTest
+import com.hasegawa.diapp.not_tests.RecyclerViewMatcher
+import com.hasegawa.diapp.not_tests.TestUtils
 import org.hamcrest.Matchers.*
 import org.junit.Test
 import org.junit.runner.RunWith

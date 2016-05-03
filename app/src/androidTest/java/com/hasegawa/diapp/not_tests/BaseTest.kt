@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp
+package com.hasegawa.diapp.not_tests
 
-import android.support.test.espresso.intent.rule.IntentsTestRule
+import android.app.Activity
+import android.app.Application
+import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.di.AppModule
 import com.hasegawa.diapp.di.DaggerAppMemComponent
+import com.hasegawa.diapp.di.MemServicesModule
 import org.junit.Assume
 import org.junit.Before
 import org.junit.Rule
 
-/**
- * Created by hasegawa on 5/3/2016.
- */
 open class BaseTest {
     @get:Rule
-    val activityRule = IntentsTestRule(MainActivity::class.java)
+    val activityRule =
+            DaggerActivityTestRule(MainActivity::class.java) {
+                application: Application, activity: Activity? ->
+                MemMockGen.setupAll()
+                DiApp.appComponent = DaggerAppMemComponent.builder()
+                        .appModule(AppModule(application))
+                        .memServicesModule(MemServicesModule())
+                        .build()
+            }
 
     @Before
     fun setUp() {
-        DiApp.appComponent = DaggerAppMemComponent.builder()
-                .appModule(AppModule(activityRule.activity.application))
-                .build()
         MemMockGen.setupAll()
     }
 

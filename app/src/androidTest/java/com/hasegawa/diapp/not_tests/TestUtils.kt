@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * Copyright 2016 Allan Yoshio Hasegawa
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,8 +12,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- ******************************************************************************/
-package com.hasegawa.diapp
+ */
+package com.hasegawa.diapp.not_tests
 
 import android.app.Activity
 import android.support.test.espresso.UiController

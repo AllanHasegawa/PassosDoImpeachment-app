@@ -22,31 +22,19 @@ import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.matcher.IntentMatchers
-import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
-import com.hasegawa.diapp.activities.MainActivity
+import com.hasegawa.diapp.not_tests.BaseTest
 import org.hamcrest.Matchers.*
-import org.junit.Assume
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class StepDetailActivityIntentsTest {
-    @get:Rule
-    val activityRule = IntentsTestRule(MainActivity::class.java)
-
-    fun tabletMode() {
-        Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))
-    }
-
-    fun phoneMode() {
-        Assume.assumeTrue(!TestUtils.isScreenSw720dp(activityRule.activity))
-    }
+class StepDetailScreenIntentsTest : BaseTest() {
 
     @Before
     fun stubAllExternalIntents() {
@@ -56,10 +44,13 @@ class StepDetailActivityIntentsTest {
                 .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null));
     }
 
-
     @Test
     fun shareFab() {
         phoneMode()
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+
+
         onView(withId(R.id.detail_fab)).perform(ViewActions.click())
         Intents.intended(allOf(
                 IntentMatchers.hasAction(Intent.ACTION_CHOOSER),

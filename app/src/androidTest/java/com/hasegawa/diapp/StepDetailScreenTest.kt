@@ -17,39 +17,28 @@ package com.hasegawa.diapp
 
 import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.action.ViewActions
 import android.support.test.espresso.assertion.ViewAssertions.matches
 import android.support.test.espresso.contrib.DrawerActions
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
+import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import com.hasegawa.diapp.activities.MainActivity
-import org.junit.Assume
-import org.junit.Rule
+import com.hasegawa.diapp.not_tests.BaseTest
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.allOf
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class StepDetailActivityTest {
-
-    @get:Rule
-    val activityRule = ActivityTestRule(MainActivity::class.java)
-
-
-    fun tabletMode() {
-        Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))
-    }
-
-    fun phoneMode() {
-        Assume.assumeTrue(!TestUtils.isScreenSw720dp(activityRule.activity))
-    }
+class StepDetailScreenTest : BaseTest() {
 
     @Test
     fun checkIfActionBarnHasUpArrow() {
         phoneMode()
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+
         onView(withContentDescription(R.string.abc_action_bar_up_description)).
                 check(matches(isDisplayed()))
     }
@@ -57,8 +46,36 @@ class StepDetailActivityTest {
     @Test
     fun openDrawerAndPressBackButtonToCloseIt() {
         phoneMode()
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
         Espresso.pressBack()
         onView(withId(R.id.detail_toolbar)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToStepsList() {
+        phoneMode()
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_step_list)).perform(ViewActions.click())
+
+        onView(allOf(withId(R.id.step_title_tv), withText(`is`("title3"))))
+                .check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToNewsList() {
+        phoneMode()
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
+
+        onView(withText("ntitle1")).check(matches(isDisplayed()))
     }
 }
