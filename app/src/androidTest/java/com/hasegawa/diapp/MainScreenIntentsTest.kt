@@ -17,25 +17,22 @@ package com.hasegawa.diapp
 
 import android.app.Activity
 import android.app.Instrumentation
-import android.app.Instrumentation.ActivityResult
-import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions
-import android.support.test.espresso.assertion.ViewAssertions
 import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.matcher.IntentMatchers
 import android.support.test.espresso.intent.rule.IntentsTestRule
-import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
 import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.controllers.ListNewsController
-import com.hasegawa.diapp.controllers.ScreenMainController
 import org.hamcrest.Matchers.*
 import org.junit.Assume
 import org.junit.Before
@@ -45,7 +42,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainActivityIntentsTest {
+class MainScreenIntentsTest {
     @get:Rule
     val activityRule = IntentsTestRule(MainActivity::class.java)
 
@@ -65,31 +62,6 @@ class MainActivityIntentsTest {
                 .respondWith(Instrumentation.ActivityResult(Activity.RESULT_OK, null));
     }
 
-    @Test
-    fun creditsToStepList() {
-        phoneMode()
-        val resultIntent = Intent()
-        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                ScreenMainController.VIEW_PAGER_STEPS_LIST)
-        Intents.intending(IntentMatchers.toPackage("com.hasegawa.diapp"))
-                .respondWith(ActivityResult(Activity.RESULT_OK, resultIntent))
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
-        onView(withId(R.id.main_steps_rv)).check(ViewAssertions.matches(isDisplayed()))
-    }
-
-    @Test
-    fun creditsToNews() {
-        phoneMode()
-        val resultIntent = Intent()
-        resultIntent.putExtra(MainActivity.INTENT_VIEW_NUMBER_KEY,
-                ScreenMainController.VIEW_PAGER_NEWS_LIST)
-        Intents.intending(IntentMatchers.toPackage("com.hasegawa.diapp"))
-                .respondWith(ActivityResult(Activity.RESULT_OK, resultIntent))
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
-        onView(withId(R.id.main_news_rv)).check(ViewAssertions.matches(isDisplayed()))
-    }
 
     @Test
     fun mainShareFab() {
@@ -156,18 +128,6 @@ class MainActivityIntentsTest {
                         IntentMatchers.hasAction(Intent.ACTION_VIEW),
                         IntentMatchers.hasData(opensourceUrl)
                 )
-        )
-    }
-
-    @Test
-    fun navBarCreditsBt() {
-        phoneMode()
-        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
-
-        Intents.intended(
-                IntentMatchers.hasComponent(ComponentName(activityRule.activity,
-                        MainActivity::class.java))
         )
     }
 
@@ -247,24 +207,6 @@ class MainActivityIntentsTest {
                 allOf(
                         IntentMatchers.hasAction(Intent.ACTION_VIEW),
                         IntentMatchers.hasData(Uri.parse(url))
-                )
-        )
-    }
-
-    @Test
-    fun stepItemClick() {
-        phoneMode()
-        onView(withId(R.id.main_view_pager)).perform(ViewActions.swipeRight())
-        Thread.sleep(300) // add animation time
-        onView(withId(R.id.main_steps_rv)).perform(
-                RecyclerViewActions.scrollToPosition<ListNewsController.Adapter.ViewHolder>(2))
-        onView(RecyclerViewMatcher(R.id.main_steps_rv).atPosition(2))
-                .perform(ViewActions.click())
-
-        Intents.intended(
-                IntentMatchers.hasComponent(
-                        ComponentName(activityRule.activity,
-                                MainActivity::class.java)
                 )
         )
     }

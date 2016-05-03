@@ -15,7 +15,6 @@
  ******************************************************************************/
 package com.hasegawa.diapp
 
-import android.support.test.espresso.Espresso
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.Espresso.pressBack
 import android.support.test.espresso.action.ViewActions
@@ -26,6 +25,7 @@ import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
+import android.support.v7.widget.CardView
 import android.widget.TextView
 import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.controllers.ListStepsController
@@ -40,7 +40,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainActivityTest {
+class MainScreenTest {
 
     @get:Rule
     val activityRule = ActivityTestRule(MainActivity::class.java)
@@ -238,10 +238,51 @@ class MainActivityTest {
     }
 
     @Test
+    fun goToTheRightDetail() {
+        onView(allOf(withText(`is`("title3")), withId(R.id.step_title_tv)))
+                .perform(ViewActions.click())
+        Thread.sleep(300) // add animation time
+        onView(withText(`is`("description3"))).check(matches(isDisplayed()))
+    }
+
+
+    @Test
+    fun navBarCreditsBt() {
+        phoneMode()
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
+
+        onView(withText(`is`("Allan Yoshio Hasegawa"))).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToCreditsThenToStepList() {
+        phoneMode()
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
+
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_step_list)).perform(ViewActions.click())
+        onView(withId(R.id.main_steps_rv)).check(matches(isDisplayed()))
+    }
+
+    @Test
+    fun goToCreditsThenToNews() {
+        phoneMode()
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_credits)).perform(ViewActions.click())
+
+        onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
+        onView(withText(R.string.nav_drawer_news_list)).perform(ViewActions.click())
+        onView(withId(R.id.main_news_rv)).check(matches(isDisplayed()))
+    }
+
+    @Test
     fun openDrawerAndPressBackButtonToCloseIt() {
         phoneMode()
         onView(withId(R.id.drawer_layout)).perform(DrawerActions.open())
-        Espresso.pressBack()
+        pressBack()
         onView(withId(R.id.main_toolbar)).check(matches(isDisplayed()))
     }
 }
