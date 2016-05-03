@@ -17,6 +17,6 @@
 package com.hasegawa.diapp.cloud
 
 object RestInfo {
-    const val API_URL = "https://hasegawa.tech/di/api"
+    const val API_URL = "http://hasegawa.tech/di/api"
 }
 
