@@ -9,7 +9,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@color/colorPrimaryText</item>
         <item name="android:textColorSecondary">@color/colorSecondaryText</item>
-        <item name="android:actionMenuTextColor">#AFFF</item>
+        <item name="android:actionMenuTextColor">#A333</item>
     </style>
 
     <style name="AppTheme.NoActionBar">

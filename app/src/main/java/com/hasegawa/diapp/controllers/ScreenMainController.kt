@@ -22,6 +22,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,6 +63,7 @@ class ScreenMainController : BaseNavigationController,
 
     @BindView(R.id.main_toolbar_expanded_pb) lateinit var toolbarPb: ProgressBar
     @BindView(R.id.main_toolbar_expanded_tv) lateinit var toolbarExpandedTv: TextView
+    @BindView(R.id.main_toolbar) lateinit var toolbar: Toolbar
 
     // Phone Mode Views
     private var viewPager: ViewPager? = null // ButterKnife + Kotlin + @Nullable == problem :(
@@ -116,6 +119,10 @@ class ScreenMainController : BaseNavigationController,
             root = baseView
             unbinder = ButterKnife.bind(this, root)
         }
+
+        toolbar = root.findViewById(R.id.main_toolbar) as Toolbar
+
+        setupToolbar(toolbar)
 
         listStepsController = ListStepsController(stepSelectedByPosition)
         listNewsController = ListNewsController()

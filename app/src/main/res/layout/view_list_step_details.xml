@@ -12,6 +12,12 @@
         android:background="@drawable/border_item_step_number_completed">
     </FrameLayout>
 
+    <com.hasegawa.diapp.views.MaybeSwipeViewPager
+        android:id="@+id/detail_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.hasegawa.diapp.views.MaybeSwipeViewPager>
+
     <ProgressBar
         android:id="@+id/detail_pb"
         style="?android:attr/progressBarStyleHorizontal"
@@ -21,12 +27,5 @@
         android:max="10"
         android:progress="5"
         android:scaleY="2"/>
-
-    <com.hasegawa.diapp.views.MaybeSwipeViewPager
-        android:id="@+id/detail_view_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </com.hasegawa.diapp.views.MaybeSwipeViewPager>
-
 
 </FrameLayout>

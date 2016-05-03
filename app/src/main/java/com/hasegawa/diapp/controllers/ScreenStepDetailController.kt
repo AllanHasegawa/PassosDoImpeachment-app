@@ -17,9 +17,15 @@
 package com.hasegawa.diapp.controllers
 
 import android.os.Bundle
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import butterknife.BindView
+import butterknife.ButterKnife
+import butterknife.OnClick
+import butterknife.Unbinder
 import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
@@ -32,7 +38,10 @@ class ScreenStepDetailController : BaseNavigationController {
         fun onRouteFromStepDetail(route: MainMvpView.Route)
     }
 
+    @BindView(R.id.detail_toolbar) lateinit var detailToolbar: Toolbar
+
     private var stepPosition: Int
+    private lateinit var unbinder: Unbinder
 
     constructor(initialStepPosition: Int, target: Controller? = null) :
     this(BundleBuilder(Bundle()).putInt(BKEY_INITIAL_STEP_POSITION, initialStepPosition)
@@ -58,12 +67,22 @@ class ScreenStepDetailController : BaseNavigationController {
         val baseView = super.onCreateView(inflater, container)
         val root = inflater.inflate(R.layout.screen_step_detail, baseContainer, true)
 
+        unbinder = ButterKnife.bind(this, root)
+
+        setupToolbar(detailToolbar, true, true, { router.handleBack() })
+
         if (childControllers.isEmpty()) {
             addChildController(ChildControllerTransaction.builder(
-                    ListStepDetailsController(stepPosition), R.id.detail_child_container).build())
+                    ListStepDetailsController(stepPosition),
+                    R.id.detail_child_container).build())
         }
 
         return baseView
+    }
+
+    override fun onDestroyView(view: View?) {
+        super.onDestroyView(view)
+        unbinder.unbind()
     }
 
     override fun onNavigationRouteRequested(route: MainMvpView.Route) {
@@ -90,6 +109,11 @@ class ScreenStepDetailController : BaseNavigationController {
             }
             else -> Unit
         }
+    }
+
+    @OnClick(R.id.detail_fab)
+    fun fabClick() {
+        Toast.makeText(activity, "[TODO] detail fab :)", Toast.LENGTH_SHORT).show()
     }
 
     companion object {

@@ -16,9 +16,14 @@
 
 package com.hasegawa.diapp.controllers
 
+import android.os.Build
 import android.os.Bundle
 import android.support.design.widget.NavigationView
+import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -27,12 +32,14 @@ import android.widget.FrameLayout
 import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.presentation.presenters.NavigationPresenter
 import com.hasegawa.diapp.presentation.views.MainMvpView
 import com.hasegawa.diapp.presentation.views.NavigationMvpView
 import com.hasegawa.diapp.utils.BundleBuilder
+import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
 
@@ -92,6 +99,34 @@ abstract class BaseNavigationController : Controller,
     override fun onDestroyView(view: View?) {
         super.onDestroyView(view)
         navigationPresenter.onPause()
+    }
+
+    protected fun setupToolbar(toolbar: Toolbar, padTop: Boolean = false,
+                               showUpButton: Boolean = false,
+                               touchAction: () -> Unit = {}) {
+        val aca = (activity as AppCompatActivity)
+
+        if (padTop && Build.VERSION.SDK_INT >= 21) {
+            val statusBarHeight = ResourcesUtils.statusBarHeight(activity)
+            toolbar.setPadding(0, statusBarHeight, 0, 0)
+        }
+
+        if (!screenDevice.isTablet()) {
+            aca.setSupportActionBar(toolbar)
+            aca.supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            aca.supportActionBar?.setDisplayShowTitleEnabled(false)
+            (aca as MainActivity).homeUpButtonTouchListener = touchAction
+
+            if (!showUpButton) {
+                val toggle = ActionBarDrawerToggle(aca, drawerLayout,
+                        R.string.nav_drawer_open, R.string.nav_drawer_close)
+                drawerLayout?.addDrawerListener(toggle)
+                toggle.syncState()
+                toolbar.setNavigationOnClickListener {
+                    drawerLayout?.openDrawer(GravityCompat.START)
+                }
+            }
+        }
     }
 
     protected var baseMvpView = object : NavigationMvpView() {

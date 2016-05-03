@@ -40,5 +40,14 @@ object ResourcesUtils {
     fun fDpToPx(context: Context, dp: Float): Float {
         return dp * context.resources.displayMetrics.density
     }
+
+    fun statusBarHeight(context: Context): Int {
+        var result = 0
+        val id = context.resources.getIdentifier("status_bar_height", "dimen", "android")
+        if (id > 0) {
+            result = context.resources.getDimensionPixelOffset(id)
+        }
+        return result
+    }
 }
 

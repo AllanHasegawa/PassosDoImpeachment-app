@@ -16,10 +16,12 @@
 
 package com.hasegawa.diapp.controllers
 
+import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import butterknife.Unbinder
@@ -34,6 +36,8 @@ class ScreenCreditsController : BaseNavigationController {
     interface CreditsTargetListener {
         fun onRouteFromCredits(route: MainMvpView.Route)
     }
+
+    @BindView(R.id.credits_toolbar) lateinit var creditsToolbar: Toolbar
 
     constructor() : this(null)
 
@@ -58,6 +62,8 @@ class ScreenCreditsController : BaseNavigationController {
         val screen = inflater.inflate(R.layout.screen_credits, baseContainer, true)
 
         unbinder = ButterKnife.bind(this, screen)
+
+        setupToolbar(creditsToolbar, true, true, { router.handleBack() })
 
         childController = CreditsController()
         addChildController(ChildControllerTransaction.builder(childController,

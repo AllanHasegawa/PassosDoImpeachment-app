@@ -19,6 +19,7 @@ package com.hasegawa.diapp.activities
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.view.MenuItem
 import android.widget.FrameLayout
 import android.widget.Toast
 import com.bluelinelabs.conductor.Conductor
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
     @Inject lateinit var postExecutionThread: PostExecutionThread
 
     private var syncIfNeededUc: SyncIfNecessaryUseCase? = null
+    var homeUpButtonTouchListener: () -> Unit = {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,6 +89,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            android.R.id.home -> homeUpButtonTouchListener()
+        }
+        return super.onOptionsItemSelected(item)
+    }
 
     private fun syncIfNeeded() {
         syncIfNeededUc?.unsubscribe()
