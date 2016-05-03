@@ -25,34 +25,20 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.intent.Intents
 import android.support.test.espresso.intent.matcher.IntentMatchers
-import android.support.test.espresso.intent.rule.IntentsTestRule
 import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.espresso.matcher.ViewMatchers.withText
 import android.support.test.filters.LargeTest
 import android.support.test.runner.AndroidJUnit4
 import android.widget.TextView
-import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.controllers.ListNewsController
 import org.hamcrest.Matchers.*
-import org.junit.Assume
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainScreenIntentsTest {
-    @get:Rule
-    val activityRule = IntentsTestRule(MainActivity::class.java)
-
-    fun tabletMode() {
-        Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))
-    }
-
-    fun phoneMode() {
-        Assume.assumeTrue(!TestUtils.isScreenSw720dp(activityRule.activity))
-    }
+class MainScreenIntentsTest : BaseTest() {
 
     @Before
     fun stubAllExternalIntents() {

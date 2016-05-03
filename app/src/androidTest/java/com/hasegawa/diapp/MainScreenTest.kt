@@ -23,49 +23,16 @@ import android.support.test.espresso.contrib.DrawerActions
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.espresso.matcher.ViewMatchers.*
 import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
-import android.support.v7.widget.CardView
 import android.widget.TextView
-import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.controllers.ListStepsController
-import com.hasegawa.diapp.di.AppModule
-import com.hasegawa.diapp.di.DaggerAppMemComponent
 import org.hamcrest.Matchers.*
-import org.junit.Assume
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
-class MainScreenTest {
-
-    @get:Rule
-    val activityRule = ActivityTestRule(MainActivity::class.java)
-
-    @Before
-    fun setUp() {
-        DiApp.appComponent = DaggerAppMemComponent.builder()
-                .appModule(AppModule(activityRule.activity.application))
-                .build()
-        MemMockGen.resetStepsRepo()
-        MemMockGen.resetSyncsRepo()
-        MemMockGen.genRegistered()
-        MemMockGen.genSynced()
-        MemMockGen.genSteps()
-        MemMockGen.genStepLinks()
-    }
-
-
-    fun tabletMode() {
-        Assume.assumeTrue(TestUtils.isScreenSw720dp(activityRule.activity))
-    }
-
-    fun phoneMode() {
-        Assume.assumeTrue(!TestUtils.isScreenSw720dp(activityRule.activity))
-    }
+class MainScreenTest : BaseTest() {
 
     @Test
     fun titleText() {

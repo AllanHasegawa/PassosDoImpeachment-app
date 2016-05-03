@@ -16,12 +16,10 @@
 
 package com.hasegawa.diapp
 
+import com.hasegawa.diapp.db.repositories.mocks.mem.MemNewsRepository
 import com.hasegawa.diapp.db.repositories.mocks.mem.MemStepsRepository
 import com.hasegawa.diapp.db.repositories.mocks.mem.MemSyncsRepository
-import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
-import com.hasegawa.diapp.domain.entities.StepEntity
-import com.hasegawa.diapp.domain.entities.StepLinkEntity
-import com.hasegawa.diapp.domain.entities.SyncEntity
+import com.hasegawa.diapp.domain.entities.*
 
 object MemMockGen {
 
@@ -43,6 +41,17 @@ object MemMockGen {
         MemStepsRepository.stepLinks.putAll(links.map { Pair(it.id!!, it) })
     }
 
+    fun resetNewsRepo() {
+        MemNewsRepository.reset()
+    }
+
+    fun genNews() {
+        val news = (1..10).map {
+            NewsEntity("nid$it", "ntitle$it", "http://google.com/news/$it", 42, "tldr$it")
+        }
+        MemNewsRepository.news.putAll(news.map { Pair(it.id!!, it) })
+    }
+
     fun resetSyncsRepo() {
         MemSyncsRepository.reset()
     }
@@ -55,5 +64,16 @@ object MemMockGen {
     fun genRegistered() {
         val successRegistration = GCMRegistrationEntity("tokenABC:)", 10)
         MemSyncsRepository.registrations.put(successRegistration.token, successRegistration)
+    }
+
+    fun setupAll() {
+        MemMockGen.resetStepsRepo()
+        MemMockGen.resetSyncsRepo()
+        MemMockGen.resetNewsRepo()
+        MemMockGen.genRegistered()
+        MemMockGen.genSynced()
+        MemMockGen.genSteps()
+        MemMockGen.genStepLinks()
+        MemMockGen.genNews()
     }
 }
