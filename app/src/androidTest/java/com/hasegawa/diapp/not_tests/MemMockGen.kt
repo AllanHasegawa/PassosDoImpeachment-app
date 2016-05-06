@@ -47,7 +47,7 @@ object MemMockGen {
 
     fun genNews() {
         val news = (1..10).map {
-            NewsEntity("nid$it", "ntitle$it", "http://google.com/news/$it", 42, "tldr$it")
+            NewsEntity("nid$it", "ntitle$it", "http://google.com/news/$it", 42L - it, "tldr$it")
         }
         MemNewsRepository.news.putAll(news.map { Pair(it.id!!, it) })
     }
