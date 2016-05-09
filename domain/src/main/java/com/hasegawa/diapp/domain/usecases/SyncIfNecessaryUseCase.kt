@@ -29,10 +29,9 @@ class SyncIfNecessaryUseCase(val syncScheduler: SyncScheduler, val syncsReposito
 
     override fun buildUseCaseObservable(): Observable<Boolean> {
         return syncsRepository.getPendingSyncs()
-                .take(1)
                 .flatMap {
                     if (it.isNotEmpty()) {
-                        Observable.fromCallable { syncScheduler.enqueueSync(true) }
+                        Observable.fromCallable { syncScheduler.enqueueSync(false) }
                                 .map { true }
                     } else {
                         syncsRepository.getSuccessfulSyncs().take(1).flatMap {

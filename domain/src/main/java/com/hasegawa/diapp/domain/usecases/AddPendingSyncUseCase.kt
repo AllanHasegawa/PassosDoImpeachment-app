@@ -23,14 +23,16 @@ import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import rx.Observable
 
-class AddPendingSyncUseCase(val syncScheduler: SyncScheduler,
-                            val syncsRepository: SyncsRepository,
-                            executionThread: ExecutionThread,
-                            postExecutionThread: PostExecutionThread) :
+class AddPendingSyncUseCase(
+        val delayed: Boolean,
+        val syncScheduler: SyncScheduler,
+        val syncsRepository: SyncsRepository,
+        executionThread: ExecutionThread,
+        postExecutionThread: PostExecutionThread) :
         UseCase<SyncEntity?>(executionThread, postExecutionThread) {
     override fun buildUseCaseObservable(): Observable<SyncEntity?> {
         return syncsRepository.upsertSync(SyncEntity(null, true, null, null))
-                .map { syncScheduler.enqueueSync(true); it }
+                .map { syncScheduler.enqueueSync(delayed); it }
                 .map { syncsRepository.notifyChange(); it }
     }
 }

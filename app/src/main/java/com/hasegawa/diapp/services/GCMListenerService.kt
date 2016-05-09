@@ -48,6 +48,7 @@ class GCMListenerService : GcmListenerService() {
     override fun onMessageReceived(from: String?, data: Bundle?) {
         DiApp.appComponent.inject(this)
 
+        var delayed = true
         if (from!!.startsWith("/topics/sync")) {
             logDevice.d("GCM full sync request received.")
         } else if (from.startsWith("/topics/news")) {
@@ -57,9 +58,11 @@ class GCMListenerService : GcmListenerService() {
                     data!!.getString("notificationMessage",
                             applicationContext.getString(R.string.notification_default_message))
             appMessageNotification(title, message)
+            delayed = false
         }
 
-        AddPendingSyncUseCase(syncScheduler, syncsRepository, executionThread, postExecutionThread)
+        AddPendingSyncUseCase(delayed, syncScheduler, syncsRepository,
+                executionThread, postExecutionThread)
                 .executeBlocking(
                         object : Subscriber<SyncEntity?>() {
                             override fun onCompleted() {

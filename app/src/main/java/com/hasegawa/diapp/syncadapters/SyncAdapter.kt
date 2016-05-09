@@ -19,6 +19,7 @@ import android.accounts.Account
 import android.content.*
 import android.os.Bundle
 import com.hasegawa.diapp.DiApp
+import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.LogDevice
@@ -60,12 +61,15 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                                provider: ContentProviderClient?, syncResult: SyncResult?) {
         DiApp.appComponent.inject(this)
 
+        Thread.sleep(1000)
+
         logDevice.d("Initiating sync!")
 
         syncSteps(syncResult)
         syncNews(syncResult)
 
-        if (!syncResult!!.hasError()) {
+        val hasError = syncResult!!.hasError()
+        if (!hasError) {
             UpdatePendingSyncsAsSuccessUseCase(syncsRepository, executionThread, postExecutionThread)
                     .execute(object : Subscriber<List<SyncEntity>>() {
                         override fun onCompleted() {
@@ -79,6 +83,10 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
                         }
                     })
         }
+
+        val broadcastResultIntent = Intent(MainActivity.BREC_SYNC_ACTION)
+        broadcastResultIntent.putExtra(MainActivity.BREC_SYNC_KEY_SUCCESS, !hasError)
+        context.sendBroadcast(broadcastResultIntent)
     }
 
 
@@ -90,21 +98,20 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
             override fun onError(e: Throwable?) {
                 logDevice.d(e, "Network Response error: ${e!!.message}")
-                syncResult!!.delayUntil = DELAY_RETRY
-                syncResult.stats.numIoExceptions++
+                rescheduleSync(syncResult!!)
             }
 
             override fun onNext(t: List<NewsResponse>?) {
                 if (t == null) {
                     logDevice.d("Response error")
-                    syncResult!!.stats.numIoExceptions++
-                    syncResult.delayUntil = DELAY_RETRY
-                }
-                try {
-                    saveNewsResponseList(t!!)
-                } catch (e: Exception) {
-                    syncResult!!.databaseError = true
-                    logDevice.d(e, "Database error: ${e.message}")
+                    rescheduleSync(syncResult!!)
+                } else {
+                    try {
+                        saveNewsResponseList(t)
+                    } catch (e: Exception) {
+                        syncResult!!.databaseError = true
+                        logDevice.d(e, "Database error: ${e.message}")
+                    }
                 }
             }
         })
@@ -118,21 +125,20 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
 
             override fun onError(e: Throwable?) {
                 logDevice.d(e, "Network Response error: ${e!!.message}")
-                syncResult!!.delayUntil = DELAY_RETRY
-                syncResult.stats.numIoExceptions++
+                rescheduleSync(syncResult!!)
             }
 
             override fun onNext(t: List<StepResponse>?) {
                 if (t == null) {
                     logDevice.d("Response error")
-                    syncResult!!.stats.numIoExceptions++
-                    syncResult.delayUntil = DELAY_RETRY
-                }
-                try {
-                    saveStepsResponsesList(t!!)
-                } catch (e: Exception) {
-                    syncResult!!.databaseError = true
-                    logDevice.d(e, "Database error: ${e.message}")
+                    rescheduleSync(syncResult!!)
+                } else {
+                    try {
+                        saveStepsResponsesList(t)
+                    } catch (e: Exception) {
+                        syncResult!!.databaseError = true
+                        logDevice.d(e, "Database error: ${e.message}")
+                    }
                 }
             }
         })
@@ -180,6 +186,12 @@ class SyncAdapter : AbstractThreadedSyncAdapter {
             logDevice.d(e, "Error while saving list of steps.")
             throw e
         }
+    }
+
+    private fun rescheduleSync(syncResult: SyncResult) {
+        syncResult.stats.numIoExceptions = 1
+        syncResult.stats.numInserts = 1
+        syncResult.delayUntil = DELAY_RETRY
     }
 
     companion object {

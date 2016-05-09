@@ -35,6 +35,8 @@ class AddStepResponsesToRepoUseCase(
     override fun buildUseCaseObservable(): Observable<List<StepEntity>> {
         return Observable
                 .just(stepResponses)
+                .zipWith(stepsRepository.clearStepLinks(),
+                        { a: List<StepResponse>, b: Int -> a })
                 .zipWith(stepsRepository.clearSteps(),
                         { a: List<StepResponse>, b: Int -> a })
                 .map {

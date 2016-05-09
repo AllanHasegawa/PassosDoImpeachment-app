@@ -16,7 +16,10 @@
 
 package com.hasegawa.diapp.activities
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
@@ -83,9 +86,35 @@ class MainActivity : AppCompatActivity() {
         syncIfNeeded()
     }
 
+    override fun onResume() {
+        super.onResume()
+        val syncAdapterBrecFilter = IntentFilter()
+        syncAdapterBrecFilter.addAction(BREC_SYNC_ACTION)
+        registerReceiver(syncAdapterBreceiver, syncAdapterBrecFilter)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(syncAdapterBreceiver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        syncIfNeededUc?.unsubscribe()
+    }
+
     override fun onBackPressed() {
         if (!router.handleBack()) {
             super.onBackPressed()
+        }
+    }
+
+
+    val syncAdapterBreceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            val success = intent?.getBooleanExtra(BREC_SYNC_KEY_SUCCESS, false) ?: false
+            val messageId = if (success) R.string.sync_done else R.string.sync_fail
+            Toast.makeText(this@MainActivity, getString(messageId), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -112,7 +141,8 @@ class MainActivity : AppCompatActivity() {
 
             override fun onNext(t: Boolean?) {
                 if (t != null && t) {
-                    Toast.makeText(this@MainActivity, constStrings.syncDone,
+                    Toast.makeText(this@MainActivity,
+                            getString(R.string.sync_first),
                             Toast.LENGTH_LONG).show()
                 }
             }
@@ -122,5 +152,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         const val INTENT_VIEW_NUMBER_KEY = "intent_view_number"
         const val TAG_MAIN_CONTROLLER = "main_controller_tag"
+
+        const val BREC_SYNC_ACTION = "brec_syncadatper_action"
+        const val BREC_SYNC_KEY_SUCCESS = "brec_syncadapter_success"
     }
 }

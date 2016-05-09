@@ -16,6 +16,7 @@
 
 package com.hasegawa.diapp.cloud.restservices.retrofit
 
+import android.accounts.NetworkErrorException
 import com.hasegawa.diapp.domain.restservices.RestService
 import com.hasegawa.diapp.domain.restservices.responses.NewsResponse
 import com.hasegawa.diapp.domain.restservices.responses.StepResponse
@@ -49,13 +50,23 @@ class RetrofitRestService(url: String) : RestService {
     override fun getNews(): Observable<List<NewsResponse>> {
         val newsCall = calls.callGetNews()
         return Observable.fromCallable { newsCall.execute() }
-                .map { it.body() }
+                .map {
+                    if (!it.isSuccessful) {
+                        throw NetworkErrorException("${it.code()}: ${it.errorBody().string()}")
+                    }
+                    it.body()
+                }
     }
 
     override fun getSteps(): Observable<List<StepResponse>> {
         val stepsCall = calls.callGetSteps()
         return Observable.fromCallable { stepsCall.execute() }
-                .map { it.body() }
+                .map {
+                    if (!it.isSuccessful) {
+                        throw NetworkErrorException("${it.code()}: ${it.errorBody().string()}")
+                    }
+                    it.body()
+                }
     }
 
     override fun postGCMToken(token: String): Observable<Boolean> {

@@ -34,6 +34,7 @@
     <string name="step_detail_description_empty">No description.</string>
     <string name="step_item_completed_in">Completed in %1$s</string>
     <string name="sync_done">Update completed successfully.</string>
+    <string name="sync_fail">There was a problem downloading content, will retry automatically.</string>
     <string name="sync_first">Downloading content...</string>
     <string name="sync_manual_request_started">Updates are automatic.</string>
     <string name="sync_never_updated">Never</string>
