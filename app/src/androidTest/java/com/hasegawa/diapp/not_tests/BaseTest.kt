@@ -16,7 +16,6 @@
 
 package com.hasegawa.diapp.not_tests
 
-import android.app.Activity
 import android.app.Application
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.activities.MainActivity
@@ -30,14 +29,16 @@ import org.junit.Rule
 open class BaseTest {
     @get:Rule
     val activityRule =
-            DaggerActivityTestRule(MainActivity::class.java) {
-                application: Application, activity: Activity? ->
-                MemMockGen.setupAll()
-                DiApp.appComponent = DaggerAppMemComponent.builder()
-                        .appModule(AppModule(application))
-                        .memServicesModule(MemServicesModule())
-                        .build()
-            }
+            DaggerActivityTestRule(MainActivity::class.java,
+                    object : DaggerActivityTestRule.OnBeforeActivityLaunchedListener<MainActivity> {
+                        override fun beforeActivityLaunched(application: Application, activity: MainActivity?) {
+                            MemMockGen.setupAll()
+                            DiApp.appComponent = DaggerAppMemComponent.builder()
+                                    .appModule(AppModule(application))
+                                    .memServicesModule(MemServicesModule())
+                                    .build()
+                        }
+                    })
 
     @Before
     fun setUp() {
