@@ -60,5 +60,6 @@
     <string name="credits_email_chooser_header">Enviar e-mail…</string>
 
     <string name="credits_hase_position">Desenvolvedor</string>
+    <string name="sync_fail">Ouve um problema ao tentar download do conteúdo. O app irá tentar novamente em breve.</string>
 
 </resources>
