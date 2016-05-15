@@ -28,7 +28,7 @@ ext {
     butterknifeVersion = '8.0.0'
 
     // Libraries
-    kotlinVersion = '1.0.1'
+    kotlinVersion = '1.0.2'
     rxKotlinVersion = '0.55.0'
     jodaVersion = '2.9.2'
     dagger2Version = '2.4'
