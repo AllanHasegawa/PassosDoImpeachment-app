@@ -29,8 +29,8 @@ import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.entities.NewsEntity
+import com.hasegawa.diapp.presentation.mvps.ListNewsMvp
 import com.hasegawa.diapp.presentation.presenters.ListNewsPresenter
-import com.hasegawa.diapp.presentation.views.ListNewsMvpView
 import com.hasegawa.diapp.views.ItemImportantNewsView
 import javax.inject.Inject
 
@@ -48,13 +48,14 @@ class ListNewsController : Controller() {
         val root = inflater.inflate(R.layout.view_list_news, container, false)
 
         unbinder = ButterKnife.bind(this, root)
-        adapter = Adapter(mvpView)
-        newsRv.layoutManager = LinearLayoutManager(activity)
-        newsRv.adapter = adapter
 
         DiApp.activityComponent.inject(this)
         listNewsPresenter.bindView(mvpView)
         listNewsPresenter.onResume()
+
+        adapter = Adapter(listNewsPresenter)
+        newsRv.layoutManager = LinearLayoutManager(activity)
+        newsRv.adapter = adapter
 
         return root
     }
@@ -66,16 +67,16 @@ class ListNewsController : Controller() {
         adapter = null
     }
 
-    private val mvpView = object : ListNewsMvpView() {
-        override fun renderNews(news: List<ListNewsMvpView.Item>) {
+    private val mvpView = object : ListNewsMvp.View {
+        override fun renderNews(news: List<ListNewsMvp.Item>) {
             adapter?.items = news
             adapter?.notifyDataSetChanged()
         }
     }
 
-    class Adapter(val newsMvpView: ListNewsMvpView) :
+    class Adapter(val presenter: ListNewsMvp.Presenter) :
             RecyclerView.Adapter<Adapter.ViewHolder>() {
-        class ViewHolder(item: View, val newsMvpView: ListNewsMvpView) :
+        class ViewHolder(item: View, val presenter: ListNewsMvp.Presenter) :
                 RecyclerView.ViewHolder(item) {
             var dateTv: TextView? = null
 
@@ -86,8 +87,8 @@ class ListNewsController : Controller() {
             fun setNews(news: NewsEntity?) {
                 if (news != null && itemView is ItemImportantNewsView) {
                     itemView.news = news
-                    itemView.shareBt.setOnClickListener { newsMvpView.shareBtTouchListener(news) }
-                    itemView.linkBt.setOnClickListener { newsMvpView.openBtTouchListener(news) }
+                    itemView.shareBt.setOnClickListener { presenter.handleShareBtTouch(news) }
+                    itemView.linkBt.setOnClickListener { presenter.handleOpenBtTouch(news) }
                 }
             }
 
@@ -96,7 +97,7 @@ class ListNewsController : Controller() {
             }
         }
 
-        var items = emptyList<ListNewsMvpView.Item>()
+        var items = emptyList<ListNewsMvp.Item>()
 
         override fun getItemViewType(position: Int): Int {
             return items[position].type
@@ -109,23 +110,23 @@ class ListNewsController : Controller() {
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             val type = getItemViewType(position)
             when (type) {
-                ListNewsMvpView.ITEM_NEWS_TYPE -> holder?.setNews(items[position].news)
-                ListNewsMvpView.ITEM_DATE_TYPE -> holder?.setDate(items[position].date)
+                ListNewsMvp.ITEM_NEWS_TYPE -> holder?.setNews(items[position].news)
+                ListNewsMvp.ITEM_DATE_TYPE -> holder?.setDate(items[position].date)
             }
         }
 
         override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder? {
             val ctx = parent!!.context
             val inf = { i: Int -> LayoutInflater.from(ctx).inflate(i, parent, false) }
-            var view: View
+            val view: View
             view = when (viewType) {
-                ListNewsMvpView.ITEM_NEWS_TYPE -> ItemImportantNewsView(ctx, null)
-                ListNewsMvpView.ITEM_SPACE_TYPE -> inf(R.layout.item_important_news_space)
-                ListNewsMvpView.ITEM_MID_SPACE_TYPE -> inf(R.layout.item_important_news_before_date_space)
-                ListNewsMvpView.ITEM_DATE_TYPE -> inf(R.layout.item_important_news_date)
+                ListNewsMvp.ITEM_NEWS_TYPE -> ItemImportantNewsView(ctx, null)
+                ListNewsMvp.ITEM_SPACE_TYPE -> inf(R.layout.item_important_news_space)
+                ListNewsMvp.ITEM_MID_SPACE_TYPE -> inf(R.layout.item_important_news_before_date_space)
+                ListNewsMvp.ITEM_DATE_TYPE -> inf(R.layout.item_important_news_date)
                 else -> inf(R.layout.item_important_news_before_date_space)
             }
-            return ViewHolder(view, newsMvpView)
+            return ViewHolder(view, presenter)
         }
 
     }

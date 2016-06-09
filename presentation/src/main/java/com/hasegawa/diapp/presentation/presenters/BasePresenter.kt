@@ -16,10 +16,8 @@
 
 package com.hasegawa.diapp.presentation.presenters
 
-import com.hasegawa.diapp.presentation.views.MvpView
 
-
-abstract class Presenter<ViewT : MvpView> {
+abstract class BasePresenter<ViewT : Any> {
     lateinit var view: ViewT
         private set
 

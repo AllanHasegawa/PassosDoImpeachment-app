@@ -19,25 +19,30 @@ package com.hasegawa.diapp.presentation.presenters
 import com.hasegawa.diapp.domain.ExecutionThread
 import com.hasegawa.diapp.domain.PostExecutionThread
 import com.hasegawa.diapp.domain.devices.LogDevice
+import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.views.ListStepDetailsMvpView
+import com.hasegawa.diapp.presentation.ConstStrings
+import com.hasegawa.diapp.presentation.mvps.ListStepDetailsMvp
 import rx.Subscriber
 import javax.inject.Inject
 
 class ListStepDetailsPresenter @Inject constructor(
         private val logDevice: LogDevice,
         private val stepsRepository: StepsRepository,
+        private val constStrings: ConstStrings,
+        private val textSharer: TextSharer,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        Presenter<ListStepDetailsMvpView>() {
+        ListStepDetailsMvp.Presenter() {
 
     private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
     private var getSteps: GetStepsUseCase? = null
 
+    private var numSteps = NumCompletedAndTotal(0, 0)
     private var stepsCache: List<StepEntity> = emptyList()
     private var currentStepPosition = 1
 
@@ -61,6 +66,7 @@ class ListStepDetailsPresenter @Inject constructor(
 
             override fun onNext(t: NumCompletedAndTotal?) {
                 if (t != null) {
+                    numSteps = t
                     view.renderNumSteps(t)
                 }
             }
@@ -84,14 +90,18 @@ class ListStepDetailsPresenter @Inject constructor(
         })
     }
 
-    override fun onViewBound() {
-        view.currentStepListener = { pos ->
-            currentStepPosition = pos
-            view.renderStepCompleted(findStepByPosition(pos)?.completed ?: false)
-            view.renderStepPosition(pos)
-        }
-        view.shareListener = {
-            view.actShare(currentStepPosition)
+    override fun handleCurrentStepChange(position: Int) {
+        currentStepPosition = position
+        view.renderStepCompleted(findStepByPosition(position)?.completed ?: false)
+        view.renderStepPosition(position)
+    }
+
+    override fun handleShareBtTouch(position: Int) {
+        val step = findStepByPosition(position)
+        if (step != null) {
+            val body = constStrings.stepDetailShareBody(position, numSteps.total, step.completed,
+                    step.possibleDate, step.title)
+            textSharer.shareText(body, constStrings.stepDetailShareHeader)
         }
     }
 

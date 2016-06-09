@@ -21,7 +21,6 @@ import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
@@ -30,12 +29,12 @@ import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.presentation.views.MainMvpView
+import com.hasegawa.diapp.presentation.mvps.MainMvp
 import com.hasegawa.diapp.utils.BundleBuilder
 
 class ScreenStepDetailController : BaseNavigationController {
     interface StepDetailTargetListener {
-        fun onRouteFromStepDetail(route: MainMvpView.Route)
+        fun onRouteFromStepDetail(route: MainMvp.Route)
     }
 
     @BindView(R.id.detail_toolbar) lateinit var detailToolbar: Toolbar
@@ -85,24 +84,24 @@ class ScreenStepDetailController : BaseNavigationController {
         unbinder.unbind()
     }
 
-    override fun onNavigationRouteRequested(route: MainMvpView.Route) {
+    override fun onNavigationRouteRequested(route: MainMvp.Route) {
         val setTargetRoute = {
             if (targetController != null) {
                 (targetController as StepDetailTargetListener?)?.onRouteFromStepDetail(route)
             }
         }
         when (route) {
-            MainMvpView.Route.Steps -> {
+            MainMvp.Route.Steps -> {
                 childControllers.map { router.popController(it) }
                 setTargetRoute()
                 router.popCurrentController()
             }
-            MainMvpView.Route.News -> {
+            MainMvp.Route.News -> {
                 childControllers.map { router.popController(it) }
                 setTargetRoute()
                 router.popCurrentController()
             }
-            MainMvpView.Route.Credits -> {
+            MainMvp.Route.Credits -> {
                 childControllers.map { router.popController(it) }
                 router.popCurrentController()
                 router.pushController(RouterTransaction.builder(ScreenCreditsController()).build())

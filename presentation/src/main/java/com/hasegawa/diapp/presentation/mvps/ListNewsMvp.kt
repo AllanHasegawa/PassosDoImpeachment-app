@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.presentation.views
+package com.hasegawa.diapp.presentation.mvps
 
 import com.hasegawa.diapp.domain.entities.NewsEntity
+import com.hasegawa.diapp.presentation.presenters.BasePresenter
 
-abstract class ListNewsMvpView : MvpView {
-    var shareBtTouchListener: (NewsEntity) -> Unit = {}
-    var openBtTouchListener: (NewsEntity) -> Unit = {}
+object ListNewsMvp {
+    const val ITEM_SPACE_TYPE = 2
+    const val ITEM_NEWS_TYPE = 3
+    const val ITEM_DATE_TYPE = 4
+    const val ITEM_MID_SPACE_TYPE = 5
 
     data class Item(val type: Int, val news: NewsEntity? = null, val date: String? = null)
 
-    abstract fun renderNews(news: List<Item>)
+    interface View {
+        fun renderNews(news: List<Item>)
+    }
 
-    companion object {
-        const val ITEM_SPACE_TYPE = 2
-        const val ITEM_NEWS_TYPE = 3
-        const val ITEM_DATE_TYPE = 4
-        const val ITEM_MID_SPACE_TYPE = 5
+    abstract class Presenter : BasePresenter<View>() {
+        abstract fun handleShareBtTouch(newsEntity: NewsEntity)
+        abstract fun handleOpenBtTouch(newsEntity: NewsEntity)
     }
 }

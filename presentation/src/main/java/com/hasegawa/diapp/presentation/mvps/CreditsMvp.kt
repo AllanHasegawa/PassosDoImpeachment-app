@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.presentation.views
+package com.hasegawa.diapp.presentation.mvps
 
-interface MvpView
+import com.hasegawa.diapp.presentation.presenters.BasePresenter
 
+object CreditsMvp {
+    interface View {
+
+    }
+
+    abstract class Presenter : BasePresenter<View>() {
+        abstract fun handleHaseEmailBtTouch()
+        abstract fun handleHaseGitHubBtTouch()
+    }
+}

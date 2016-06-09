@@ -25,8 +25,8 @@ import butterknife.Unbinder
 import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
+import com.hasegawa.diapp.presentation.mvps.CreditsMvp
 import com.hasegawa.diapp.presentation.presenters.CreditsPresenter
-import com.hasegawa.diapp.presentation.views.CreditsMvpView
 import javax.inject.Inject
 
 class CreditsController : Controller() {
@@ -54,11 +54,11 @@ class CreditsController : Controller() {
         unbinder.unbind()
     }
 
-    private val mvpView = object : CreditsMvpView() {}
+    private val mvpView = object : CreditsMvp.View {}
 
     @OnClick(R.id.credits_hase_email_bt)
-    fun haseEmailBtClick() = mvpView.haseEmailTouchListener()
+    fun haseEmailBtClick() = creditsPresenter.handleHaseEmailBtTouch()
 
     @OnClick(R.id.credits_hase_github_bt)
-    fun haseGitHubClick() = mvpView.haseGitHubTouchListener()
+    fun haseGitHubClick() = creditsPresenter.handleHaseGitHubBtTouch()
 }

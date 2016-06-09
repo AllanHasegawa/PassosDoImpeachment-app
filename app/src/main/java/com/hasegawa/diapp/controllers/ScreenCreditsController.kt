@@ -29,14 +29,14 @@ import com.bluelinelabs.conductor.Controller
 import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.devices.TextSharer
-import com.hasegawa.diapp.presentation.views.MainMvpView
-import com.hasegawa.diapp.presentation.views.NavigationMvpView
+import com.hasegawa.diapp.presentation.mvps.MainMvp
+import com.hasegawa.diapp.presentation.mvps.NavDrawerMvp
 import javax.inject.Inject
 
 class ScreenCreditsController : BaseNavigationController {
 
     interface CreditsTargetListener {
-        fun onRouteFromCredits(route: MainMvpView.Route)
+        fun onRouteFromCredits(route: MainMvp.Route)
     }
 
     @Inject lateinit var textSharer: TextSharer
@@ -45,7 +45,7 @@ class ScreenCreditsController : BaseNavigationController {
 
     constructor() : this(null)
 
-    constructor(target: Controller?) : super(NavigationMvpView.Item.Credits) {
+    constructor(target: Controller?) : super(NavDrawerMvp.Item.Credits) {
         if (target != null) {
             if (target is CreditsTargetListener) {
                 this.targetController = target
@@ -84,17 +84,17 @@ class ScreenCreditsController : BaseNavigationController {
         unbinder.unbind()
     }
 
-    override fun onNavigationRouteRequested(route: MainMvpView.Route) {
+    override fun onNavigationRouteRequested(route: MainMvp.Route) {
         val target = targetController
         when (route) {
-            MainMvpView.Route.Steps -> {
+            MainMvp.Route.Steps -> {
                 removeChildController(childController)
-                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvpView.Route.Steps)
+                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvp.Route.Steps)
                 router.popCurrentController()
             }
-            MainMvpView.Route.News -> {
+            MainMvp.Route.News -> {
                 removeChildController(childController)
-                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvpView.Route.News)
+                (target as CreditsTargetListener?)?.onRouteFromCredits(MainMvp.Route.News)
                 router.popCurrentController()
             }
             else -> return

@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -47,9 +46,9 @@ import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.ConstStrings
+import com.hasegawa.diapp.presentation.mvps.MainMvp
+import com.hasegawa.diapp.presentation.mvps.NavDrawerMvp
 import com.hasegawa.diapp.presentation.presenters.MainPresenter
-import com.hasegawa.diapp.presentation.views.MainMvpView
-import com.hasegawa.diapp.presentation.views.NavigationMvpView
 import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
@@ -85,21 +84,21 @@ class ScreenMainController : BaseNavigationController,
     private var numSteps: NumCompletedAndTotal? = null
 
     private var stepSelectedByPosition: Int = 1
-    private var currentRoute = MainMvpView.Route.Steps
-    var routeFromOthersScreens: MainMvpView.Route? = null
+    private var currentRoute = MainMvp.Route.Steps
+    var routeFromOthersScreens: MainMvp.Route? = null
 
 
     private var unbinder: Unbinder? = null
 
     constructor(viewNumber: Int) : super(
             when (viewNumber) {
-                0 -> NavigationMvpView.Item.StepsList
-                1 -> NavigationMvpView.Item.NewsList
-                else -> NavigationMvpView.Item.StepsList
+                0 -> NavDrawerMvp.Item.StepsList
+                1 -> NavDrawerMvp.Item.NewsList
+                else -> NavDrawerMvp.Item.StepsList
             }) {
         when (viewNumber) {
-            0 -> currentRoute = MainMvpView.Route.Steps
-            1 -> currentRoute = MainMvpView.Route.News
+            0 -> currentRoute = MainMvp.Route.Steps
+            1 -> currentRoute = MainMvp.Route.News
         }
         DiApp.activityComponent.inject(this)
     }
@@ -148,11 +147,11 @@ class ScreenMainController : BaseNavigationController,
         mainPresenter.bindView(mvpView)
         mainPresenter.onResume()
 
-        listStepsController?.stepTouchListener = { mvpView.stepSelectedByPosListener(it) }
-        listStepsController?.listStepsScrollListener = { mvpView.listStepsScrollListener(it) }
+        listStepsController?.stepTouchListener = { mainPresenter.handleStepSelectionChange(it) }
+        listStepsController?.listStepsScrollListener = { mainPresenter.handleStepsListScroll(it) }
 
         if (screenDevice.isTablet()) {
-            mvpView.routeListener(currentRoute)
+            mainPresenter.handleRouteChange(currentRoute)
         }
 
         return baseView
@@ -178,21 +177,21 @@ class ScreenMainController : BaseNavigationController,
         super.onRestoreViewState(view, savedViewState)
         stepSelectedByPosition = savedViewState.getInt(BKEY_STEP_SELECTED)
         if (screenDevice.isTablet()) {
-            mvpView.stepSelectedByPosListener(stepSelectedByPosition)
+            mainPresenter.handleStepSelectionChange(stepSelectedByPosition)
         }
 
 
-        currentRoute = MainMvpView.Route.valueOf(savedViewState.getString(BKEY_CURRENT_ROUTE))
+        currentRoute = MainMvp.Route.valueOf(savedViewState.getString(BKEY_CURRENT_ROUTE))
         currentRoute = routeFromOthersScreens ?: currentRoute
         routeFromOthersScreens = null
-        mvpView.routeListener(currentRoute)
+        mainPresenter.handleRouteChange(currentRoute)
     }
 
-    override fun onRouteFromCredits(route: MainMvpView.Route) {
+    override fun onRouteFromCredits(route: MainMvp.Route) {
         routeFromOthersScreens = route
     }
 
-    override fun onRouteFromStepDetail(route: MainMvpView.Route) {
+    override fun onRouteFromStepDetail(route: MainMvp.Route) {
         routeFromOthersScreens = route
     }
 
@@ -205,21 +204,21 @@ class ScreenMainController : BaseNavigationController,
         textSharer.shareText(body, chooserTitle)
     }
 
-    private val mvpView = object : MainMvpView() {
-        override fun actRouteChange(route: Route) {
+    private val mvpView = object : MainMvp.View {
+        override fun actRouteChange(route: MainMvp.Route) {
             logDevice.d("Act Route Change $route")
             if (!screenDevice.isTablet()) {
                 val viewPage: Int
                 when (route) {
-                    MainMvpView.Route.Steps -> {
+                    MainMvp.Route.Steps -> {
                         viewPage = VIEW_PAGER_STEPS_LIST
                         currentRoute = route
                     }
-                    MainMvpView.Route.News -> {
+                    MainMvp.Route.News -> {
                         viewPage = VIEW_PAGER_NEWS_LIST
                         currentRoute = route
                     }
-                    MainMvpView.Route.Credits -> {
+                    MainMvp.Route.Credits -> {
                         if (router.getControllerWithTag(TAG_CREDITS) == null) {
                             router.pushController(
                                     RouterTransaction.builder(ScreenCreditsController(
@@ -236,15 +235,15 @@ class ScreenMainController : BaseNavigationController,
                 viewPager?.setCurrentItem(viewPage, true)
             } else {
                 when (route) {
-                    Route.Steps -> if (childControllers.contains(listStepsController)) return
-                    Route.News -> if (childControllers.contains(listNewsController)) return
-                    Route.Credits -> if (childControllers.contains(creditsController)) return
+                    MainMvp.Route.Steps -> if (childControllers.contains(listStepsController)) return
+                    MainMvp.Route.News -> if (childControllers.contains(listNewsController)) return
+                    MainMvp.Route.Credits -> if (childControllers.contains(creditsController)) return
                     else -> return
                 }
                 currentRoute = route
                 childControllers.forEach { this@ScreenMainController.removeChildController(it) }
                 when (route) {
-                    MainMvpView.Route.Steps -> {
+                    MainMvp.Route.Steps -> {
                         addChildController(ChildControllerTransaction.builder(
                                 listStepsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
@@ -256,14 +255,14 @@ class ScreenMainController : BaseNavigationController,
                                 .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                     }
-                    MainMvpView.Route.News -> {
+                    MainMvp.Route.News -> {
                         addChildController(ChildControllerTransaction.builder(
                                 listNewsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
                                 .pushChangeHandler(HorizontalChangeHandler())
                                 .build())
                     }
-                    MainMvpView.Route.Credits -> {
+                    MainMvp.Route.Credits -> {
                         addChildController(ChildControllerTransaction.builder(
                                 creditsController!!, R.id.base_container)
                                 .popChangeHandler(HorizontalChangeHandler())
@@ -275,11 +274,11 @@ class ScreenMainController : BaseNavigationController,
             }
         }
 
-        override fun renderMode(mode: MainMvpView.Mode) {
+        override fun renderMode(mode: MainMvp.Mode) {
             if (screenDevice.isTablet()) {
                 when (mode) {
-                    Mode.OnePane -> tmAdjustPanes(false)
-                    Mode.TwoPane -> tmAdjustPanes(true)
+                    MainMvp.Mode.OnePane -> tmAdjustPanes(false)
+                    MainMvp.Mode.TwoPane -> tmAdjustPanes(true)
                 }
             }
         }
@@ -304,37 +303,37 @@ class ScreenMainController : BaseNavigationController,
             numSteps = numbers
         }
 
-        override fun renderRouteChange(route: Route) {
+        override fun renderRouteSelection(route: MainMvp.Route) {
             when (route) {
-                Route.Steps -> baseMvpView.itemSelectionListener(NavigationMvpView.Item.StepsList)
-                Route.News -> baseMvpView.itemSelectionListener(NavigationMvpView.Item.NewsList)
-                Route.Credits -> baseMvpView.itemSelectionListener(NavigationMvpView.Item.Credits)
+                MainMvp.Route.Steps -> navDrawerPresenter.handleItemSelected(NavDrawerMvp.Item.StepsList)
+                MainMvp.Route.News -> navDrawerPresenter.handleItemSelected(NavDrawerMvp.Item.NewsList)
+                MainMvp.Route.Credits -> navDrawerPresenter.handleItemSelected(NavDrawerMvp.Item.Credits)
                 else -> Unit
             }
 
             if (!screenDevice.isTablet()) {
                 val toolbarShrunkTitle = when (route) {
-                    MainMvpView.Route.Steps -> constStrings.stepsToolbarShrunkTitle
-                    MainMvpView.Route.News -> constStrings.newsToolbarShrunkTitle
+                    MainMvp.Route.Steps -> constStrings.stepsToolbarShrunkTitle
+                    MainMvp.Route.News -> constStrings.newsToolbarShrunkTitle
                     else -> return
                 }
                 toolbarShrunkTv?.text = toolbarShrunkTitle
             }
         }
 
-        override fun renderSizeState(state: MainMvpView.SizeState) {
+        override fun renderSizeState(state: MainMvp.SizeState) {
             if (!screenDevice.isTablet()) {
                 when (state) {
-                    MainMvpView.SizeState.Expanded -> expandToolbar()
-                    MainMvpView.SizeState.Shrunk -> shrinkToolbar()
+                    MainMvp.SizeState.Expanded -> expandToolbar()
+                    MainMvp.SizeState.Shrunk -> shrinkToolbar()
                 }
             }
         }
 
     }
 
-    override fun onNavigationRouteRequested(route: MainMvpView.Route) {
-        mvpView.routeListener(route)
+    override fun onNavigationRouteRequested(route: MainMvp.Route) {
+        mainPresenter.handleRouteChange(route)
     }
 
     private fun tmAdjustPanes(twoPanes: Boolean) {
@@ -372,9 +371,9 @@ class ScreenMainController : BaseNavigationController,
 
                 override fun onPageSelected(position: Int) {
                     if (position == VIEW_PAGER_STEPS_LIST) {
-                        mvpView.viewPagerListener(MainMvpView.Route.Steps)
+                        mainPresenter.handleViewPagerChange(MainMvp.Route.Steps)
                     } else {
-                        mvpView.viewPagerListener(MainMvpView.Route.News)
+                        mainPresenter.handleViewPagerChange(MainMvp.Route.News)
                     }
                 }
             })
@@ -384,9 +383,9 @@ class ScreenMainController : BaseNavigationController,
 
                 override fun onTabSelected(tab: TabLayout.Tab?) {
                     if (tab!!.position == VIEW_PAGER_STEPS_LIST) {
-                        mvpView.tabSelectedListener(MainMvpView.Route.Steps)
+                        mainPresenter.handleTabSelectionChange(MainMvp.Route.Steps)
                     } else {
-                        mvpView.tabSelectedListener(MainMvpView.Route.News)
+                        mainPresenter.handleTabSelectionChange(MainMvp.Route.News)
                     }
                 }
 
@@ -439,7 +438,7 @@ class ScreenMainController : BaseNavigationController,
     private var textFadeOutAnim1: ObjectAnimator? = null
     private fun changeToolbarExpandedContentAlpha(fadeOut: Boolean) {
         if (screenDevice.isTablet()) return
-        var end = when (fadeOut) {
+        val end = when (fadeOut) {
             true -> 0.0f
             false -> 1.0f
         }
