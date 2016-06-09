@@ -35,8 +35,8 @@ ext {
 
     // Testing
     junitVersion = '4.12'
-    robolectricVersion = '3.1-SNAPSHOT'
-    mockWebServerVersion = '3.3.0-SNAPSHOT'
+    robolectricVersion = '3.1'
+    mockWebServerVersion = '3.3.1'
     mockitoVersion = '2.0.49-beta'
     espressoVersion = '2.2.2'
     androidTestVersion = '0.5'
