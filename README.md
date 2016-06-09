@@ -126,22 +126,18 @@ and another mock implementation that only replays what we want ([example](https:
 ### presentation module
 
 The *presentation* module is based on the [MVP design pattern](http://lenguyenthanh.com/model-view-presentermvp-definitions-and-best-practices/).
-*Presenters* will mostly call *use cases* and control the [MvpView](https://github.com/AranHase/PassosDoImpeachment-app/blob/master/presentation/src/main/java/com/hasegawa/diapp/presentation/views/MvpView.kt)
-([example](https://github.com/AranHase/PassosDoImpeachment-app/blob/master/presentation/src/main/java/com/hasegawa/diapp/presentation/views/ListNewsMvpView.kt)).
-Sometimes the *presenter* may use a *device*, but its communication is mostly limited to the view and the *use cases*. **Note**, this means the controller NEVER talks directly with
-the presenter, even thought the controller does keep an instance of a presenter. The controller will implement the `MvpView` in the *app* module,
-and will communicate with the presenter only through listeners in the `MvpView`.
+`Presenter`s will mostly call *use cases* and control the `MvpView`.
+Sometimes the *presenter* may use a *device*, but its communication is mostly limited to the view and the *use cases*.
+
+Each *presenter* will have an interface describing the events it can receive from the system. While the view will have an interface describing
+what it can show on screen (eg. [ListStepsMvp](https://github.com/AranHase/PassosDoImpeachment-app/blob/master/presentation/src/main/java/com/hasegawa/diapp/presentation/mvps/ListStepsMvp.kt)).
+Presenters and Views are grouped together based on the "contract" pattern used by the
+[android-architecture project](https://github.com/googlesamples/android-architecture/blob/todo-mvp/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/tasks/TasksContract.java) (tip by @hussam789, thanks!).
 
 The "Clean-way Android architecture" implementation I mentioned earlier keeps presentation + app on the same module.
 But, why put the *presentation* module on a different module than the app? To me it was because my *presentation* module has no dependencies
 to the Android framework. Also, keeping things separated was much easier to keep track of things and have an idea of what every screen and view will
 have to do.
-
-The view itself does not depend on any *presenter*, so the *presenter* needs to subscribe to listeners in the view to react to events from the view.
-
-A concrete example: The `ListNewsPresenter` ([go to code](https://github.com/AranHase/PassosDoImpeachment-app/blob/master/presentation/src/main/java/com/hasegawa/diapp/presentation/presenters/ListNewsPresenter.kt))
-reactively loads the news and send a list to the `ListNewsMvpView` ([go to code](https://github.com/AranHase/PassosDoImpeachment-app/blob/master/presentation/src/main/java/com/hasegawa/diapp/presentation/views/ListNewsMvpView.kt))
-to be shown on screen. The view has listeners for when buttons are clicked, and the *presenter* can listen to those touches and react accordingly.
 
 ### app module
 
@@ -231,7 +227,12 @@ Here is a [code example](https://github.com/AranHase/PassosDoImpeachment-app/blo
 
 ### presentation module
 
-Tests for the *presentation* module were skipped in favor of tests in the *app* module.
+One of the main advantages of having a separate *presentation* module is to better test the MVP.
+
+Unfortunately, the *app* module existed long before this separation was introduced in this project, and most tests
+were already created for the *app* module. The *presentation* module was them created to pass these tests.
+
+Thus, this module ended up without tests. In an app still in development, it is highly recommended to test this module.
 
 ### app module
 
