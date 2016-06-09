@@ -64,6 +64,7 @@ class AddStepResponsesToRepoUseCaseTest {
 
     @Test
     fun onClearRepo() {
+        `when`(stepsRepository!!.clearStepLinks()).thenReturn(Observable.just(0))
         `when`(stepsRepository!!.clearSteps()).thenReturn(Observable.just(0))
         `when`(stepsRepository!!.addStep(responses[0].toEntity(null)))
                 .thenReturn(Observable.just(responses[0].toEntity("id0")))
@@ -106,6 +107,7 @@ class AddStepResponsesToRepoUseCaseTest {
         assertThat(completed, `is`(true))
 
         verify(stepsRepository!!).clearSteps()
+        verify(stepsRepository!!).clearStepLinks()
         verify(stepsRepository!!, times(2)).addStep(anyObject())
         verify(stepsRepository!!).addStepLinks(responses[0].links!!.map { it.toEntity(null, "id0") })
         verify(stepsRepository!!).addStepLinks(emptyList())

@@ -82,7 +82,7 @@ class SyncIfNecessaryUseCaseTest {
         lock.await(10, TimeUnit.SECONDS)
         assertThat(result, `is`(true))
 
-        verify(syncScheduler!!).enqueueSync(true)
+        verify(syncScheduler!!).enqueueSync(false)
         verifyNoMoreInteractions(syncScheduler!!)
         verify(syncsRepository!!).getPendingSyncs()
         verifyNoMoreInteractions(syncsRepository!!)

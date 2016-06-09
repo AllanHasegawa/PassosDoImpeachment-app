@@ -54,7 +54,7 @@ class AddPendingSyncUseCaseTest {
         `when`(syncsRepository!!.upsertSync(pendingSync))
                 .thenReturn(Observable.just(pendingSyncRet))
 
-        val useCase = AddPendingSyncUseCase(syncScheduler!!, syncsRepository!!, et, pet)
+        val useCase = AddPendingSyncUseCase(true, syncScheduler!!, syncsRepository!!, et, pet)
 
         var result: SyncEntity? = null
         val lock = CountDownLatch(1)
