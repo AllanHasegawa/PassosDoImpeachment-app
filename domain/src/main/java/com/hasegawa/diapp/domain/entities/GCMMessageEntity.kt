@@ -30,11 +30,11 @@ enum class GCMMessageType(val value: Int) {
     }
 }
 
-data class GCMMessageEntity(var id: String? = null,
-                            var syncsId: String?,
-                            var type: GCMMessageType,
-                            var data: String,
-                            var timeCreated: Long? = null)
+data class GCMMessageEntity(val id: String? = null,
+                            val syncsId: String?,
+                            val type: GCMMessageType,
+                            val data: String,
+                            val timeCreated: Long? = null)
 
 fun GCMMessageEntity.equalsNoId(m: GCMMessageEntity): Boolean {
     return this.syncsId == m.syncsId &&

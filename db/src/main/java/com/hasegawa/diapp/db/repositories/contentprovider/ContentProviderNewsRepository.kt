@@ -20,7 +20,7 @@ import android.content.ContentResolver
 import android.net.Uri
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.NewsContract
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.NewsEntityMapping
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.pushtorefresh.storio.contentresolver.impl.DefaultStorIOContentResolver
@@ -41,10 +41,7 @@ class ContentProviderNewsRepository(resolver: ContentResolver) : NewsRepository 
 
     override fun addAllNews(news: List<NewsEntity>): Observable<List<NewsEntity>> {
         return provider.put()
-                .objects(news.map {
-                    it.id = IdUtils.genIdIfNull(it.id)
-                    it
-                })
+                .objects(news.map { it.copyWithId() })
                 .prepare()
                 .asRxObservable()
                 .map { it.results().keys.toList() }

@@ -16,7 +16,7 @@
 
 package com.hasegawa.diapp.db.repositories.mocks.mem
 
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import rx.Observable
@@ -27,8 +27,7 @@ import java.util.*
 class MemNewsRepository : NewsRepository {
 
     override fun addAllNews(news: List<NewsEntity>): Observable<List<NewsEntity>> {
-        news.forEach { it.id = IdUtils.genIdIfNull(it.id) }
-        MemNewsRepository.news.putAll(news.map { Pair(it.id!!, it) })
+        MemNewsRepository.news.putAll(news.map { it.copyWithId() }.map { Pair(it.id!!, it) })
         return Observable.just(news)
     }
 

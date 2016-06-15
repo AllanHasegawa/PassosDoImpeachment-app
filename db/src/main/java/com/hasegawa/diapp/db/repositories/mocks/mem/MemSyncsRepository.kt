@@ -16,8 +16,8 @@
 
 package com.hasegawa.diapp.db.repositories.mocks.mem
 
-import com.hasegawa.diapp.db.utils.DateTimeUtils
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
+import com.hasegawa.diapp.db.repositories.copyWithTime
 import com.hasegawa.diapp.domain.entities.GCMMessageEntity
 import com.hasegawa.diapp.domain.entities.GCMMessageType
 import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
@@ -51,9 +51,9 @@ class MemSyncsRepository : SyncsRepository {
     override fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?> {
         val hasIt = registrations[registration.token]
         if (hasIt != null) return Observable.just(hasIt)
-        registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
-        registrations.put(registration.token, registration)
-        return Observable.just(registration)
+        val newReg = registration.copyWithTime()
+        registrations.put(newReg.token, newReg)
+        return Observable.just(newReg)
     }
 
     override fun getGCMRegistrationByToken(token: String): Observable<GCMRegistrationEntity?> {
@@ -87,18 +87,15 @@ class MemSyncsRepository : SyncsRepository {
     }
 
     override fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity?> {
-        message.id = IdUtils.genIdIfNull(message.id)
-        message.timeCreated = DateTimeUtils.nowIfNull(message.timeCreated)
-        messages.put(message.id!!, message)
-        return Observable.just(message)
+        val newMsg = message.copyWithId()
+        messages.put(newMsg.id!!, newMsg)
+        return Observable.just(newMsg)
     }
 
     override fun upsertSync(sync: SyncEntity): Observable<SyncEntity?> {
-        sync.id = IdUtils.genIdIfNull(sync.id)
-        sync.timeCreated = DateTimeUtils.nowIfNull(sync.timeCreated)
-        sync.timeSynced = DateTimeUtils.nowIfNull(sync.timeSynced)
-        syncs.put(sync.id!!, sync)
-        return Observable.just(sync)
+        val newSync = sync.copyWithId()
+        syncs.put(newSync.id!!, newSync)
+        return Observable.just(newSync)
     }
 
     override fun upsertSyncs(syncs: List<SyncEntity>): Observable<List<SyncEntity>> {

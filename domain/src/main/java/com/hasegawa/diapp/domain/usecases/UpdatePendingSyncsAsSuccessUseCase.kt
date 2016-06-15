@@ -38,7 +38,7 @@ class UpdatePendingSyncsAsSuccessUseCase(val syncsRepository: SyncsRepository,
                         Observable.just(it)
                     }
                 }
-                .map { it.map { it.pending = false; it.timeSynced = null; it } }
+                .map { it.map { it.copy(pending = false, timeSynced = null) } }
                 .flatMap { syncsRepository.upsertSyncs(it) }
                 .map { syncsRepository.notifyChange(); it }
     }

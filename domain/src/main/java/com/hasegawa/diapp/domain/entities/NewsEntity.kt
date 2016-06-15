@@ -16,11 +16,11 @@
 
 package com.hasegawa.diapp.domain.entities
 
-data class NewsEntity(var id: String? = null,
-                      var title: String,
-                      var url: String,
-                      var date: Long,
-                      var tldr: String? = null)
+data class NewsEntity(val id: String? = null,
+                      val title: String,
+                      val url: String,
+                      val date: Long,
+                      val tldr: String? = null)
 
 fun NewsEntity.equalsNoId(n: NewsEntity): Boolean {
     return this.title == n.title &&

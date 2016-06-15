@@ -21,7 +21,7 @@ import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.entities.equalsNoId
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import org.hamcrest.Matchers.*
-import org.junit.Assert.assertThat
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -65,7 +65,7 @@ open class ContentProviderNewsRepositoryTest {
     @Test
     fun testAddNewsNoId() {
         val inserted = db().addAllNews(
-                newsList().map { it.id = null; it }
+                newsList().map { it.copy(id = null) }
         ).toBlocking().first()
         val n = inserted.map { news -> newsList().find { it.equalsNoId(news) } != null }
                 .sumBy { if (it) 1 else 0 }

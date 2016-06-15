@@ -16,10 +16,10 @@
 
 package com.hasegawa.diapp.domain.entities
 
-data class StepLinkEntity(var id: String? = null,
-                          var stepsId: String,
-                          var title: String,
-                          var url: String)
+data class StepLinkEntity(val id: String? = null,
+                          val stepsId: String,
+                          val title: String,
+                          val url: String)
 
 fun StepLinkEntity.equalsNotId(s: StepLinkEntity): Boolean {
     return this.stepsId == s.stepsId &&

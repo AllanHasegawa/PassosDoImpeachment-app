@@ -16,10 +16,10 @@
 
 package com.hasegawa.diapp.domain.entities
 
-data class SyncEntity(var id: String? = null,
-                      var pending: Boolean,
-                      var timeSynced: Long? = null,
-                      var timeCreated: Long? = null)
+data class SyncEntity(val id: String? = null,
+                      val pending: Boolean,
+                      val timeSynced: Long? = null,
+                      val timeCreated: Long? = null)
 
 fun SyncEntity.equalsNoId(s: SyncEntity): Boolean {
     return this.pending == s.pending &&

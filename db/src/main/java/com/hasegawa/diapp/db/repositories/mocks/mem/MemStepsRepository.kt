@@ -16,7 +16,7 @@
 
 package com.hasegawa.diapp.db.repositories.mocks.mem
 
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
@@ -40,15 +40,15 @@ class MemStepsRepository : StepsRepository {
     }
 
     override fun addStep(step: StepEntity): Observable<StepEntity> {
-        step.id = IdUtils.genIdIfNull(step.id)
-        steps.put(step.id!!, step)
-        return Observable.just(step)
+        val newStep = step.copyWithId()
+        steps.put(newStep.id!!, newStep)
+        return Observable.just(newStep)
     }
 
     override fun addStepLinks(links: List<StepLinkEntity>): Observable<List<StepLinkEntity>> {
-        links.forEach { it.id = IdUtils.genIdIfNull(it.id) }
-        stepLinks.putAll(links.map { Pair(it.id!!, it) })
-        return Observable.just(links)
+        val newLinks = links.map { it.copyWithId() }
+        stepLinks.putAll(newLinks.map { Pair(it.id!!, it) })
+        return Observable.just(newLinks)
     }
 
     override fun addSteps(steps: List<StepEntity>): Observable<List<StepEntity>> {

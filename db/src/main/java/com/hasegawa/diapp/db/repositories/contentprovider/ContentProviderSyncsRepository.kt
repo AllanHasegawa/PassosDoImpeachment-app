@@ -24,8 +24,8 @@ import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.SyncsContra
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.GCMMessageEntityMapping
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.GCMRegistrationEntityMapping
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.SyncEntityMapping
-import com.hasegawa.diapp.db.utils.DateTimeUtils
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
+import com.hasegawa.diapp.db.repositories.copyWithTime
 import com.hasegawa.diapp.domain.entities.GCMMessageEntity
 import com.hasegawa.diapp.domain.entities.GCMRegistrationEntity
 import com.hasegawa.diapp.domain.entities.SyncEntity
@@ -108,12 +108,11 @@ class ContentProviderSyncsRepository(resolver: ContentResolver) : SyncsRepositor
     }
 
     override fun addGCMRegistration(registration: GCMRegistrationEntity): Observable<GCMRegistrationEntity?> {
-        registration.timeCreated = DateTimeUtils.nowIfNull(registration.timeCreated)
         return getGCMRegistrationByToken(registration.token)
                 .flatMap {
                     if (it == null) {
                         provider.put()
-                                .`object`(registration)
+                                .`object`(registration.copyWithTime())
                                 .prepare()
                                 .asRxObservable()
                                 .flatMap {
@@ -137,10 +136,8 @@ class ContentProviderSyncsRepository(resolver: ContentResolver) : SyncsRepositor
     }
 
     override fun upsertMessage(message: GCMMessageEntity): Observable<GCMMessageEntity?> {
-        message.id = IdUtils.genIdIfNull(message.id)
-        message.timeCreated = DateTimeUtils.nowIfNull(message.timeCreated)
         return provider.put()
-                .`object`(message)
+                .`object`(message.copyWithId())
                 .prepare()
                 .asRxObservable()
                 .flatMap {
@@ -160,11 +157,8 @@ class ContentProviderSyncsRepository(resolver: ContentResolver) : SyncsRepositor
     }
 
     override fun upsertSync(sync: SyncEntity): Observable<SyncEntity?> {
-        sync.id = IdUtils.genIdIfNull(sync.id)
-        sync.timeCreated = DateTimeUtils.nowIfNull(sync.timeCreated)
-        sync.timeSynced = DateTimeUtils.nowIfNull(sync.timeSynced)
         return provider.put()
-                .`object`(sync)
+                .`object`(sync.copyWithId())
                 .prepare()
                 .asRxObservable()
                 .flatMap {
@@ -185,12 +179,7 @@ class ContentProviderSyncsRepository(resolver: ContentResolver) : SyncsRepositor
 
     override fun upsertSyncs(syncs: List<SyncEntity>): Observable<List<SyncEntity>> {
         return provider.put()
-                .objects(syncs.map {
-                    it.id = IdUtils.genIdIfNull(it.id)
-                    it.timeCreated = DateTimeUtils.nowIfNull(it.timeCreated)
-                    it.timeSynced = DateTimeUtils.nowIfNull(it.timeSynced)
-                    it
-                })
+                .objects(syncs.map { it.copyWithId() })
                 .prepare()
                 .asRxObservable()
                 .map { syncs ->

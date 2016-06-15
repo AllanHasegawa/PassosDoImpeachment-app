@@ -16,5 +16,5 @@
 
 package com.hasegawa.diapp.domain.entities
 
-data class GCMRegistrationEntity(var token: String,
-                                 var timeCreated: Long? = null)
+data class GCMRegistrationEntity(val token: String,
+                                 val timeCreated: Long? = null)

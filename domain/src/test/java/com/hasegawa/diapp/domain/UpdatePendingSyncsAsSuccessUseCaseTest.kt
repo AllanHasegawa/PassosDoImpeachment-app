@@ -19,8 +19,8 @@ package com.hasegawa.diapp.domain
 import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.UpdatePendingSyncsAsSuccessUseCase
-import org.hamcrest.Matchers.`is`
-import org.junit.Assert.assertThat
+import org.hamcrest.Matchers.*
+import org.junit.Assert.*
 import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito
@@ -59,7 +59,7 @@ class UpdatePendingSyncsAsSuccessUseCaseTest {
     fun execute() {
         `when`(syncsRepository!!.getPendingSyncs())
                 .thenReturn(Observable.just(pendingSyncs))
-        `when`(syncsRepository!!.upsertSyncs(pendingSyncs.map { it.pending = false; it.timeSynced = null; it }))
+        `when`(syncsRepository!!.upsertSyncs(pendingSyncs.map { it.copy(pending = false, timeSynced = null) }))
                 .thenReturn(Observable.just(successSyncs))
 
         val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!, et, pet)
@@ -94,7 +94,7 @@ class UpdatePendingSyncsAsSuccessUseCaseTest {
                 .thenReturn(Observable.just(emptyList()))
         `when`(syncsRepository!!.upsertSync(SyncEntity(null, false, null, null)))
                 .thenReturn(Observable.just(successSyncs[0]))
-        `when`(syncsRepository!!.upsertSyncs(listOf(successSyncs[0])))
+        `when`(syncsRepository!!.upsertSyncs(listOf(successSyncs[0].copy(timeSynced = null))))
                 .thenReturn(Observable.just(listOf(successSyncs[0])))
 
         val useCase = UpdatePendingSyncsAsSuccessUseCase(syncsRepository!!, et, pet)

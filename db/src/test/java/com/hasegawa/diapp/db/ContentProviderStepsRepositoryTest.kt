@@ -23,7 +23,7 @@ import com.hasegawa.diapp.domain.entities.equalsNotId
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.pushtorefresh.storio.StorIOException
 import org.hamcrest.Matchers.*
-import org.junit.Assert.assertThat
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -273,7 +273,7 @@ open class ContentProviderStepsRepositoryTest {
 
     @Test
     fun testAddStepsIdCreation() {
-        val steps = stepsList().map { it.id = null; it }
+        val steps = stepsList().map { it.copy(id = null) }
         db().addSteps(steps).toBlocking().first()
         val n = db().getSteps().toBlocking().first().map { s ->
             steps.find { it.equalsNotId(s) }
@@ -283,8 +283,7 @@ open class ContentProviderStepsRepositoryTest {
 
     @Test
     fun testAddStepIdCreation() {
-        val step = stepsList()[0]
-        step.id = null
+        val step = stepsList()[0].copy(id = null)
         db().addStep(step).toBlocking().first()
         val steps = db().getSteps().toBlocking().first()
         assertThat(steps[0].id, notNullValue())
@@ -293,7 +292,7 @@ open class ContentProviderStepsRepositoryTest {
 
     @Test
     fun testAddStepLinksIdCreation() {
-        val links = stepLinksList().map { it.id = null; it }
+        val links = stepLinksList().map { it.copy(id = null) }
         db().addSteps(stepsList()).toBlocking().first()
         db().addStepLinks(links).toBlocking().first()
         val n = db().getStepLinks().toBlocking().first().map { s ->

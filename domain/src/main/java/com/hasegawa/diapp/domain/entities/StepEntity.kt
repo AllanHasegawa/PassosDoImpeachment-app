@@ -17,12 +17,12 @@
 package com.hasegawa.diapp.domain.entities
 
 
-data class StepEntity(var id: String? = null,
-                      var position: Int,
-                      var title: String,
-                      var description: String,
-                      var completed: Boolean,
-                      var possibleDate: String
+data class StepEntity(val id: String? = null,
+                      val position: Int,
+                      val title: String,
+                      val description: String,
+                      val completed: Boolean,
+                      val possibleDate: String
 )
 
 

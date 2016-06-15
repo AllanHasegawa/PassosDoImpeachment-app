@@ -22,7 +22,7 @@ import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.LinksContra
 import com.hasegawa.diapp.db.repositories.contentprovider.DiContract.StepsContract
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.StepEntityMapping
 import com.hasegawa.diapp.db.repositories.contentprovider.mappings.StepLinkEntityMapping
-import com.hasegawa.diapp.db.utils.IdUtils
+import com.hasegawa.diapp.db.repositories.copyWithId
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.entities.StepLinkEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
@@ -45,10 +45,7 @@ class ContentProviderStepsRepository(resolver: ContentResolver) : StepsRepositor
 
     override fun addStepLinks(links: List<StepLinkEntity>): Observable<List<StepLinkEntity>> {
         return provider.put()
-                .objects(links.map {
-                    it.id = IdUtils.genIdIfNull(it.id)
-                    it
-                })
+                .objects(links.map { it.copyWithId() })
                 .prepare()
                 .asRxObservable()
                 .map { r: PutResults<StepLinkEntity> ->
@@ -59,9 +56,8 @@ class ContentProviderStepsRepository(resolver: ContentResolver) : StepsRepositor
     }
 
     override fun addStep(step: StepEntity): Observable<StepEntity> {
-        step.id = IdUtils.genIdIfNull(step.id)
         return provider.put()
-                .`object`(step)
+                .`object`(step.copyWithId())
                 .prepare()
                 .asRxObservable()
                 .map { step }
@@ -69,10 +65,7 @@ class ContentProviderStepsRepository(resolver: ContentResolver) : StepsRepositor
 
     override fun addSteps(steps: List<StepEntity>): Observable<List<StepEntity>> {
         return provider.put()
-                .objects(steps.map {
-                    it.id = IdUtils.genIdIfNull(it.id)
-                    it
-                })
+                .objects(steps.map { it.copyWithId() })
                 .prepare()
                 .asRxObservable()
                 .map { r: PutResults<StepEntity> ->

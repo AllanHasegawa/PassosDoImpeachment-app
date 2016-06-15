@@ -22,7 +22,7 @@ import com.hasegawa.diapp.domain.entities.*
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.pushtorefresh.storio.StorIOException
 import org.hamcrest.Matchers.*
-import org.junit.Assert.assertThat
+import org.junit.Assert.*
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricGradleTestRunner
@@ -65,8 +65,8 @@ open class ContentProviderSyncsRepositoryTest {
 
     fun <T> doNotifyChangeTestResults(obs: Observable<List<T>>,
                                       changes: (() -> Unit)): List<List<T>> {
-        var barrier = CyclicBarrier(2)
-        var results = ArrayList<List<T>>()
+        val barrier = CyclicBarrier(2)
+        val results = ArrayList<List<T>>()
         obs.subscribeOn(Schedulers.io())
                 .take(3)
                 .subscribe({
@@ -102,7 +102,7 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testUpsertSyncWithNullTimeCreated() {
-        var reg = db().upsertSync(SyncEntity(null, false, 10, null)).toBlocking().first()
+        val reg = db().upsertSync(SyncEntity(null, false, 10, null)).toBlocking().first()
         assertThat(reg, notNullValue())
         assertThat(reg!!.id, notNullValue())
         assertThat(reg.timeCreated, notNullValue())
@@ -110,14 +110,14 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testUpsertSyncsWithNullTimeCreated() {
-        val syncs = syncsList().map { it.timeCreated = null; it }
-        var reg = db().upsertSyncs(syncs).toBlocking().first()
+        val syncs = syncsList().map { it.copy(timeCreated = null) }
+        val reg = db().upsertSyncs(syncs).toBlocking().first()
         assertThat(reg.sumBy { if (it.timeCreated != null) 1 else 0 }, `is`(syncsList().size))
     }
 
     @Test
     fun testUpsertSyncWithNullTimeSynced() {
-        var reg = db().upsertSync(SyncEntity(null, false, null, 10)).toBlocking().first()
+        val reg = db().upsertSync(SyncEntity(null, false, null, 10)).toBlocking().first()
         assertThat(reg, notNullValue())
         assertThat(reg!!.id, notNullValue())
         assertThat(reg.timeCreated, notNullValue())
@@ -125,8 +125,8 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testUpsertSyncsWithNullTimeSynced() {
-        val syncs = syncsList().map { it.timeSynced = null; it }
-        var reg = db().upsertSyncs(syncs).toBlocking().first()
+        val syncs = syncsList().map { it.copy(timeSynced = null) }
+        val reg = db().upsertSyncs(syncs).toBlocking().first()
         assertThat(reg.sumBy { if (it.timeSynced != null) 1 else 0 }, `is`(syncsList().size))
     }
 
@@ -142,8 +142,7 @@ open class ContentProviderSyncsRepositoryTest {
         val reg = db().addGCMRegistration(gcmRegistrationsList()[0]).toBlocking().first()
         assertThat(reg, `is`(gcmRegistrationsList()[0]))
 
-        val modifiedReg = gcmRegistrationsList()[0]
-        modifiedReg.timeCreated = Random().nextLong()
+        val modifiedReg = gcmRegistrationsList()[0].copy(timeCreated = Random().nextLong())
         val newReg = db().addGCMRegistration(modifiedReg).toBlocking().first()
         assertThat(newReg, `is`(reg))
     }
@@ -174,8 +173,7 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testAddRegistrationWithNullTimeCreated() {
-        val reg = gcmRegistrationsList()[0]
-        reg.timeCreated = null
+        val reg = gcmRegistrationsList()[0].copy(timeCreated = null)
         val retReg = db().addGCMRegistration(reg).toBlocking().first()
         assertThat(retReg!!.timeCreated, notNullValue())
     }
@@ -191,18 +189,15 @@ open class ContentProviderSyncsRepositoryTest {
         val msg = db().upsertMessage(gcmMessagesList()[0]).toBlocking().first()
         assertThat(msg, `is`(gcmMessagesList()[0]))
 
-        val modifiedMsg = gcmMessagesList()[0]
-        modifiedMsg.data = UUID.randomUUID().toString()
-        modifiedMsg.timeCreated = Random().nextLong()
-        modifiedMsg.type = GCMMessageType.fromValue(Random().nextInt(1) + 1)
+        val modifiedMsg = gcmMessagesList()[0].copy(timeCreated = Random().nextLong(),
+                type = GCMMessageType.fromValue(Random().nextInt(1) + 1))
         val newMsg = db().upsertMessage(modifiedMsg).toBlocking().first()
         assertThat(newMsg, `is`(modifiedMsg))
     }
 
     @Test
     fun testAddMessage() {
-        val msg = gcmMessagesList()[0]
-        msg.id = null
+        val msg = gcmMessagesList()[0].copy(id = null)
         val retMsg = db().upsertMessage(msg).toBlocking().first()
         assertThat(retMsg, notNullValue())
         assertThat(retMsg!!.equalsNoId(msg), `is`(true))
@@ -210,8 +205,7 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testInsertMessageWithNullTimeCreated() {
-        val msg = gcmMessagesList()[0]
-        msg.timeCreated = null
+        val msg = gcmMessagesList()[0].copy(timeCreated = null)
         val retMsg = db().upsertMessage(msg).toBlocking().first()
         assertThat(retMsg, notNullValue())
         assertThat(retMsg!!.timeCreated, notNullValue())
@@ -241,10 +235,9 @@ open class ContentProviderSyncsRepositoryTest {
         val sync = db().upsertSync(syncsList()[0]).toBlocking().first()
         assertThat(sync, `is`(syncsList()[0]))
 
-        val modifiedSync = sync
-        modifiedSync!!.pending = Random().nextBoolean()
-        modifiedSync.timeSynced = Random().nextLong()
-        modifiedSync.timeCreated = Random().nextLong()
+        val modifiedSync = sync!!.copy(pending = Random().nextBoolean(),
+                timeSynced = Random().nextLong(),
+                timeCreated = Random().nextLong())
         val newSync = db().upsertSync(modifiedSync).toBlocking().first()
         assertThat(newSync, `is`(modifiedSync))
     }
@@ -257,8 +250,7 @@ open class ContentProviderSyncsRepositoryTest {
 
     @Test
     fun testInsertSync() {
-        val sync = syncsList()[0]
-        sync.id = null
+        val sync = syncsList()[0].copy(id = null)
         val retSync = db().upsertSync(sync).toBlocking().first()
         assertThat(retSync, notNullValue())
         assertThat(sync.equalsNoId(retSync!!), `is`(true))
