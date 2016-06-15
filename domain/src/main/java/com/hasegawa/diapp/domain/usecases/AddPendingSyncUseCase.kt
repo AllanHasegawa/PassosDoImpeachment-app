@@ -32,7 +32,9 @@ class AddPendingSyncUseCase(
         UseCase<SyncEntity?>(executionThread, postExecutionThread) {
     override fun buildUseCaseObservable(): Observable<SyncEntity?> {
         return syncsRepository.upsertSync(SyncEntity(null, true, null, null))
-                .map { syncScheduler.enqueueSync(delayed); it }
-                .map { syncsRepository.notifyChange(); it }
+                .doOnCompleted {
+                    syncScheduler.enqueueSync(delayed)
+                    syncsRepository.notifyChange()
+                }
     }
 }

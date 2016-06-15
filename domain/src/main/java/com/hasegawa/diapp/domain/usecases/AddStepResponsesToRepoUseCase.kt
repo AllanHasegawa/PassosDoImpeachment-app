@@ -52,6 +52,6 @@ class AddStepResponsesToRepoUseCase(
                 .concatMap { it }
                 .buffer(stepResponses.size)
                 .timeout(10, TimeUnit.SECONDS)
-                .map { stepsRepository.notifyChange(); it }
+                .doOnCompleted { stepsRepository.notifyChange() }
     }
 }

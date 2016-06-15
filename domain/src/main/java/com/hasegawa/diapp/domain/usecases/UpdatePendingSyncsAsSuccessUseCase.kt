@@ -40,6 +40,6 @@ class UpdatePendingSyncsAsSuccessUseCase(val syncsRepository: SyncsRepository,
                 }
                 .map { it.map { it.copy(pending = false, timeSynced = null) } }
                 .flatMap { syncsRepository.upsertSyncs(it) }
-                .map { syncsRepository.notifyChange(); it }
+                .doOnCompleted { syncsRepository.notifyChange() }
     }
 }

@@ -35,6 +35,6 @@ class AddNewsResponsesToRepoUseCase(val responses: List<NewsResponse>,
                 .map { it.map { it.toEntity(null) } }
                 .zipWith(newsRepository.clearNews(), { responses, cleared -> responses })
                 .flatMap { newsRepository.addAllNews(it) }
-                .map { newsRepository.notifyChange(); it }
+                .doOnCompleted { newsRepository.notifyChange() }
     }
 }
