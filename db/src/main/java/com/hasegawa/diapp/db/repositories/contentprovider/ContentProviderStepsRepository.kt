@@ -56,8 +56,9 @@ class ContentProviderStepsRepository(resolver: ContentResolver) : StepsRepositor
     }
 
     override fun addStep(step: StepEntity): Observable<StepEntity> {
+        if (step.id == null) return addStep(step.copyWithId())
         return provider.put()
-                .`object`(step.copyWithId())
+                .`object`(step)
                 .prepare()
                 .asRxObservable()
                 .map { step }

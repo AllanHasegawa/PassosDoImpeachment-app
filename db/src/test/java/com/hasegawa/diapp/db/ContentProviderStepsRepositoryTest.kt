@@ -284,10 +284,11 @@ open class ContentProviderStepsRepositoryTest {
     @Test
     fun testAddStepIdCreation() {
         val step = stepsList()[0].copy(id = null)
-        db().addStep(step).toBlocking().first()
+        val retStep = db().addStep(step).toBlocking().first()
         val steps = db().getSteps().toBlocking().first()
         assertThat(steps[0].id, notNullValue())
         assertThat(steps[0].equalsNotId(stepsList()[0]), `is`(true))
+        assertThat(steps[0], `is`(retStep))
     }
 
     @Test
