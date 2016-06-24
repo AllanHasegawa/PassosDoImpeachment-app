@@ -1,18 +1,17 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.github.ben-manes.versions'
 
 android {
-    def globalConfig = rootProject.extensions.getByName("ext")
+    def config = rootProject.ext.androidConfig
 
-    compileSdkVersion globalConfig.getAt("androidCompileSdkVersion")
-    buildToolsVersion globalConfig.getAt("androidBuildToolsVersion")
+    compileSdkVersion config.compileSdkVersion
+    buildToolsVersion config.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion globalConfig.getAt("androidMinSdkVersion")
-        targetSdkVersion globalConfig.getAt("androidTargetSdkVersion")
-        versionCode globalConfig.getAt("androidVersionCode")
-        versionName globalConfig.getAt("androidVersionName")
+        minSdkVersion config.minSdkVersion
+        targetSdkVersion config.targetSdkVersion
+        versionCode config.ersionCode
+        versionName config.versionName
     }
     buildTypes {
         release {
@@ -30,25 +29,13 @@ kapt {
     generateStubs = true
 }
 
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
-
 dependencies {
     compile project(":domain")
 
-    def dependencies = rootProject.ext.cloudDependencies
-    def testDependencies = rootProject.ext.cloudTestDependencies
+    def dependencies = rootProject.ext.cloudDeps.deps
+    def testDependencies = rootProject.ext.cloudDeps.test
 
-    testCompile testDependencies.junit
-    testCompile testDependencies.robolectric
-    testCompile testDependencies.mockwebserver
-    compile dependencies.appcompat
-    compile dependencies.kotlin_stdlib
-    compile dependencies.kotlin_reflect
-    compile dependencies.rxkotlin
-    compile dependencies.rxandroid
-    compile dependencies.retrofit
-    compile dependencies.retrofit_gson
+    testDependencies.each { testCompile it }
+    dependencies.each { compile it }
 }
 

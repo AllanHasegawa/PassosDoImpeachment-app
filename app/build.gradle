@@ -1,26 +1,24 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.github.ben-manes.versions'
-apply plugin: 'com.google.gms.google-services'
 
 android {
-    def globalConfig = rootProject.extensions.getByName("ext")
+    def config = rootProject.ext.androidConfig
 
-    compileSdkVersion globalConfig.getAt("androidCompileSdkVersion")
-    buildToolsVersion globalConfig.getAt("androidBuildToolsVersion")
+    compileSdkVersion config.compileSdkVersion
+    buildToolsVersion config.buildToolsVersion
 
     defaultConfig {
-        applicationId globalConfig.getAt("androidApplicationId")
-        minSdkVersion globalConfig.getAt("androidMinSdkVersion")
-        targetSdkVersion globalConfig.getAt("androidTargetSdkVersion")
-        versionCode globalConfig.getAt("androidVersionCode")
-        versionName globalConfig.getAt("androidVersionName")
+        applicationId config.applicationId
+        minSdkVersion config.minSdkVersion
+        targetSdkVersion config.targetSdkVersion
+        versionCode config.versionCode
+        versionName config.versionName
 
         vectorDrawables.useSupportLibrary = true
 
-        testInstrumentationRunner globalConfig.getAt("androidTestInstrumentationRunner")
+        testInstrumentationRunner config.testInstrumentationRunner
 
-        multiDexEnabled = globalConfig.getAt("androidMultiDexEnabled")
+        multiDexEnabled = config.multiDexEnabled
 
         testProguardFiles "test-proguard-rules.pro"
     }
@@ -79,40 +77,15 @@ dependencies {
     compile project(":cloud")
     compile project(":presentation")
 
-    def testDependencies = rootProject.ext.appTestDependencies
-    def androidTestDependencies = rootProject.ext.appAndroidTestDependencies
-    def debugDependencies = rootProject.ext.appDebugDependencies
-    def dependencies = rootProject.ext.appDependencies
-    def kaptDependencies = rootProject.ext.appKaptDependencies
+    def androidTestDependencies = rootProject.ext.appDeps.androidTest
+    def debugDependencies = rootProject.ext.appDeps.debug
+    def dependencies = rootProject.ext.appDeps.deps
+    def kaptDependencies = rootProject.ext.appDeps.kapt
 
-    testCompile testDependencies.junit
-
-    androidTestCompile androidTestDependencies.support_annotations
-    androidTestCompile androidTestDependencies.test_runner
-    androidTestCompile androidTestDependencies.test_rules
-    androidTestCompile androidTestDependencies.espresso_core
-    androidTestCompile androidTestDependencies.espresso_intents
-    androidTestCompile androidTestDependencies.espresso_contrib
-
-    debugCompile debugDependencies.stheto
-
-    compile dependencies.multidex
-    compile dependencies.kotlin_stdlib
-    compile dependencies.kotlin_reflect
-    compile dependencies.support_design
-    compile dependencies.support_cardview
-    compile dependencies.support_recyclerview
-    compile dependencies.support
-    compile dependencies.rxkotlin
-    compile dependencies.rxandroid
-    compile dependencies.joda
-    compile dependencies.gcm
-    compile dependencies.conductor
-    compile dependencies.conductor_support
-    compile dependencies.butterknife
-    compile dependencies.dagger2
-
-    kapt kaptDependencies.butterknife_compiler
-    kapt kaptDependencies.dagger2_compiler
+    androidTestDependencies.each { androidTestCompile it }
+    debugDependencies.each { debugCompile it }
+    dependencies.each { compile it }
+    kaptDependencies.each { kapt it }
 }
 
+apply plugin: 'com.google.gms.google-services'

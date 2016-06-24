@@ -9,11 +9,9 @@ targetCompatibility = JavaVersion.VERSION_1_7
 
 
 dependencies {
-    def dependencies = rootProject.ext.domainDependencies
-    def testDependencies = rootProject.ext.domainTestDependencies
+    def dependencies = rootProject.ext.domainDeps.deps
+    def testDependencies = rootProject.ext.domainDeps.test
 
-    testCompile testDependencies.junit
-    testCompile testDependencies.hamcrest_junit
-    testCompile testDependencies.mockito
-    compile dependencies.rxkotlin
+    testDependencies.each { testCompile it }
+    dependencies.each { compile it }
 }

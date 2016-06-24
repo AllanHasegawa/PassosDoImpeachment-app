@@ -5,143 +5,190 @@ allprojects {
 }
 
 ext {
-    // Android
-    androidBuildToolsVersion = "23.0.3"
-    androidMinSdkVersion = 16
-    androidTargetSdkVersion = 23
-    androidCompileSdkVersion = 23
-    androidVersionCode = 12
-    androidVersionName = "1.12"
-    androidTestInstrumentationRunner = "android.support.test.runner.AndroidJUnitRunner"
-    androidApplicationId = 'com.hasegawa.diapp'
-    androidTestApplicationId = 'com.hasegawa.diapp.test'
-    androidMultiDexEnabled = false
-
-    // AndroidLibraries
-    rxAndroidVersion = '1.1.0'
-    retrofitVersion = '2.0.0'
-    storIoVersion = '1.8.0'
-    supportLibVersion = '23.2.1'
-    gcmVersion = '8.3.0'
-    conductorVersion = '1.1.4'
-    multidexVersion = '1.0.0'
-    butterknifeVersion = '8.0.0'
-
-    // Libraries
-    kotlinVersion = '1.0.2'
-    rxKotlinVersion = '0.55.0'
-    jodaVersion = '2.9.2'
-    dagger2Version = '2.4'
-
-    // Testing
-    junitVersion = '4.12'
-    robolectricVersion = '3.1'
-    mockWebServerVersion = '3.3.1'
-    mockitoVersion = '2.0.49-beta'
-    espressoVersion = '2.2.2'
-    androidTestVersion = '0.5'
-    hamcrestJUnitVersion = '2.0.0.0'
-
-    // Debug
-    sthetoVersion = '1.3.1'
-
-
-    appDependencies = [
-            kotlin_stdlib       : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-            kotlin_reflect      : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-            rxkotlin            : "io.reactivex:rxkotlin:$rxKotlinVersion",
-            rxandroid           : "io.reactivex:rxandroid:$rxAndroidVersion",
-            gcm                 : "com.google.android.gms:play-services-gcm:$gcmVersion",
-            support_design      : "com.android.support:design:$supportLibVersion",
-            support_cardview    : "com.android.support:cardview-v7:$supportLibVersion",
-            support_recyclerview: "com.android.support:recyclerview-v7:$supportLibVersion",
-            support             : "com.android.support:support-v4:$supportLibVersion",
-            joda                : "net.danlew:android.joda:$jodaVersion",
-            conductor           : "com.bluelinelabs:conductor:$conductorVersion",
-            conductor_support   : "com.bluelinelabs:conductor-support:$conductorVersion",
-            multidex            : "com.android.support:multidex:$multidexVersion",
-            butterknife         : "com.jakewharton:butterknife:$butterknifeVersion",
-            dagger2             : "com.google.dagger:dagger:$dagger2Version",
+    androidConfig = [
+            buildToolsVersion        : "23.0.3",
+            minSdkVersion            : 16,
+            targetSdkVersion         : 23,
+            compileSdkVersion        : 23,
+            versionCode              : 12,
+            versionName              : "1.12",
+            testInstrumentationRunner: "android.support.test.runner.AndroidJUnitRunner",
+            applicationId            : 'com.hasegawa.diapp',
+            testApplicationId        : 'com.hasegawa.diapp.test',
+            multiDexEnabled          : false,
     ]
 
-    appKaptDependencies = [
-            butterknife_compiler: "com.jakewharton:butterknife-compiler:$butterknifeVersion",
-            dagger2_compiler    : "com.google.dagger:dagger-compiler:$dagger2Version",
+    versions = [
+            // AndroidLibraries
+            rxAndroid    : '1.1.0',
+            retrofit     : '2.0.0',
+            storIo       : '1.8.0',
+            supportLib   : '23.2.1',
+            gcm          : '8.3.0',
+            conductor    : '1.1.4',
+            multidex     : '1.0.0',
+            butterknife  : '8.0.0',
+
+            // Libraries,
+            kotlin       : '1.0.2',
+            rxKotlin     : '0.55.0',
+            joda         : '2.9.2',
+            dagger2      : '2.4',
+
+            // Testing,
+            junit        : '4.12',
+            robolectric  : '3.1',
+            mockWebServer: '3.3.1',
+            mockito      : '2.0.49-beta',
+            hamcrestJUnit: '2.0.0.0',
+
+            // AndroidTesting
+            espresso     : '2.2.2',
+            androidTest  : '0.5',
+
+            // Debug
+            stheto       : '1.3.1',
     ]
 
-    appTestDependencies = [
-            junit: "junit:junit:$junitVersion"
+    paths = [
+            // Libraries
+            kotlinStd            : "org.jetbrains.kotlin:kotlin-stdlib:$versions.kotlin",
+            kotlinReflect        : "org.jetbrains.kotlin:kotlin-reflect:$versions.kotlin",
+            rxKotlin             : "io.reactivex:rxkotlin:$versions.rxKotlin",
+            dagger2              : "com.google.dagger:dagger:$versions.dagger2",
+            dagger2Compiler      : "com.google.dagger:dagger-compiler:$versions.dagger2",
+
+            // Android Libraries
+            rxAndroid            : "io.reactivex:rxandroid:$versions.rxAndroid",
+            gcm                  : "com.google.android.gms:play-services-gcm:$versions.gcm",
+            appcompat            : "com.android.support:appcompat-v7:$versions.supportLib",
+            supportDesign        : "com.android.support:design:$versions.supportLib",
+            supportCardView      : "com.android.support:cardview-v7:$versions.supportLib",
+            supportRecyclerView  : "com.android.support:recyclerview-v7:$versions.supportLib",
+            support              : "com.android.support:support-v4:$versions.supportLib",
+            joda                 : "net.danlew:android.joda:$versions.joda",
+            conductor            : "com.bluelinelabs:conductor:$versions.conductor",
+            conductorSupport     : "com.bluelinelabs:conductor-support:$versions.conductor",
+            multidex             : "com.android.support:multidex:$versions.multidex",
+            butterknife          : "com.jakewharton:butterknife:$versions.butterknife",
+            butterknifeCompiler  : "com.jakewharton:butterknife-compiler:$versions.butterknife",
+            retrofit             : "com.squareup.retrofit2:retrofit:$versions.retrofit",
+            retrofitGson         : "com.squareup.retrofit2:converter-gson:$versions.retrofit",
+            storIoContentResolver: "com.pushtorefresh.storio:content-resolver:$versions.storIo",
+
+            // Testing
+            junit                : "junit:junit:$versions.junit",
+            mockito              : "org.mockito:mockito-core:$versions.mockito",
+            hamcrestJunit        : "org.hamcrest:hamcrest-junit:$versions.hamcrestJUnit",
+            robolectric          : "org.robolectric:robolectric:$versions.robolectric",
+            mockwebserver        : "com.squareup.okhttp3:mockwebserver:$versions.mockWebServer",
+
+            // Android Testing
+            supportAnnotations   : "com.android.support:support-annotations:$versions.supportLib",
+            testRunner           : "com.android.support.test:runner:$versions.androidTest",
+            testRules            : "com.android.support.test:rules:$versions.androidTest",
+            espressoCore         : "com.android.support.test.espresso:espresso-core:$versions.espresso",
+            espressoIntents      : "com.android.support.test.espresso:espresso-intents:$versions.espresso",
+            espressoContrib      : "com.android.support.test.espresso:espresso-contrib:$versions.espresso",
+
+            // Android Debug
+            stheto               : "com.facebook.stetho:stetho:$versions.stheto",
     ]
 
-    appAndroidTestDependencies = [
-            support_annotations: "com.android.support:support-annotations:$supportLibVersion",
-            test_runner        : "com.android.support.test:runner:$androidTestVersion",
-            test_rules         : "com.android.support.test:rules:$androidTestVersion",
-            espresso_core      : "com.android.support.test.espresso:espresso-core:$espressoVersion",
-            espresso_intents   : "com.android.support.test.espresso:espresso-intents:$espressoVersion",
-            espresso_contrib   : "com.android.support.test.espresso:espresso-contrib:$espressoVersion",
+
+    appDeps = [
+            deps       : [
+                    paths.kotlinStd,
+                    paths.kotlinReflect,
+                    paths.rxKotlin,
+                    paths.rxAndroid,
+                    paths.gcm,
+                    paths.supportDesign,
+                    paths.supportCardView,
+                    paths.supportRecyclerView,
+                    paths.support,
+                    paths.joda,
+                    paths.conductor,
+                    paths.conductorSupport,
+                    paths.multidex,
+                    paths.butterknife,
+                    paths.dagger2,
+            ],
+
+            kapt       : [
+                    paths.butterknifeCompiler,
+                    paths.dagger2Compiler,
+            ],
+
+            androidTest: [
+                    paths.supportAnnotations,
+                    paths.testRunner,
+                    paths.testRules,
+                    paths.espressoCore,
+                    paths.espressoIntents,
+                    paths.espressoContrib,
+            ],
+
+            debug      : [
+                    paths.stheto
+            ]
     ]
 
-    appDebugDependencies = [
-            stheto: "com.facebook.stetho:stetho:$sthetoVersion"
+    presentationDeps = [
+            deps: [
+                    paths.rxKotlin,
+                    paths.dagger2
+            ],
+
+            kapt: [
+                    paths.dagger2Compiler
+            ],
+
+            test: []
     ]
 
-    presentationDependencies = [
-            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion",
-            dagger2 : "com.google.dagger:dagger:$dagger2Version",
+    domainDeps = [
+            deps: [
+                    paths.rxKotlin
+            ],
+
+            test: [
+                    paths.junit,
+                    paths.mockito,
+                    paths.hamcrestJunit,
+            ]
     ]
 
-    presentationKaptDependencies = [
-            dagger2_compiler: "com.google.dagger:dagger-compiler:$dagger2Version",
+    cloudDeps = [
+            deps: [
+                    paths.appcompat,
+                    paths.kotlinStd,
+                    paths.rxKotlin,
+                    paths.rxAndroid,
+                    paths.retrofit,
+                    paths.retrofitGson,
+            ],
+
+            test: [
+                    paths.junit,
+                    paths.robolectric,
+                    paths.mockwebserver,
+            ]
     ]
 
-    presentationTestDependencies = [
-            junit         : "junit:junit:$junitVersion",
-            mockito       : "org.mockito:mockito-core:$mockitoVersion",
-            hamcrest_junit: "org.hamcrest:hamcrest-junit:$hamcrestJUnitVersion"
-    ]
+    dbDeps = [
+            deps: [
+                    paths.appcompat,
+                    paths.kotlinStd,
+                    paths.rxKotlin,
+                    paths.rxAndroid,
+                    paths.joda,
+                    paths.storIoContentResolver,
+            ],
 
-    domainDependencies = [
-            rxkotlin: "io.reactivex:rxkotlin:$rxKotlinVersion"
-    ]
-
-    domainTestDependencies = [
-            junit         : "junit:junit:$junitVersion",
-            mockito       : "org.mockito:mockito-core:$mockitoVersion",
-            hamcrest_junit: "org.hamcrest:hamcrest-junit:$hamcrestJUnitVersion"
-    ]
-
-    cloudDependencies = [
-            appcompat     : "com.android.support:appcompat-v7:$supportLibVersion",
-            kotlin_stdlib : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-            kotlin_reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-            rxkotlin      : "io.reactivex:rxkotlin:$rxKotlinVersion",
-            rxandroid     : "io.reactivex:rxandroid:$rxAndroidVersion",
-            retrofit      : "com.squareup.retrofit2:retrofit:$retrofitVersion",
-            retrofit_gson : "com.squareup.retrofit2:converter-gson:$retrofitVersion",
-    ]
-
-    cloudTestDependencies = [
-            junit        : "junit:junit:$junitVersion",
-            robolectric  : "org.robolectric:robolectric:$robolectricVersion",
-            mockwebserver: "com.squareup.okhttp3:mockwebserver:$mockWebServerVersion"
-    ]
-
-    dbDependencies = [
-            appcompat     : "com.android.support:appcompat-v7:$supportLibVersion",
-            kotlin_stdlib : "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion",
-            kotlin_reflect: "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
-            rxkotlin      : "io.reactivex:rxkotlin:$rxKotlinVersion",
-            rxandroid     : "io.reactivex:rxandroid:$rxAndroidVersion",
-            joda          : "net.danlew:android.joda:$jodaVersion",
-            storio        : "com.pushtorefresh.storio:content-resolver:$storIoVersion",
-    ]
-
-    dbTestDependencies = [
-            junit      : "junit:junit:$junitVersion",
-            robolectric: "org.robolectric:robolectric:$robolectricVersion"
-    ]
-
-    dbKaptDependencies = [
+            test: [
+                    paths.junit,
+                    paths.robolectric
+            ]
     ]
 }

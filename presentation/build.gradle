@@ -4,16 +4,13 @@ sourceCompatibility = JavaVersion.VERSION_1_7
 targetCompatibility = JavaVersion.VERSION_1_7
 
 dependencies {
-    def dependencies = rootProject.ext.presentationDependencies
-    def kaptDependencies = rootProject.ext.presentationKaptDependencies
-    def testDependencies = rootProject.ext.presentationTestDependencies
+    def dependencies = rootProject.ext.presentationDeps.deps
+    def kaptDependencies = rootProject.ext.presentationDeps.kapt
+    def testDependencies = rootProject.ext.presentationDeps.test
 
     compile project(":domain")
 
-    testCompile testDependencies.junit
-    testCompile testDependencies.hamcrest_junit
-    testCompile testDependencies.mockito
-    compile dependencies.rxkotlin
-    compile dependencies.dagger2
-    kapt kaptDependencies.dagger2_compiler
+    testDependencies.each { testCompile it }
+    dependencies.each { compile it }
+    kaptDependencies.each { kapt it }
 }
