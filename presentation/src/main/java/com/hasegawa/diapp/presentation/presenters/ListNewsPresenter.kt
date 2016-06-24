@@ -22,7 +22,7 @@ import com.hasegawa.diapp.domain.devices.*
 import com.hasegawa.diapp.domain.entities.NewsEntity
 import com.hasegawa.diapp.domain.repositories.NewsRepository
 import com.hasegawa.diapp.domain.usecases.GetNewsUseCase
-import com.hasegawa.diapp.presentation.mvps.ListNewsMvp
+import com.hasegawa.diapp.presentation.mvpview.ListNewsMvpView
 import rx.Subscriber
 import java.util.*
 import javax.inject.Inject
@@ -36,7 +36,7 @@ class ListNewsPresenter @Inject constructor(
         private val newsRepository: NewsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        ListNewsMvp.Presenter() {
+        BasePresenter<ListNewsMvpView>() {
 
     private var getNewsUc: GetNewsUseCase? = null
 
@@ -65,30 +65,29 @@ class ListNewsPresenter @Inject constructor(
         getNewsUc = null
     }
 
-    override fun handleOpenBtTouch(newsEntity: NewsEntity) {
-        urlOpener.openUrl(newsEntity.url)
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenOpenBtTouch = { news -> urlOpener.openUrl(news.url) }
+        view.listenShareBtTouch = { news -> newsSharer.shareNews(news) }
     }
 
-    override fun handleShareBtTouch(newsEntity: NewsEntity) {
-        newsSharer.shareNews(newsEntity)
-    }
 
-    private fun makeNewsList(source: List<NewsEntity>): List<ListNewsMvp.Item> {
-        val ret = ArrayList<ListNewsMvp.Item>(source.size)
+    private fun makeNewsList(source: List<NewsEntity>): List<ListNewsMvpView.Item> {
+        val ret = ArrayList<ListNewsMvpView.Item>(source.size)
 
         val groups = source.groupBy { dateDevice.timestampToFormattedDate(it.date) }
 
         if (!screenDevice.isTablet()) {
-            ret.add(ListNewsMvp.Item(ListNewsMvp.ITEM_SPACE_TYPE))
+            ret.add(ListNewsMvpView.Item(ListNewsMvpView.ITEM_SPACE_TYPE))
         }
 
         groups.keys.forEachIndexed { i, date ->
             if (i != 0) {
-                ret.add(ListNewsMvp.Item(ListNewsMvp.ITEM_MID_SPACE_TYPE))
+                ret.add(ListNewsMvpView.Item(ListNewsMvpView.ITEM_MID_SPACE_TYPE))
             }
-            ret.add(ListNewsMvp.Item(ListNewsMvp.ITEM_DATE_TYPE, date = date))
+            ret.add(ListNewsMvpView.Item(ListNewsMvpView.ITEM_DATE_TYPE, date = date))
             ret.addAll(groups[date]!!.map {
-                ListNewsMvp.Item(ListNewsMvp.ITEM_NEWS_TYPE, it)
+                ListNewsMvpView.Item(ListNewsMvpView.ITEM_NEWS_TYPE, it)
             })
         }
 

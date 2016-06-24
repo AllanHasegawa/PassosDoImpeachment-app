@@ -19,22 +19,29 @@ package com.hasegawa.diapp.presentation.presenters
 import com.hasegawa.diapp.domain.devices.TextSharer
 import com.hasegawa.diapp.domain.devices.UrlOpener
 import com.hasegawa.diapp.presentation.ConstStrings
-import com.hasegawa.diapp.presentation.mvps.CreditsMvp
+import com.hasegawa.diapp.presentation.mvpview.CreditsMvpView
 import javax.inject.Inject
 
 class CreditsPresenter @Inject constructor(
         private val textSharer: TextSharer,
         private val constStrings: ConstStrings,
         private val urlOpener: UrlOpener) :
-        CreditsMvp.Presenter() {
-    override fun handleHaseEmailBtTouch() {
+        BasePresenter<CreditsMvpView>() {
+
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenHaseEmailBtTouch = { handleHaseEmailBtTouch() }
+        view.listenHaseGitHubBtTouch = { handleHaseGitHubBtTouch() }
+    }
+
+    private fun handleHaseEmailBtTouch() {
         textSharer.shareTextByEmail(
                 constStrings.creditsHaseEmail,
                 constStrings.creditsHaseEmailSubject,
                 constStrings.creditsEmailChooserTitle)
     }
 
-    override fun handleHaseGitHubBtTouch() {
+    private fun handleHaseGitHubBtTouch() {
         urlOpener.openUrl(constStrings.creditsHaseGitHubUrl)
     }
 }

@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.presentation.mvps
+package com.hasegawa.diapp.presentation.mvpview
 
-import com.hasegawa.diapp.presentation.presenters.BasePresenter
-
-object NavDrawerMvp {
+abstract class NavDrawerMvpView : MvpView {
     enum class Item {
         StepsList,
         NewsList,
@@ -33,21 +31,16 @@ object NavDrawerMvp {
         Closed
     }
 
-    interface View {
-        fun actItemTouched(item: Item)
-        fun renderUpdateDateText(text: String)
-        fun renderItemSelected(item: Item)
-        fun renderOpenedNavView()
-        fun renderClosedNavView()
-    }
+    /** Listen for touch events on items. */
+    open var listenItemTouch: (item: Item) -> Unit = {}
+    /** Listen for drawer state change. */
+    open var listenDrawerStateChange: (state: DrawerState) -> Unit = {}
 
-    abstract class Presenter : BasePresenter<View>() {
-        /** Triggered by User touching an item. */
-        abstract fun handleItemTouch(item: Item)
 
-        /** Triggered by the system. An item can be selected from a saved instance. */
-        abstract fun handleItemSelected(item: Item)
-
-        abstract fun handleDrawerStateChange(state: DrawerState)
-    }
+    abstract fun actItemTouched(item: Item)
+    abstract fun renderUpdateDateText(text: String)
+    abstract fun renderItemSelected(item: Item)
+    abstract fun renderOpenedNavView()
+    abstract fun renderClosedNavView()
 }
+

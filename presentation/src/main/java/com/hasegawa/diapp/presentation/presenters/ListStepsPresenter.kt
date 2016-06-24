@@ -23,7 +23,7 @@ import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.domain.entities.StepEntity
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
-import com.hasegawa.diapp.presentation.mvps.ListStepsMvp
+import com.hasegawa.diapp.presentation.mvpview.ListStepsMvpView
 import rx.Subscriber
 import java.util.*
 import javax.inject.Inject
@@ -34,7 +34,7 @@ class ListStepsPresenter @Inject constructor(
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        ListStepsMvp.Presenter() {
+        BasePresenter<ListStepsMvpView>() {
 
     private var getStepsUc: GetStepsUseCase? = null
     private var stepByPosSelected: Int = -1
@@ -67,26 +67,29 @@ class ListStepsPresenter @Inject constructor(
         getStepsUc = null
     }
 
-    override fun handleScrollChanged(dy: Int) {
+    override fun onViewBound() {
+        super.onViewBound()
+
+        view.listenStepSelectionChange = { position -> handleStepSelectionChanged(position) }
+        view.listenStepTouch = { step -> handleStepTouched(step) }
     }
 
-    override fun handleStepSelectionChanged(position: Int) {
+    private fun handleStepSelectionChanged(position: Int) {
         stepByPosSelected = position
         view.renderStepByPosSelected(position)
     }
 
-    override fun handleStepTouched(step: StepEntity) {
+    private fun handleStepTouched(step: StepEntity) {
         stepByPosSelected = step.position
         view.renderStepByPosSelected(step.position)
-//        view.actStepByPosTouched(step.position)
     }
 
-    private fun makeStepList(source: List<StepEntity>): List<ListStepsMvp.Item> {
-        val ret = ArrayList<ListStepsMvp.Item>(source.size + 1)
+    private fun makeStepList(source: List<StepEntity>): List<ListStepsMvpView.Item> {
+        val ret = ArrayList<ListStepsMvpView.Item>(source.size + 1)
         if (!screenDevice.isTablet()) {
-            ret.add(ListStepsMvp.Item(ListStepsMvp.ITEM_TYPE_SPACE))
+            ret.add(ListStepsMvpView.Item(ListStepsMvpView.ITEM_TYPE_SPACE))
         }
-        ret.addAll(source.map { ListStepsMvp.Item(ListStepsMvp.ITEM_TYPE_STEP, it) })
+        ret.addAll(source.map { ListStepsMvpView.Item(ListStepsMvpView.ITEM_TYPE_STEP, it) })
         return ret
     }
 }

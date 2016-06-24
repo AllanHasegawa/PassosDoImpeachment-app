@@ -26,7 +26,7 @@ import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.GetStepsUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.ConstStrings
-import com.hasegawa.diapp.presentation.mvps.ListStepDetailsMvp
+import com.hasegawa.diapp.presentation.mvpview.ListStepDetailsMvpView
 import rx.Subscriber
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ class ListStepDetailsPresenter @Inject constructor(
         private val textSharer: TextSharer,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        ListStepDetailsMvp.Presenter() {
+        BasePresenter<ListStepDetailsMvpView>() {
 
     private var getNumStepsUc: GetNumStepsTotalCompletedUseCase? = null
     private var getSteps: GetStepsUseCase? = null
@@ -85,18 +85,25 @@ class ListStepDetailsPresenter @Inject constructor(
                 if (t != null) {
                     stepsCache = t
                     view.renderStepsByPosition(t.map { it.position }.distinct())
+                    view.renderStepPosition(currentStepPosition)
                 }
             }
         })
     }
 
-    override fun handleCurrentStepChange(position: Int) {
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenCurrentStepChange = { position -> handleCurrentStepChange(position) }
+        view.listenShareBtTouch = { position -> handleShareBtTouch(position) }
+    }
+
+    private fun handleCurrentStepChange(position: Int) {
         currentStepPosition = position
         view.renderStepCompleted(findStepByPosition(position)?.completed ?: false)
         view.renderStepPosition(position)
     }
 
-    override fun handleShareBtTouch(position: Int) {
+    private fun handleShareBtTouch(position: Int) {
         val step = findStepByPosition(position)
         if (step != null) {
             val body = constStrings.stepDetailShareBody(position, numSteps.total, step.completed,

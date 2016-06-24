@@ -35,19 +35,19 @@ import com.hasegawa.diapp.R
 import com.hasegawa.diapp.activities.MainActivity
 import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.ScreenDevice
-import com.hasegawa.diapp.presentation.mvps.MainMvp
-import com.hasegawa.diapp.presentation.mvps.NavDrawerMvp
+import com.hasegawa.diapp.presentation.mvpview.MainMvpView
+import com.hasegawa.diapp.presentation.mvpview.NavDrawerMvpView
 import com.hasegawa.diapp.presentation.presenters.NavDrawerPresenter
 import com.hasegawa.diapp.utils.BundleBuilder
 import com.hasegawa.diapp.utils.ResourcesUtils
 import javax.inject.Inject
 
 
-fun NavDrawerMvp.Item.toMainRoute(): MainMvp.Route =
+fun NavDrawerMvpView.Item.toMainRoute(): MainMvpView.Route =
         when (this) {
-            NavDrawerMvp.Item.StepsList -> MainMvp.Route.Steps
-            NavDrawerMvp.Item.NewsList -> MainMvp.Route.News
-            NavDrawerMvp.Item.Credits -> MainMvp.Route.Credits
+            NavDrawerMvpView.Item.StepsList -> MainMvpView.Route.Steps
+            NavDrawerMvpView.Item.NewsList -> MainMvpView.Route.News
+            NavDrawerMvpView.Item.Credits -> MainMvpView.Route.Credits
             else -> throw RuntimeException("$this cannot be converted to MainMvpView.Route.")
         }
 
@@ -62,17 +62,17 @@ abstract class BaseNavigationController : Controller,
     protected lateinit var navView: NavigationView
     private var drawerLayout: DrawerLayout? = null
 
-    private var itemSelected: NavDrawerMvp.Item
+    private var itemSelected: NavDrawerMvpView.Item
 
-    constructor(itemSelected: NavDrawerMvp.Item) : this(BundleBuilder(Bundle())
+    constructor(itemSelected: NavDrawerMvpView.Item) : this(BundleBuilder(Bundle())
             .putString(BKEY_ITEM_SELECTED, itemSelected.toString()).build())
 
     constructor(bundle: Bundle) : super(bundle) {
         val itemString = bundle.getString(BKEY_ITEM_SELECTED)
         if (itemString != null) {
-            itemSelected = NavDrawerMvp.Item.valueOf(itemString)
+            itemSelected = NavDrawerMvpView.Item.valueOf(itemString)
         } else {
-            itemSelected = NavDrawerMvp.Item.OpenSource // invalid selection :)
+            itemSelected = NavDrawerMvpView.Item.OpenSource // invalid selection :)
         }
         DiApp.activityComponent.inject(this)
     }
@@ -91,7 +91,7 @@ abstract class BaseNavigationController : Controller,
 
         navDrawerPresenter.bindView(baseMvpView)
         navDrawerPresenter.onResume()
-        navDrawerPresenter.handleItemSelected(itemSelected)
+        navDrawerPresenter.setItemSelection(itemSelected)
 
         return root
     }
@@ -129,25 +129,25 @@ abstract class BaseNavigationController : Controller,
         }
     }
 
-    private var baseMvpView = object : NavDrawerMvp.View {
+    private var baseMvpView = object : NavDrawerMvpView() {
 
-        override fun actItemTouched(item: NavDrawerMvp.Item) {
+        override fun actItemTouched(item: NavDrawerMvpView.Item) {
             when (item) {
-                NavDrawerMvp.Item.StepsList,
-                NavDrawerMvp.Item.NewsList,
-                NavDrawerMvp.Item.Credits -> {
-                    navDrawerPresenter.handleDrawerStateChange(NavDrawerMvp.DrawerState.Closed)
+                NavDrawerMvpView.Item.StepsList,
+                NavDrawerMvpView.Item.NewsList,
+                NavDrawerMvpView.Item.Credits -> {
+                    listenDrawerStateChange(DrawerState.Closed)
                     onNavigationRouteRequested(item.toMainRoute())
                 }
                 else -> Unit
             }
         }
 
-        override fun renderItemSelected(item: NavDrawerMvp.Item) {
+        override fun renderItemSelected(item: NavDrawerMvpView.Item) {
             when (item) {
-                NavDrawerMvp.Item.StepsList -> navView.setCheckedItem(R.id.nav_steps_list)
-                NavDrawerMvp.Item.NewsList -> navView.setCheckedItem(R.id.nav_news_list)
-                NavDrawerMvp.Item.Credits -> navView.setCheckedItem(R.id.nav_credits)
+                NavDrawerMvpView.Item.StepsList -> navView.setCheckedItem(R.id.nav_steps_list)
+                NavDrawerMvpView.Item.NewsList -> navView.setCheckedItem(R.id.nav_news_list)
+                NavDrawerMvpView.Item.Credits -> navView.setCheckedItem(R.id.nav_credits)
                 else -> return
             }
             itemSelected = item
@@ -170,26 +170,26 @@ abstract class BaseNavigationController : Controller,
 
     override fun handleBack(): Boolean {
         if (drawerLayout?.isDrawerOpen(navView) ?: false) {
-            navDrawerPresenter.handleDrawerStateChange(NavDrawerMvp.DrawerState.Closed)
+            baseMvpView.listenDrawerStateChange(NavDrawerMvpView.DrawerState.Closed)
             return true
         }
         return super.handleBack()
     }
 
-    abstract fun onNavigationRouteRequested(route: MainMvp.Route)
+    abstract fun onNavigationRouteRequested(route: MainMvpView.Route)
 
     override fun onNavigationItemSelected(item: MenuItem?): Boolean {
         if (item == null) return false
         val itemEnum = when (item.itemId) {
-            R.id.nav_steps_list -> NavDrawerMvp.Item.StepsList
-            R.id.nav_news_list -> NavDrawerMvp.Item.NewsList
-            R.id.nav_credits -> NavDrawerMvp.Item.Credits
-            R.id.nav_send_feedback -> NavDrawerMvp.Item.Feedback
-            R.id.nav_opensource_link -> NavDrawerMvp.Item.OpenSource
-            R.id.nav_last_update -> NavDrawerMvp.Item.Update
+            R.id.nav_steps_list -> NavDrawerMvpView.Item.StepsList
+            R.id.nav_news_list -> NavDrawerMvpView.Item.NewsList
+            R.id.nav_credits -> NavDrawerMvpView.Item.Credits
+            R.id.nav_send_feedback -> NavDrawerMvpView.Item.Feedback
+            R.id.nav_opensource_link -> NavDrawerMvpView.Item.OpenSource
+            R.id.nav_last_update -> NavDrawerMvpView.Item.Update
             else -> throw RuntimeException("unknown item id ${item.itemId}")
         }
-        navDrawerPresenter.handleItemTouch(itemEnum)
+        baseMvpView.listenItemTouch(itemEnum)
         return true
     }
 

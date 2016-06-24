@@ -25,7 +25,7 @@ import com.hasegawa.diapp.domain.entities.SyncEntity
 import com.hasegawa.diapp.domain.repositories.SyncsRepository
 import com.hasegawa.diapp.domain.usecases.GetLastSuccessfulSyncUseCase
 import com.hasegawa.diapp.presentation.ConstStrings
-import com.hasegawa.diapp.presentation.mvps.NavDrawerMvp
+import com.hasegawa.diapp.presentation.mvpview.NavDrawerMvpView
 import rx.Subscriber
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ class NavDrawerPresenter @Inject constructor(
         private val syncsRepository: SyncsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        NavDrawerMvp.Presenter() {
+        BasePresenter<NavDrawerMvpView>() {
 
     private var getLastUpdateUc: GetLastSuccessfulSyncUseCase? = null
 
@@ -67,25 +67,28 @@ class NavDrawerPresenter @Inject constructor(
         })
     }
 
-    override fun handleDrawerStateChange(state: NavDrawerMvp.DrawerState) {
-        when (state) {
-            NavDrawerMvp.DrawerState.Opened -> view.renderOpenedNavView()
-            NavDrawerMvp.DrawerState.Closed -> view.renderClosedNavView()
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenItemTouch = { item ->
+            view.renderItemSelected(item)
+            when (item) {
+                NavDrawerMvpView.Item.Feedback -> urlOpener.openUrl(constStrings.navFeedbackUrl)
+                NavDrawerMvpView.Item.OpenSource -> urlOpener.openUrl(constStrings.navOpenSourceUrl)
+                else -> Unit
+            }
+            view.actItemTouched(item)
+        }
+
+        view.listenDrawerStateChange = { state ->
+            when (state) {
+                NavDrawerMvpView.DrawerState.Opened -> view.renderOpenedNavView()
+                NavDrawerMvpView.DrawerState.Closed -> view.renderClosedNavView()
+            }
         }
     }
 
-    override fun handleItemSelected(item: NavDrawerMvp.Item) {
+    fun setItemSelection(item: NavDrawerMvpView.Item) {
         view.renderItemSelected(item)
-    }
-
-    override fun handleItemTouch(item: NavDrawerMvp.Item) {
-        view.renderItemSelected(item)
-        when (item) {
-            NavDrawerMvp.Item.Feedback -> urlOpener.openUrl(constStrings.navFeedbackUrl)
-            NavDrawerMvp.Item.OpenSource -> urlOpener.openUrl(constStrings.navOpenSourceUrl)
-            else -> Unit
-        }
-        view.actItemTouched(item)
     }
 
     private fun setUpdateDate(time: Long?) {

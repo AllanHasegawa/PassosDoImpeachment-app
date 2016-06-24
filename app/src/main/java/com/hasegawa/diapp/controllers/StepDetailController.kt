@@ -32,7 +32,7 @@ import com.hasegawa.diapp.di.DaggerStepDetailComponent
 import com.hasegawa.diapp.di.StepDetailModule
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.mvps.StepDetailMvp
+import com.hasegawa.diapp.presentation.mvpview.StepDetailMvpView
 import com.hasegawa.diapp.presentation.presenters.StepDetailPresenter
 import com.hasegawa.diapp.utils.BundleBuilder
 import com.hasegawa.diapp.views.ItemDetailLinkView
@@ -85,10 +85,10 @@ class StepDetailController : Controller {
     }
 
     fun share() {
-        stepDetailPresenter.handleShareFabTouch()
+        mvpView.listenShareFabTouch()
     }
 
-    private val mvpView = object : StepDetailMvp.View {
+    private val mvpView = object : StepDetailMvpView() {
         override fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity) {
             val step = stepWithLinks.step!!
             numberTv.text = step.position.toString()
@@ -100,7 +100,7 @@ class StepDetailController : Controller {
             stepWithLinks.links.forEach { linkEntity ->
                 val linkView = ItemDetailLinkView(activity, null)
                 linkView.setOnClickListener {
-                    stepDetailPresenter.handleLinkBtTouch(linkEntity.url)
+                    listenLinkBtTouch(linkEntity.url)
                 }
                 linkView.stepLink = linkEntity
                 linksLl.addView(linkView)

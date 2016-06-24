@@ -24,7 +24,8 @@ import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.domain.repositories.StepsRepository
 import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.mvps.MainMvp
+import com.hasegawa.diapp.presentation.mvpview.MainMvpView
+import com.hasegawa.diapp.presentation.mvpview.MainMvpView.*
 import rx.Subscriber
 import rx.schedulers.Timestamped
 import java.util.*
@@ -37,7 +38,7 @@ class MainPresenter @Inject constructor(
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        MainMvp.Presenter() {
+        BasePresenter<MainMvpView>() {
 
     private var getNumTotalsCompletedUc: GetNumStepsTotalCompletedUseCase? = null
 
@@ -66,15 +67,24 @@ class MainPresenter @Inject constructor(
         })
     }
 
-    override fun handleRouteChange(route: MainMvp.Route) {
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenRouteChange = { route -> handleRouteChange(route) }
+        view.listenStepSelectionChange = { position -> view.renderStepSelectedByPosition(position) }
+        view.listenTabSelectionChange = { route -> handleTabSelectionChange(route) }
+        view.listenViewPagerChange = { route -> handleViewPagerChange(route) }
+        view.listenStepsListScroll = { dy -> handleStepsListScroll(dy) }
+    }
+
+    private fun handleRouteChange(route: Route) {
         view.renderRouteSelection(route)
         when (route) {
-            MainMvp.Route.Steps,
-            MainMvp.Route.News -> {
+            Route.Steps,
+            Route.News -> {
                 view.renderSizeState(routeToSize(route))
                 view.renderMode(routeToMode(route))
             }
-            MainMvp.Route.Credits -> {
+            Route.Credits -> {
                 view.renderMode(routeToMode(route))
             }
             else -> Unit
@@ -82,24 +92,19 @@ class MainPresenter @Inject constructor(
         view.actRouteChange(route)
     }
 
-    override fun handleStepSelectionChange(position: Int) {
-        view.renderStepSelectedByPosition(position)
-    }
-
-    override fun handleTabSelectionChange(route: MainMvp.Route) {
+    private fun handleTabSelectionChange(route: Route) {
         view.renderRouteSelection(route)
         view.renderSizeState(routeToSize(route))
         view.actRouteChange(route)
     }
 
-    override fun handleViewPagerChange(route: MainMvp.Route) {
+    private fun handleViewPagerChange(route: Route) {
         view.renderRouteSelection(route)
         view.renderSizeState(routeToSize(route))
     }
 
-
     private var dyHistory: List<Timestamped<Int>> = ArrayList(100)
-    override fun handleStepsListScroll(dy: Int) {
+    private fun handleStepsListScroll(dy: Int) {
         if (screenDevice.isTablet()) return
         if (dy != 0) {
             val useMoreComplexChangeDetection = false
@@ -112,32 +117,32 @@ class MainPresenter @Inject constructor(
                 val dyDp = screenDevice.pxToDp(dySum)
                 if (Math.abs(dyDp) > 32) {
                     if (dyDp < 0) {
-                        view.renderSizeState(MainMvp.SizeState.Expanded)
+                        view.renderSizeState(SizeState.Expanded)
                     } else {
-                        view.renderSizeState(MainMvp.SizeState.Shrunk)
+                        view.renderSizeState(SizeState.Shrunk)
                     }
                 }
             } else {
                 if (dy < 0) {
-                    view.renderSizeState(MainMvp.SizeState.Expanded)
+                    view.renderSizeState(SizeState.Expanded)
                 } else {
-                    view.renderSizeState(MainMvp.SizeState.Shrunk)
+                    view.renderSizeState(SizeState.Shrunk)
                 }
             }
         }
     }
 
 
-    private fun routeToSize(route: MainMvp.Route): MainMvp.SizeState = when (route) {
-        MainMvp.Route.Steps -> MainMvp.SizeState.Expanded
-        MainMvp.Route.News -> MainMvp.SizeState.Shrunk
+    private fun routeToSize(route: Route): SizeState = when (route) {
+        Route.Steps -> SizeState.Expanded
+        Route.News -> SizeState.Shrunk
         else -> throw RuntimeException("Can't convert route $route to SizeState.")
     }
 
-    private fun routeToMode(route: MainMvp.Route): MainMvp.Mode = when (route) {
-        MainMvp.Route.Steps -> MainMvp.Mode.TwoPane
-        MainMvp.Route.News -> MainMvp.Mode.OnePane
-        MainMvp.Route.Credits -> MainMvp.Mode.OnePane
+    private fun routeToMode(route: Route): Mode = when (route) {
+        Route.Steps -> Mode.TwoPane
+        Route.News -> Mode.OnePane
+        Route.Credits -> Mode.OnePane
         else -> throw RuntimeException("Can't convert route $route to Mode.")
     }
 }

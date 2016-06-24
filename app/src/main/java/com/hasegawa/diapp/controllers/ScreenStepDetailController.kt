@@ -29,12 +29,12 @@ import com.bluelinelabs.conductor.ChildControllerTransaction
 import com.bluelinelabs.conductor.Controller
 import com.bluelinelabs.conductor.RouterTransaction
 import com.hasegawa.diapp.R
-import com.hasegawa.diapp.presentation.mvps.MainMvp
+import com.hasegawa.diapp.presentation.mvpview.MainMvpView
 import com.hasegawa.diapp.utils.BundleBuilder
 
 class ScreenStepDetailController : BaseNavigationController {
     interface StepDetailTargetListener {
-        fun onRouteFromStepDetail(route: MainMvp.Route)
+        fun onRouteFromStepDetail(route: MainMvpView.Route)
     }
 
     @BindView(R.id.detail_toolbar) lateinit var detailToolbar: Toolbar
@@ -84,24 +84,24 @@ class ScreenStepDetailController : BaseNavigationController {
         unbinder.unbind()
     }
 
-    override fun onNavigationRouteRequested(route: MainMvp.Route) {
+    override fun onNavigationRouteRequested(route: MainMvpView.Route) {
         val setTargetRoute = {
             if (targetController != null) {
                 (targetController as StepDetailTargetListener?)?.onRouteFromStepDetail(route)
             }
         }
         when (route) {
-            MainMvp.Route.Steps -> {
+            MainMvpView.Route.Steps -> {
                 childControllers.map { router.popController(it) }
                 setTargetRoute()
                 router.popCurrentController()
             }
-            MainMvp.Route.News -> {
+            MainMvpView.Route.News -> {
                 childControllers.map { router.popController(it) }
                 setTargetRoute()
                 router.popCurrentController()
             }
-            MainMvp.Route.Credits -> {
+            MainMvpView.Route.Credits -> {
                 childControllers.map { router.popController(it) }
                 router.popCurrentController()
                 router.pushController(RouterTransaction.builder(ScreenCreditsController()).build())

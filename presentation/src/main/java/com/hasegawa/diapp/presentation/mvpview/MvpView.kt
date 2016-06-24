@@ -14,26 +14,7 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.presentation.presenters
+package com.hasegawa.diapp.presentation.mvpview
 
-import com.hasegawa.diapp.presentation.mvpview.MvpView
 
-abstract class BasePresenter<ViewT : MvpView> {
-    lateinit var view: ViewT
-        private set
-
-    fun bindView(view: ViewT) {
-        this.view = view
-        onViewBound()
-    }
-
-    open fun onViewBound() {
-    }
-
-    open fun onResume() {
-    }
-
-    open fun onPause() {
-    }
-}
-
+interface MvpView

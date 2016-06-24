@@ -27,7 +27,7 @@ import com.hasegawa.diapp.domain.usecases.GetNumStepsTotalCompletedUseCase
 import com.hasegawa.diapp.domain.usecases.GetStepWithLinksByPositionUseCase
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
 import com.hasegawa.diapp.presentation.ConstStrings
-import com.hasegawa.diapp.presentation.mvps.StepDetailMvp
+import com.hasegawa.diapp.presentation.mvpview.StepDetailMvpView
 import rx.Subscriber
 import javax.inject.Inject
 import javax.inject.Named
@@ -41,7 +41,7 @@ class StepDetailPresenter @Inject constructor(
         private val stepsRepository: StepsRepository,
         private val executionThread: ExecutionThread,
         private val postExecutionThread: PostExecutionThread) :
-        StepDetailMvp.Presenter() {
+        BasePresenter<StepDetailMvpView>() {
 
     private var getStepUc: GetStepWithLinksByPositionUseCase? = null
     private var getTotalStepsUc: GetNumStepsTotalCompletedUseCase? = null
@@ -94,16 +94,19 @@ class StepDetailPresenter @Inject constructor(
         getTotalStepsUc = null
     }
 
-    override fun handleLinkBtTouch(url: String) {
-        urlOpener.openUrl(url)
-    }
+    override fun onViewBound() {
+        super.onViewBound()
+        view.listenLinkBtTouch = { linkUrl ->
+            urlOpener.openUrl(linkUrl)
+        }
 
-    override fun handleShareFabTouch() {
-        if (stepCache?.step != null) {
-            val s = stepCache!!.step!!
-            val body = constStrings.stepDetailShareBody(s.position, totalCache, s.completed,
-                    s.possibleDate, s.title)
-            textSharer.shareText(body, constStrings.stepDetailShareHeader)
+        view.listenShareFabTouch = {
+            if (stepCache?.step != null) {
+                val s = stepCache!!.step!!
+                val body = constStrings.stepDetailShareBody(s.position, totalCache, s.completed,
+                        s.possibleDate, s.title)
+                textSharer.shareText(body, constStrings.stepDetailShareHeader)
+            }
         }
     }
 }

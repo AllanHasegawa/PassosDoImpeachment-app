@@ -31,7 +31,7 @@ import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.devices.LogDevice
 import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.domain.entities.StepEntity
-import com.hasegawa.diapp.presentation.mvps.ListStepsMvp
+import com.hasegawa.diapp.presentation.mvpview.ListStepsMvpView
 import com.hasegawa.diapp.presentation.presenters.ListStepsPresenter
 import com.hasegawa.diapp.utils.BundleBuilder
 import com.hasegawa.diapp.views.ItemStepView
@@ -68,14 +68,14 @@ class ListStepsController : Controller {
 
         unbinder = ButterKnife.bind(this, root)
 
-        adapter = Adapter(listStepsPresenter, this)
+        adapter = Adapter(mvpView, this)
         stepsRv.layoutManager = LinearLayoutManager(activity)
         stepsRv.adapter = adapter
         stepsRv.addOnScrollListener(onScrollListener)
 
         listStepsPresenter.bindView(mvpView)
         listStepsPresenter.onResume()
-        listStepsPresenter.handleStepSelectionChanged(stepByPosSelected)
+        mvpView.listenStepSelectionChange(stepByPosSelected)
 
         return root
     }
@@ -88,10 +88,10 @@ class ListStepsController : Controller {
     }
 
     fun renderSelectedStepByPosition(position: Int) {
-        listStepsPresenter.handleStepSelectionChanged(position)
+        mvpView.listenStepSelectionChange(position)
     }
 
-    private val mvpView = object : ListStepsMvp.View {
+    private val mvpView = object : ListStepsMvpView() {
         override fun renderStepByPosSelected(position: Int) {
             stepByPosSelected = position
             val newSelectionIndex = adapter?.items?.indexOfFirst { it.step?.position == position }
@@ -103,7 +103,7 @@ class ListStepsController : Controller {
             }
         }
 
-        override fun renderSteps(steps: List<ListStepsMvp.Item>) {
+        override fun renderSteps(steps: List<ListStepsMvpView.Item>) {
             adapter?.items = steps
             adapter?.notifyDataSetChanged()
         }
@@ -113,14 +113,14 @@ class ListStepsController : Controller {
     private val onScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
-            listStepsPresenter.handleScrollChanged(dy)
+            mvpView.listenScrollChange(dy)
             listStepsScrollListener(dy)
         }
     }
 
-    class Adapter(val presenter: ListStepsMvp.Presenter, val controller: ListStepsController) :
+    class Adapter(val mvpView: ListStepsMvpView, val controller: ListStepsController) :
             RecyclerView.Adapter<Adapter.ViewHolder>() {
-        class ViewHolder(item: View, val presenter: ListStepsMvp.Presenter,
+        class ViewHolder(item: View, val mvpView: ListStepsMvpView,
                          val controller: ListStepsController) : RecyclerView.ViewHolder(item) {
             fun setStep(step: StepEntity?, selected: Boolean) {
                 if (step == null) return
@@ -128,14 +128,14 @@ class ListStepsController : Controller {
                     itemView.step = step
                     itemView.isSelected = selected
                     itemView.setOnClickListener {
-                        presenter.handleStepTouched(step)
+                        mvpView.listenStepTouch(step)
                         controller.stepTouchListener(step.position)
                     }
                 }
             }
         }
 
-        var items = emptyList<ListStepsMvp.Item>()
+        var items = emptyList<ListStepsMvpView.Item>()
         var selected = -1
 
         override fun getItemViewType(position: Int): Int = items[position].type
@@ -144,7 +144,7 @@ class ListStepsController : Controller {
         override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
             val type = items[position].type
             when (type) {
-                ListStepsMvp.ITEM_TYPE_STEP ->
+                ListStepsMvpView.ITEM_TYPE_STEP ->
                     holder?.setStep(items[position].step, selected == position)
             }
         }
@@ -153,11 +153,11 @@ class ListStepsController : Controller {
             val ctx = parent!!.context
             val inf = { id: Int -> LayoutInflater.from(ctx).inflate(id, parent, false) }
             val view = when (viewType) {
-                ListStepsMvp.ITEM_TYPE_SPACE -> inf(R.layout.item_step_space)
-                ListStepsMvp.ITEM_TYPE_STEP -> ItemStepView(ctx, null)
+                ListStepsMvpView.ITEM_TYPE_SPACE -> inf(R.layout.item_step_space)
+                ListStepsMvpView.ITEM_TYPE_STEP -> ItemStepView(ctx, null)
                 else -> throw RuntimeException("Unknown view type $viewType")
             }
-            return ViewHolder(view, presenter, controller)
+            return ViewHolder(view, mvpView, controller)
         }
     }
 

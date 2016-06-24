@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.hasegawa.diapp.presentation.mvps
+package com.hasegawa.diapp.presentation.mvpview
 
 import com.hasegawa.diapp.domain.entities.StepWithLinksEntity
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.presenters.BasePresenter
 
-object StepDetailMvp {
-    interface View {
-        fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity)
-        fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
-    }
+abstract class StepDetailMvpView : MvpView {
+    /** Listen for touch events on the link button. */
+    var listenLinkBtTouch: (linkUrl: String) -> Unit = {}
+    /** Listen for touch events on the share button. */
+    var listenShareFabTouch: () -> Unit = {}
 
-    abstract class Presenter : BasePresenter<View>() {
-        abstract fun handleLinkBtTouch(url: String)
-        abstract fun handleShareFabTouch()
-    }
+
+    abstract fun renderStepAndLinks(stepWithLinks: StepWithLinksEntity)
+    abstract fun renderNumStepsCompletedAndTotal(numbers: NumCompletedAndTotal)
 }

@@ -35,7 +35,7 @@ import com.hasegawa.diapp.DiApp
 import com.hasegawa.diapp.R
 import com.hasegawa.diapp.domain.devices.ScreenDevice
 import com.hasegawa.diapp.domain.usecases.NumCompletedAndTotal
-import com.hasegawa.diapp.presentation.mvps.ListStepDetailsMvp
+import com.hasegawa.diapp.presentation.mvpview.ListStepDetailsMvpView
 import com.hasegawa.diapp.presentation.presenters.ListStepDetailsPresenter
 import com.hasegawa.diapp.utils.BundleBuilder
 import com.hasegawa.diapp.views.MaybeSwipeViewPager
@@ -82,7 +82,7 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
 
         listStepDetailsPresenter.bindView(mvpView)
         listStepDetailsPresenter.onResume()
-        listStepDetailsPresenter.handleCurrentStepChange(stepPosition)
+        mvpView.listenCurrentStepChange(stepPosition)
 
         return root
     }
@@ -94,14 +94,14 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
     }
 
     fun renderStepByPosition(position: Int) {
-        listStepDetailsPresenter.handleCurrentStepChange(position)
+        mvpView.listenCurrentStepChange(position)
     }
 
     fun share() {
-        listStepDetailsPresenter.handleShareBtTouch(stepPosition)
+        mvpView.listenShareBtTouch(stepPosition)
     }
 
-    private val mvpView = object : ListStepDetailsMvp.View {
+    private val mvpView = object : ListStepDetailsMvpView() {
         override fun renderNumSteps(numbers: NumCompletedAndTotal) {
             numTotalSteps = numbers.total
             updateProgressBar()
@@ -144,7 +144,6 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
             adapter.stepPositions = positions
             adapter.savedInstances.clear()
             adapter.notifyDataSetChanged()
-            listStepDetailsPresenter.handleCurrentStepChange(stepPosition)
         }
     }
 
@@ -155,7 +154,7 @@ class ListStepDetailsController : Controller, ViewPager.OnPageChangeListener {
     }
 
     override fun onPageSelected(position: Int) {
-        listStepDetailsPresenter.handleCurrentStepChange(adapter.stepPositions[position])
+        mvpView.listenCurrentStepChange(adapter.stepPositions[position])
     }
 
     class StepDetailsAdapter(host: Controller) : ControllerPagerAdapter(host) {
