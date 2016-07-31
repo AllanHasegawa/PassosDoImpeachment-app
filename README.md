@@ -1,3 +1,12 @@
+# This project is deprecated
+
+This project is being deprecated. I have no more plans to update it. The main reason is because the project is useless. I had someone willing to make the content for the app, but then it didn't work out. Also, this project was a programming exercise. My first Android app. At the time I tried to use good programming practices as much as possible with lots of research, but lack of experience made a few parts of the project not quite "clean".
+
+I have been working on a new project that is better organized and "cleaner". I may in the future decouple its framework and make a new opensource project with it. If you have any ideas, shout it to me ^^;
+
+Thank you o7
+
+
 # Passos do Impeachment (Android app)
 
 [![Play Link](http://steverichey.github.io/google-play-badge-svg/img/en_get.svg)](https://play.google.com/store/apps/details?id=com.hasegawa.diapp)
